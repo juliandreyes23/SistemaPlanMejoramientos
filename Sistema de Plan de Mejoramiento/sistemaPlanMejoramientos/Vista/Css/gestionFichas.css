@@ -1,0 +1,138 @@
+﻿body {
+    background: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
+    background-attachment: fixed;
+    color: #f8fafc;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+}
+
+h2, h4 {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+    h2 i, h4 i {
+        color: #39b54a;
+    }
+
+.card-custom {
+    background: rgba(17, 24, 39, 0.7) !important;
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container-header {
+    border-bottom: 2px solid #39b54a;
+    padding-bottom: 12px;
+    font-weight: 600;
+    color: #ffffff !important;
+    letter-spacing: 0.5px;
+}
+
+.card-custom label,
+.form-label {
+    color: #ffffff !important;
+    font-weight: 500 !important;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+.form-control, .form-select {
+    background-color: rgba(31, 41, 55, 0.7) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+.form-control::placeholder {
+    color: #94a3b8 !important;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #1f2937 !important;
+    border-color: #39b54a !important;
+    box-shadow: 0 0 0 0.25rem rgba(57, 181, 74, 0.25) !important;
+    outline: none;
+    color: #ffffff !important;
+}
+
+.form-select option {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+}
+
+.btn-sena {
+    background-color: #39b54a !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    border-radius: 8px !important;
+    padding: 12px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+    .btn-sena:hover {
+        background-color: #2e943c !important;
+        box-shadow: 0 4px 15px rgba(57, 181, 74, 0.4) !important;
+        transform: translateY(-1px);
+        color: #ffffff !important;
+    }
+
+.table-responsive-custom {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.table-custom {
+    width: 100%;
+    margin-bottom: 0 !important;
+    background: transparent !important;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+    .table-custom th {
+        background-color: #1e293b !important;
+        color: #39b54a !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.82rem;
+        letter-spacing: 0.5px;
+        padding: 14px !important;
+        border-bottom: 2px solid rgba(57, 181, 74, 0.3) !important;
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
+    }
+
+    .table-custom td {
+        padding: 14px !important;
+        border-color: rgba(255, 255, 255, 0.06) !important;
+        background-color: rgba(15, 23, 42, 0.6) !important;
+        color: #ffffff !important;
+        font-size: 0.88rem;
+    }
+
+    .table-custom tr:nth-child(even) td {
+        background-color: rgba(30, 41, 59, 0.4) !important;
+    }
+
+    .table-custom tr:hover td {
+        background-color: rgba(57, 181, 74, 0.1) !important;
+        color: #ffffff !important;
+    }
