@@ -1,0 +1,388 @@
+﻿<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>sistemaPlanMejoramientos</RootNamespace>
+    <AssemblyName>sistemaPlanMejoramientos</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <Use64BitIISExpress />
+    <IISExpressSSLPort>44345</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EPPlus, Version=4.5.3.3, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.4.5.3.3\lib\net40\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="EPPlus.Interfaces, Version=8.4.0.0, Culture=neutral, PublicKeyToken=a694d7f3b0907a61, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.Interfaces.8.4.0\lib\net462\EPPlus.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ComponentModel.Annotations.5.0.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.Cryptography.Xml, Version=8.0.0.3, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Cryptography.Xml.8.0.3\lib\net462\System.Security.Cryptography.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Vista\AsignacionInstructores.aspx" />
+    <Content Include="Vista\Cargamasivaaprendices.aspx" />
+    <Content Include="Vista\Css\Cargamasivaaprendices.css" />
+    <Content Include="Vista\Css\frmUsuarios.css" />
+    <Content Include="Vista\Css\gestionAprendices.css" />
+    <Content Include="Vista\Css\gestionFichas.css" />
+    <Content Include="Vista\Css\gestionInstructores.css" />
+    <Content Include="Vista\Css\gestionProgramas.css" />
+    <Content Include="Vista\Css\inicio.css" />
+    <Content Include="Vista\Dashboard.aspx" />
+    <Content Include="Vista\DashboardAprendiz.aspx" />
+    <Content Include="Vista\DashboardInstructor.aspx" />
+    <Content Include="Vista\FrmConsultarFichas.aspx" />
+    <Content Include="Vista\FrmCrearPlan.aspx" />
+    <Content Include="Vista\FrmEvaluarEvidencias.aspx" />
+    <Content Include="Vista\FrmHistoricoComite.aspx" />
+    <Content Include="Vista\FrmHistoricoInternos.aspx" />
+    <Content Include="Vista\FrmLogin.aspx" />
+    <Content Include="Vista\FrmMiPerfil.aspx" />
+    <Content Include="Vista\FrmMisPlanes.aspx" />
+    <Content Include="Vista\FrmRecuperar.aspx" />
+    <Content Include="Vista\FrmSubirEvidencia.aspx" />
+    <Content Include="Vista\FrmUsuarios.aspx" />
+    <Content Include="Vista\GestionAprendices.aspx" />
+    <Content Include="Vista\GestionCentros.aspx" />
+    <Content Include="Vista\GestionFichas.aspx" />
+    <Content Include="Vista\GestionInstructores.aspx" />
+    <Content Include="Vista\GestionProgramas.aspx" />
+    <Content Include="Vista\Inicio.aspx" />
+    <Content Include="Vista\resetPassword.aspx" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Datos\ClAprendizD.cs" />
+    <Compile Include="Datos\ClAsignacionD.cs" />
+    <Compile Include="Datos\ClCentroD.cs" />
+    <Compile Include="Datos\ClCompetenciaD.cs" />
+    <Compile Include="Datos\ClConexion.cs" />
+    <Compile Include="Datos\ClEvaluacionD.cs" />
+    <Compile Include="Datos\ClEvidenciaD.cs" />
+    <Compile Include="Datos\ClFichaD.cs" />
+    <Compile Include="Datos\ClInstructorD.cs" />
+    <Compile Include="Datos\ClPlanMejoramientoD.cs" />
+    <Compile Include="Datos\ClProgramaD.cs" />
+    <Compile Include="Datos\ClResultadoAprendizajeD.cs" />
+    <Compile Include="Datos\ClRolD.cs" />
+    <Compile Include="Datos\ClUsuarioD.cs" />
+    <Compile Include="Logica\ClAprendizL.cs" />
+    <Compile Include="Logica\ClAsignacionL.cs" />
+    <Compile Include="Logica\ClCentroL.cs" />
+    <Compile Include="Logica\ClCompetenciaL.cs" />
+    <Compile Include="Logica\ClEvaluacionL.cs" />
+    <Compile Include="Logica\ClEvidenciaL.cs" />
+    <Compile Include="Logica\ClFichaL.cs" />
+    <Compile Include="Logica\ClInstructorL.cs" />
+    <Compile Include="Logica\ClPlanMejoramientoL.cs" />
+    <Compile Include="Logica\ClProgramaL.cs" />
+    <Compile Include="Logica\ClResultadoAprendizajeL.cs" />
+    <Compile Include="Logica\ClRolL.cs" />
+    <Compile Include="Logica\ClUsuarioL.cs" />
+    <Compile Include="Modelo\ClAprendizM.cs" />
+    <Compile Include="Modelo\ClCentroM.cs" />
+    <Compile Include="Modelo\ClCompetenciasM.cs" />
+    <Compile Include="Modelo\ClEvaluacionesM.cs" />
+    <Compile Include="Modelo\ClEvidenciasM.cs" />
+    <Compile Include="Modelo\ClFichaAprendizM.cs" />
+    <Compile Include="Modelo\ClFichaInstructorM.cs" />
+    <Compile Include="Modelo\ClFichasM.cs" />
+    <Compile Include="Modelo\ClInstructoresM.cs" />
+    <Compile Include="Modelo\ClPlanMejoramientoM.cs" />
+    <Compile Include="Modelo\ClPlanResultadosM.cs" />
+    <Compile Include="Modelo\ClProgramasM.cs" />
+    <Compile Include="Modelo\ClRecuperacionPasswordM.cs" />
+    <Compile Include="Modelo\ClResultadoAprendizajeM.cs" />
+    <Compile Include="Modelo\ClRolM.cs" />
+    <Compile Include="Modelo\ClUsuarioM.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Vista\AsignacionInstructores.aspx.cs">
+      <DependentUpon>AsignacionInstructores.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\AsignacionInstructores.aspx.designer.cs">
+      <DependentUpon>AsignacionInstructores.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\Cargamasivaaprendices.aspx.cs">
+      <DependentUpon>Cargamasivaaprendices.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\Cargamasivaaprendices.aspx.designer.cs">
+      <DependentUpon>Cargamasivaaprendices.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\Dashboard.aspx.cs">
+      <DependentUpon>Dashboard.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\Dashboard.aspx.designer.cs">
+      <DependentUpon>Dashboard.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\DashboardAprendiz.aspx.cs">
+      <DependentUpon>DashboardAprendiz.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\DashboardAprendiz.aspx.designer.cs">
+      <DependentUpon>DashboardAprendiz.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\DashboardInstructor.aspx.cs">
+      <DependentUpon>DashboardInstructor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\DashboardInstructor.aspx.designer.cs">
+      <DependentUpon>DashboardInstructor.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\FrmConsultarFichas.aspx.cs">
+      <DependentUpon>FrmConsultarFichas.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\FrmConsultarFichas.aspx.designer.cs">
+      <DependentUpon>FrmConsultarFichas.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\FrmCrearPlan.aspx.cs">
+      <DependentUpon>FrmCrearPlan.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\FrmCrearPlan.aspx.designer.cs">
+      <DependentUpon>FrmCrearPlan.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\FrmEvaluarEvidencias.aspx.cs">
+      <DependentUpon>FrmEvaluarEvidencias.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\FrmEvaluarEvidencias.aspx.designer.cs">
+      <DependentUpon>FrmEvaluarEvidencias.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\FrmHistoricoComite.aspx.cs">
+      <DependentUpon>FrmHistoricoComite.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\FrmHistoricoComite.aspx.designer.cs">
+      <DependentUpon>FrmHistoricoComite.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\FrmHistoricoInternos.aspx.cs">
+      <DependentUpon>FrmHistoricoInternos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\FrmHistoricoInternos.aspx.designer.cs">
+      <DependentUpon>FrmHistoricoInternos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\FrmLogin.aspx.cs">
+      <DependentUpon>FrmLogin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\FrmLogin.aspx.designer.cs">
+      <DependentUpon>FrmLogin.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\FrmMiPerfil.aspx.cs">
+      <DependentUpon>FrmMiPerfil.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\FrmMiPerfil.aspx.designer.cs">
+      <DependentUpon>FrmMiPerfil.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\FrmMisPlanes.aspx.cs">
+      <DependentUpon>FrmMisPlanes.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\FrmMisPlanes.aspx.designer.cs">
+      <DependentUpon>FrmMisPlanes.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\FrmRecuperar.aspx.cs">
+      <DependentUpon>FrmRecuperar.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\FrmRecuperar.aspx.designer.cs">
+      <DependentUpon>FrmRecuperar.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\FrmSubirEvidencia.aspx.cs">
+      <DependentUpon>FrmSubirEvidencia.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\FrmSubirEvidencia.aspx.designer.cs">
+      <DependentUpon>FrmSubirEvidencia.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\FrmUsuarios.aspx.cs">
+      <DependentUpon>FrmUsuarios.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\FrmUsuarios.aspx.designer.cs">
+      <DependentUpon>FrmUsuarios.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\GestionAprendices.aspx.cs">
+      <DependentUpon>GestionAprendices.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\GestionAprendices.aspx.designer.cs">
+      <DependentUpon>GestionAprendices.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\GestionCentros.aspx.cs">
+      <DependentUpon>GestionCentros.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\GestionCentros.aspx.designer.cs">
+      <DependentUpon>GestionCentros.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\GestionFichas.aspx.cs">
+      <DependentUpon>GestionFichas.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\GestionFichas.aspx.designer.cs">
+      <DependentUpon>GestionFichas.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\GestionInstructores.aspx.cs">
+      <DependentUpon>GestionInstructores.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\GestionInstructores.aspx.designer.cs">
+      <DependentUpon>GestionInstructores.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\GestionProgramas.aspx.cs">
+      <DependentUpon>GestionProgramas.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\GestionProgramas.aspx.designer.cs">
+      <DependentUpon>GestionProgramas.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\Inicio.aspx.cs">
+      <DependentUpon>Inicio.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\Inicio.aspx.designer.cs">
+      <DependentUpon>Inicio.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\resetPassword.aspx.cs">
+      <DependentUpon>resetPassword.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\resetPassword.aspx.designer.cs">
+      <DependentUpon>resetPassword.aspx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="libman.json" />
+    <None Include="packages.config" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Vista\Evidencias\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>52462</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>https://localhost:44345/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Este proyecto hace referencia a los paquetes NuGet que faltan en este equipo. Use la restauración de paquetes NuGet para descargarlos. Para obtener más información, consulte http://go.microsoft.com/fwlink/?LinkID=322105. El archivo que falta es {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
