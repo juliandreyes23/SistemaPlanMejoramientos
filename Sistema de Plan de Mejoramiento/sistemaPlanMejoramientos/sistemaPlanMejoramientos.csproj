@@ -120,11 +120,13 @@
     <Content Include="Vista\FrmUsuarios.aspx" />
     <Content Include="Vista\GestionAprendices.aspx" />
     <Content Include="Vista\GestionCentros.aspx" />
+    <Content Include="Vista\GestionCompetencias.aspx" />
     <Content Include="Vista\GestionFichas.aspx" />
     <Content Include="Vista\GestionInstructores.aspx" />
     <Content Include="Vista\GestionProgramas.aspx" />
     <Content Include="Vista\Inicio.aspx" />
     <Content Include="Vista\resetPassword.aspx" />
+    <Content Include="Vista\ResultadosAprendizaje.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -298,6 +300,13 @@
     <Compile Include="Vista\GestionCentros.aspx.designer.cs">
       <DependentUpon>GestionCentros.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Vista\GestionCompetencias.aspx.cs">
+      <DependentUpon>GestionCompetencias.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\GestionCompetencias.aspx.designer.cs">
+      <DependentUpon>GestionCompetencias.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Vista\GestionFichas.aspx.cs">
       <DependentUpon>GestionFichas.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -332,6 +341,13 @@
     </Compile>
     <Compile Include="Vista\resetPassword.aspx.designer.cs">
       <DependentUpon>resetPassword.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Vista\ResultadosAprendizaje.aspx.cs">
+      <DependentUpon>ResultadosAprendizaje.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Vista\ResultadosAprendizaje.aspx.designer.cs">
+      <DependentUpon>ResultadosAprendizaje.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

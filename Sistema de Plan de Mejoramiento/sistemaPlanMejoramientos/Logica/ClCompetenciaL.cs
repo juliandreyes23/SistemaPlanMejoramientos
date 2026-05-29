@@ -42,5 +42,14 @@ namespace sistemaPlanMejoramientos.Logica
             }
             return oCompetenciaD.MtEliminarCompetencia(idCompetencia);
         }
+
+        public DataTable MtCargarCompetencia(int idPrograma)
+        {
+            return oCompetenciaD.MtCargarCompetencias(idPrograma);
+        }
+        public DataTable MListarCompetencia()
+        {
+            return oCompetenciaD.MtListaCompetencia();
+        }
     }
 }

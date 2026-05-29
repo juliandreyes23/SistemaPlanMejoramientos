@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using System.Web.UI.WebControls;
 
 namespace sistemaPlanMejoramientos.Datos
 {
@@ -80,6 +81,34 @@ namespace sistemaPlanMejoramientos.Datos
             oConex.MtCerrarConexion();
 
             return filas > 0;
+        }
+
+        public DataTable MtCargarCompetencias(int idPrograma)
+        {
+
+            ClConexion oConex = new ClConexion();
+            SqlConnection cn = oConex.MtAbrirConexion();
+            string query = "SELECT idCompetencia, descripcion FROM competencias WHERE idPrograma = @id ORDER BY descripcion";
+            SqlCommand cmd = new SqlCommand(query, cn);
+            cmd.Parameters.AddWithValue("@id", idPrograma);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            oConex.MtCerrarConexion();
+            return dt;
+        }
+        public DataTable MtListaCompetencia()
+        {
+
+            ClConexion oConex = new ClConexion();
+            SqlConnection cn = oConex.MtAbrirConexion();
+            string query = "SELECT idCompetencia, descripcion FROM competencias ORDER BY descripcion";
+            SqlCommand cmd = new SqlCommand(query, cn);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            oConex.MtCerrarConexion();
+            return dt;
         }
     }
 }
