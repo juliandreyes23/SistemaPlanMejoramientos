@@ -251,17 +251,40 @@ namespace sistemaPlanMejoramientos.Vista
             {
                 DataTable dt = oLogica.MtListarResultadoAprendizaje();
                 DataRow[] rows = dt.Select("idResultadoAprendizaje = " + id);
+
                 if (rows.Length > 0)
                 {
                     DataRow row = rows[0];
+
                     hfIdResultado.Value = id.ToString();
                     txtDescripcion.Text = row["DescripcionResultado"].ToString();
 
                     string idProg = row["idPrograma"].ToString();
+
                     CargarProgramas();
                     ddlPrograma.SelectedValue = idProg;
+
+                    ddlCompetencia.Items.Clear();
+                    ddlCompetencia.Items.Add(new ListItem("-- Seleccione una competencia --", "0"));
+
                     DataTable tb = oCompetencia.MtCargarCompetencia(int.Parse(idProg));
-                    ddlCompetencia.SelectedValue = row["idCompetencia"].ToString();
+
+                    foreach (DataRow item in tb.Rows)
+                    {
+                        ddlCompetencia.Items.Add(
+                            new ListItem(
+                                item["descripcion"].ToString(),
+                                item["idCompetencia"].ToString()
+                            )
+                        );
+                    }
+
+                    string idCompetencia = row["idCompetencia"].ToString();
+
+                    if (ddlCompetencia.Items.FindByValue(idCompetencia) != null)
+                    {
+                        ddlCompetencia.SelectedValue = idCompetencia;
+                    }
 
                     lblTituloForm.Text = "Actualizar Resultado";
                     btnCancelar.Visible = true;
