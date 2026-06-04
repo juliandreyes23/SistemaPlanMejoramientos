@@ -51,5 +51,10 @@ namespace sistemaPlanMejoramientos.Logica
         {
             return oCompetenciaD.MtListaCompetencia();
         }
+
+        public DataTable MtBuscarCompetencias(string filtro)
+        {
+            return oCompetenciaD.MtBuscarCompetencias(filtro);
+        }
     }
 }

@@ -1,23 +1,14 @@
 # Sistema de Planes de Mejoramiento
 
-Sistema web desarrollado en ASP.NET para la gestión de planes de mejoramiento académicos, aprendices, instructores, fichas y evidencias dentro de un entorno de formación.
+Sistema web desarrollado en ASP.NET Web Forms para la gestión de planes de mejoramiento académicos, aprendices, instructores, fichas, programas de formación y evidencias dentro de un entorno de formación similar al SENA.
 
 ---
 
 # Descripción
 
-El proyecto **sistemaPlanMejoramientos** permite administrar procesos académicos relacionados con:
+El proyecto **Sistema de Planes de Mejoramiento** permite administrar y realizar seguimiento a los procesos académicos relacionados con aprendices que requieren actividades de mejoramiento para alcanzar los resultados de aprendizaje establecidos en su programa de formación.
 
-* Gestión de aprendices.
-* Gestión de instructores.
-* Administración de fichas.
-* Gestión de programas de formación.
-* Creación de planes de mejoramiento.
-* Subida y evaluación de evidencias.
-* Control de usuarios y roles.
-* Históricos y seguimiento.
-
-El sistema está orientado a instituciones de formación similares al SENA.
+La plataforma facilita la interacción entre administradores, instructores y aprendices mediante módulos especializados para cada rol.
 
 ---
 
@@ -43,7 +34,7 @@ El sistema está orientado a instituciones de formación similares al SENA.
 ## Herramientas
 
 * Visual Studio
-* SQL Server Management Studio
+* SQL Server Management Studio (SSMS)
 * Git
 * GitHub
 
@@ -55,41 +46,49 @@ El sistema está orientado a instituciones de formación similares al SENA.
 
 * Inicio de sesión.
 * Recuperación de contraseña.
-* Roles de usuario.
+* Gestión de usuarios.
+* Administración de roles.
 * Gestión de perfiles.
 
 ## Gestión Académica
 
-* Registro de aprendices.
-* Registro de instructores.
-* Gestión de programas.
-* Gestión de centros.
+* Gestión de centros de formación.
+* Gestión de programas de formación.
+* Gestión de competencias.
+* Gestión de resultados de aprendizaje.
 * Gestión de fichas.
+* Gestión de aprendices.
+* Gestión de instructores.
+* Asignación de instructores.
+* Carga masiva de aprendices.
 
 ## Planes de Mejoramiento
 
-* Creación de planes.
-* Seguimiento de actividades.
+* Creación de planes de mejoramiento.
 * Asignación de resultados de aprendizaje.
+* Seguimiento de actividades.
+* Registro de observaciones.
 * Control de estados.
 
 ## Evidencias
 
-* Subida de archivos.
-* Evaluación de evidencias.
-* Observaciones del instructor.
+* Carga de evidencias.
+* Evaluación por parte del instructor.
+* Registro de observaciones.
+* Seguimiento del estado de aprobación.
 
 ## Históricos
 
-* Consulta de registros.
-* Seguimiento de procesos.
+* Consulta de registros históricos.
+* Seguimiento de procesos académicos.
 * Historial de evaluaciones.
+* Historial de planes de mejoramiento.
 
 ---
 
 # Estructura General del Proyecto
 
-
+text
 sistemaPlanMejoramientos/
 │
 ├── Datos/
@@ -97,13 +96,31 @@ sistemaPlanMejoramientos/
 ├── Modelo/
 ├── Vista/
 │   ├── Dashboard.aspx
+│   ├── DashboardInstructor.aspx
+│   ├── DashboardAprendiz.aspx
 │   ├── FrmLogin.aspx
-│   ├── GestionAprendices.aspx
-│   ├── GestionInstructores.aspx
+│   ├── FrmRecuperar.aspx
+│   ├── resetPassword.aspx
+│   ├── FrmUsuarios.aspx
+│   ├── GestionCentros.aspx
+│   ├── GestionProgramas.aspx
+│   ├── GestionCompetencias.aspx
+│   ├── ResultadosAprendizaje.aspx
 │   ├── GestionFichas.aspx
+│   ├── FrmConsultarFichas.aspx
+│   ├── GestionAprendices.aspx
+│   ├── Cargamasivaaprendices.aspx
+│   ├── GestionInstructores.aspx
+│   ├── AsignacionInstructores.aspx
 │   ├── FrmCrearPlan.aspx
+│   ├── FrmMisPlanes.aspx
 │   ├── FrmSubirEvidencia.aspx
+│   ├── FrmEvaluarEvidencias.aspx
+│   ├── FrmHistoricoComite.aspx
+│   ├── FrmHistoricoInternos.aspx
+│   ├── FrmMiPerfil.aspx
 │   └── ...
+│
 └── Web.config
 
 
@@ -115,6 +132,7 @@ sistemaPlanMejoramientos/
 
 * Visual Studio 2019 o superior.
 * SQL Server.
+* SQL Server Management Studio (SSMS).
 * .NET Framework.
 * Navegador web moderno.
 
@@ -124,107 +142,170 @@ sistemaPlanMejoramientos/
 
 ## 1. Clonar el repositorio
 
-
+bash
 git clone https://github.com/juliandreyes23/SistemaPlanMejoramientos.git
 
 
-
+---
 
 ## 2. Abrir la solución
 
 Abrir el archivo:
 
-
+text
 sistemaPlanMejoramientos.sln
 
 
-Desde Visual Studio.
+desde Visual Studio.
 
 ---
 
-## 3. Configurar la base de datos
-Abrir SQL Server Management Studio.
-Crear la base de datos llamada:
+## 3. Configurar la Base de Datos
 
+### Crear la Base de Datos
+
+Crear una base de datos llamada:
+
+sql
 planMejoramiento
 
-Ejecutar el script SQL del proyecto para crear las tablas.
-Abrir la solución en Visual Studio.
-Ubicar la clase de conexión:
 
+### Ejecutar Scripts
+
+Ejecutar los scripts SQL incluidos en el proyecto para crear:
+
+* Tablas.
+* Procedimientos almacenados.
+* Relaciones.
+* Datos iniciales (si aplica).
+
+### Configurar la Conexión
+
+Ubicar la clase:
+
+text
 Datos/ClConexion.cs
 
-Verificar la cadena de conexión utilizada por el sistema.
 
-Ejemplo utilizado en el proyecto:
+Verificar la cadena de conexión:
 
 SqlConnection oConex = new SqlConnection(
     "Data Source=.;Initial Catalog=planMejoramiento;Integrated Security=True;Encrypt=False;"
 );
 
-Importante
 
-Si el nombre del servidor o la base de datos es diferente en otro equipo, se debe modificar la cadena de conexión dentro de:
+### Importante
 
-ClConexion.cs
+Si el servidor SQL o el nombre de la base de datos es diferente, se deberá modificar la cadena de conexión en:
 
+text
+Datos/ClConexion.cs
+
+
+---
 
 # Roles del Sistema
 
 ## Administrador
 
-Puede:
+Responsable de la administración general del sistema.
+
+### Funciones
 
 * Gestionar usuarios.
-* Gestionar centros.
+* Gestionar centros de formación.
 * Gestionar programas.
+* Gestionar competencias.
+* Gestionar resultados de aprendizaje.
 * Gestionar fichas.
-* Consultar históricos.
+* Gestionar aprendices.
+* Gestionar instructores.
+* Asignar instructores.
+* Realizar carga masiva de aprendices.
+* Consultar información académica.
+
+---
 
 ## Instructor
 
-Puede:
+Responsable del seguimiento académico y evaluación de evidencias.
 
-* Evaluar evidencias.
-* Gestionar aprendices.
+### Funciones
+
+* Consultar aprendices asignados.
 * Crear planes de mejoramiento.
-* Consultar fichas.
+* Evaluar evidencias.
+* Registrar observaciones.
+* Consultar históricos.
+* Realizar seguimiento académico.
+
+---
 
 ## Aprendiz
 
-Puede:
+Responsable de cumplir las actividades establecidas en el plan de mejoramiento.
 
-* Consultar planes.
-* Subir evidencias.
+### Funciones
+
+* Consultar planes asignados.
 * Revisar observaciones.
-* Consultar estados.
+* Subir evidencias.
+* Consultar estados del plan.
+* Actualizar información personal.
 
 ---
 
 # Módulos Principales
 
-| Módulo                  | Función                            |
-| ----------------------- | ---------------------------------- |
-| Login                   | Inicio de sesión                   |
-| Dashboard               | Panel principal                    |
-| Gestión de Aprendices   | Administración de aprendices       |
-| Gestión de Instructores | Administración de instructores     |
-| Gestión de Fichas       | Administración de fichas           |
-| Gestión de Programas    | Administración de programas        |
-| Crear Plan              | Registro de planes de mejoramiento |
-| Evidencias              | Subida y evaluación de archivos    |
-| Históricos              | Consulta de registros              |
+| Módulo                     | Función                            |
+| -------------------------- | ---------------------------------- |
+| Login                      | Inicio de sesión                   |
+| Recuperación de Contraseña | Restablecimiento de acceso         |
+| Dashboard Administrador    | Administración general             |
+| Dashboard Instructor       | Seguimiento y evaluación           |
+| Dashboard Aprendiz         | Consulta de planes                 |
+| Gestión de Usuarios        | Administración de usuarios         |
+| Gestión de Centros         | Administración de centros          |
+| Gestión de Programas       | Administración de programas        |
+| Gestión de Competencias    | Administración de competencias     |
+| Resultados de Aprendizaje  | Administración de resultados       |
+| Gestión de Fichas          | Administración de fichas           |
+| Gestión de Aprendices      | Administración de aprendices       |
+| Carga Masiva de Aprendices | Importación masiva                 |
+| Gestión de Instructores    | Administración de instructores     |
+| Asignación de Instructores | Asociación instructor-ficha        |
+| Crear Plan                 | Registro de planes                 |
+| Mis Planes                 | Consulta de planes asignados       |
+| Evidencias                 | Carga y evaluación                 |
+| Históricos                 | Consulta de registros              |
+| Perfil de Usuario          | Administración de datos personales |
 
 ---
 
 # Seguridad
 
-El sistema cuenta con:
+El sistema implementa mecanismos de seguridad para proteger la información y controlar el acceso a los diferentes módulos.
 
-* Validación de usuarios.
-* Control de roles.
-* Recuperación de contraseña.
-* Restricción de acceso por módulos.
+## Funcionalidades de Seguridad
+
+* Validación de credenciales.
+* Control de acceso basado en roles.
+* Recuperación de contraseña mediante correo electrónico.
+* Restricción de acceso por perfil.
+* Protección de funcionalidades según permisos del usuario.
+
+---
+
+# Flujo General del Sistema
+
+1. El usuario inicia sesión.
+2. El sistema identifica el rol asignado.
+3. Se redirecciona al dashboard correspondiente.
+4. El administrador configura la estructura académica.
+5. Los instructores crean planes de mejoramiento.
+6. Los aprendices cargan evidencias.
+7. Los instructores evalúan evidencias.
+8. El sistema almacena el historial de actividades realizadas.
 
 ---
 
@@ -232,24 +313,44 @@ El sistema cuenta con:
 
 ## Página de Inicio
 
-Agregar captura aquí.
+Agregar captura de la página principal.
 
-## Dashboard
+## Inicio de Sesión
 
-Agregar captura aquí.
+Agregar captura del formulario de autenticación.
+
+## Dashboard Administrador
+
+Agregar captura del panel administrativo.
+
+## Dashboard Instructor
+
+Agregar captura del panel del instructor.
+
+## Dashboard Aprendiz
+
+Agregar captura del panel del aprendiz.
 
 ## Gestión de Aprendices
 
-Agregar captura aquí.
+Agregar captura del módulo.
 
-## Planes de Mejoramiento
+## Gestión de Instructores
 
-Agregar captura aquí.
+Agregar captura del módulo.
+
+## Creación de Planes de Mejoramiento
+
+Agregar captura del formulario.
+
+## Subida de Evidencias
+
+Agregar captura del módulo.
 
 ---
 
 # Autor
 
-Proyecto desarrollado por:
-
 **Julian Reyes**
+
+Proyecto académico desarrollado para la gestión de planes de mejoramiento y seguimiento académico dentro de entornos de formación.

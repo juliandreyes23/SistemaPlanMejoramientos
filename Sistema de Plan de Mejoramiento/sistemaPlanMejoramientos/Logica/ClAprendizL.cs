@@ -11,7 +11,7 @@ namespace sistemaPlanMejoramientos.Logica
     {
         ClAprendizD oAprendizD = new ClAprendizD();
 
-        public bool MtCrearAprendiz(string tipoDocumento, string numeroDocumento, string nombres, string apellidos, string correo, string telefono, string estadoAcademico, int idUsuario, int idFicha,int idCentro)
+        public bool MtCrearAprendiz(string tipoDocumento, string numeroDocumento, string nombres, string apellidos, string correo, string telefono, string estadoAcademico, int idUsuario, int idFicha, int idCentro)
         {
             if (string.IsNullOrWhiteSpace(tipoDocumento) || string.IsNullOrWhiteSpace(numeroDocumento) ||
                 string.IsNullOrWhiteSpace(nombres) || string.IsNullOrWhiteSpace(apellidos) ||
@@ -19,7 +19,7 @@ namespace sistemaPlanMejoramientos.Logica
             {
                 return false;
             }
-            return oAprendizD.MtCrearAprendiz(tipoDocumento, numeroDocumento, nombres, apellidos, correo, telefono, estadoAcademico, idUsuario, idFicha,idCentro);
+            return oAprendizD.MtCrearAprendiz(tipoDocumento, numeroDocumento, nombres, apellidos, correo, telefono, estadoAcademico, idUsuario, idFicha, idCentro);
         }
 
         public DataTable MtListarAprendices()
@@ -83,6 +83,20 @@ namespace sistemaPlanMejoramientos.Logica
         {
             if (string.IsNullOrWhiteSpace(numeroDocumento)) return false;
             return oAprendizD.MtExisteAprendiz(numeroDocumento);
+        }
+        public int MtCrearAprendizConRetorno(string tipoDocumento, string numeroDocumento, string nombres, string apellidos, string correo, string telefono, string estadoAcademico, int idUsuario, int idFicha, int idCentro)
+        {
+            if (string.IsNullOrWhiteSpace(tipoDocumento) || string.IsNullOrWhiteSpace(numeroDocumento) ||
+                string.IsNullOrWhiteSpace(nombres) || string.IsNullOrWhiteSpace(apellidos) ||
+                string.IsNullOrWhiteSpace(correo) || idUsuario <= 0 || idFicha <= 0)
+                return 0;
+            return oAprendizD.MtCrearAprendizConRetorno(tipoDocumento, numeroDocumento, nombres, apellidos, correo, telefono, estadoAcademico, idUsuario, idFicha, idCentro);
+        }
+
+        public int MtObtenerIdUsuarioPorAprendiz(int idAprendiz)
+        {
+            if (idAprendiz <= 0) return 0;
+            return oAprendizD.MtObtenerIdUsuarioPorAprendiz(idAprendiz);
         }
     }
 }

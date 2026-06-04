@@ -26,11 +26,18 @@ namespace sistemaPlanMejoramientos.Logica
             return oFichaD.MtListarFichas();
         }
 
-        public bool MtActualizarFichas(int idFicha, string codigoFicha, DateTime fechaInicio, DateTime fechaFinalizacion, string jornada, string estado, int idPrograma)
+        public DataTable MtListarFichas(string filtro)
+        {
+            return oFichaD.MtListarFichas(filtro ?? "");
+        }
+
+        public bool MtActualizarFicha(int idFicha, string codigoFicha, DateTime fechaInicio,
+            DateTime fechaFinalizacion, string jornada, string estado, int idPrograma)
         {
             if (idFicha <= 0 || string.IsNullOrWhiteSpace(codigoFicha) ||
                 string.IsNullOrWhiteSpace(jornada) || string.IsNullOrWhiteSpace(estado) || idPrograma <= 0)
                 return false;
+
             return oFichaD.MtActualizarFicha(idFicha, codigoFicha, fechaInicio, fechaFinalizacion, jornada, estado, idPrograma);
         }
 
@@ -38,6 +45,24 @@ namespace sistemaPlanMejoramientos.Logica
         {
             if (idFicha <= 0) return false;
             return oFichaD.MtEliminarFicha(idFicha);
+        }
+
+        public bool MtExisteFicha(string codigoFicha)
+        {
+            if (string.IsNullOrWhiteSpace(codigoFicha)) return false;
+            return oFichaD.MtExisteFicha(codigoFicha);
+        }
+
+        public bool MtExisteFichaEditar(int idFicha, string codigoFicha)
+        {
+            if (idFicha <= 0 || string.IsNullOrWhiteSpace(codigoFicha)) return false;
+            return oFichaD.MtExisteFichaEditar(idFicha, codigoFicha);
+        }
+
+        public int MtObtenerIdCentroPorPrograma(int idPrograma)
+        {
+            if (idPrograma <= 0) return 0;
+            return oFichaD.MtObtenerIdCentroPorPrograma(idPrograma);
         }
 
         public DataTable MtListarFichasPorInstructor(int idInstructor)
@@ -56,6 +81,12 @@ namespace sistemaPlanMejoramientos.Logica
         {
             if (idInstructor <= 0) return 0;
             return oFichaD.MtContarFichasPorInstructor(idInstructor);
+        }
+
+        public int MtObtenerIdCentroPorFicha(int idFicha)
+        {
+            if (idFicha <= 0) return 0;
+            return oFichaD.MtObtenerIdCentroPorFicha(idFicha);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using sistemaPlanMejoramientos.Datos;
+﻿using sistemaPlanMejoramientos.Logica;
 using System;
 using System.Data;
 using System.Linq;
@@ -9,8 +9,8 @@ namespace sistemaPlanMejoramientos.Vista
 {
     public partial class GestionFichas : System.Web.UI.Page
     {
-        ClFichaD oFichaD = new ClFichaD();
-        ClProgramaD oProgramaD = new ClProgramaD();
+        ClFichaL oFichaL = new ClFichaL();
+        ClProgramaL oProgramaL = new ClProgramaL();
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -29,7 +29,7 @@ namespace sistemaPlanMejoramientos.Vista
         {
             try
             {
-                DataTable dtProg = oProgramaD.MtListarProgramas();
+                DataTable dtProg = oProgramaL.MtListarProgramas();
                 ddlPrograma.DataSource = dtProg;
                 ddlPrograma.DataTextField = "nombre";
                 ddlPrograma.DataValueField = "idPrograma";
@@ -46,7 +46,7 @@ namespace sistemaPlanMejoramientos.Vista
         {
             try
             {
-                DataTable dtFichas = oFichaD.MtListarFichas(txtBuscar.Text.Trim());
+                DataTable dtFichas = oFichaL.MtListarFichas(txtBuscar.Text.Trim());
 
                 gvFichas.PageIndex = (int)ViewState["PaginaActual"];
                 gvFichas.DataSource = dtFichas;
@@ -133,20 +133,28 @@ namespace sistemaPlanMejoramientos.Vista
 
                 if (esNuevo)
                 {
-                    int idCentro = oFichaD.MtObtenerIdCentroPorPrograma(idPrograma);
-
-                    if (idCentro == 0)
+                    if (oFichaL.MtExisteFicha(codigo))
                     {
-                        SetMensaje("error", "El programa seleccionado no tiene un centro asignado.");
+                        SetMensaje("warning", "Ya existe una ficha registrada con ese código.");
                         return;
                     }
 
-                    resultado = oFichaD.MtCrearFicha(codigo, fInicio, fFinal, jornada, estado, idPrograma, idCentro);
+                    resultado = oFichaL.MtCrearFicha(codigo, fInicio, fFinal, jornada, estado, idPrograma);
+
+                    if (!resultado)
+                        SetMensaje("error", "El programa seleccionado no tiene un centro asignado.");
                 }
                 else
                 {
                     int idFicha = Convert.ToInt32(hfIdFicha.Value);
-                    resultado = oFichaD.MtActualizarFicha(idFicha, codigo, fInicio, fFinal, jornada, estado, idPrograma);
+
+                    if (oFichaL.MtExisteFichaEditar(idFicha, codigo))
+                    {
+                        SetMensaje("warning", "Ya existe otra ficha registrada con ese código.");
+                        return;
+                    }
+
+                    resultado = oFichaL.MtActualizarFicha(idFicha, codigo, fInicio, fFinal, jornada, estado, idPrograma);
                 }
 
                 if (resultado)
@@ -155,7 +163,7 @@ namespace sistemaPlanMejoramientos.Vista
                     ListarFichas();
                     SetMensaje("success", esNuevo ? "¡Ficha registrada con éxito!" : "¡Ficha actualizada con éxito!");
                 }
-                else
+                else if (esNuevo == false)
                 {
                     SetMensaje("error", "No se pudo completar la operación en la base de datos.");
                 }
@@ -214,7 +222,7 @@ namespace sistemaPlanMejoramientos.Vista
             {
                 try
                 {
-                    bool eliminado = oFichaD.MtEliminarFicha(idFicha);
+                    bool eliminado = oFichaL.MtEliminarFicha(idFicha);
                     if (eliminado)
                     {
                         LimpiarFormulario();

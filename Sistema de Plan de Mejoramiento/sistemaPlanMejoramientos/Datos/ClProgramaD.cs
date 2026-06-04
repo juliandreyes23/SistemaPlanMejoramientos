@@ -68,12 +68,12 @@ namespace sistemaPlanMejoramientos.Datos
         public bool MtObtenerProgramaPorCodigo(string codigo)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
-            string query = "select codigoPrograma FROM programas WHERE codigoPrograma = @codigoPrograma";
+            string query = "SELECT COUNT(*) FROM programas WHERE codigoPrograma = @codigoPrograma";
             SqlCommand cmd = new SqlCommand(query, cn);
             cmd.Parameters.AddWithValue("@codigoPrograma", codigo);
-            int filas = cmd.ExecuteNonQuery();
+            int conteo = Convert.ToInt32(cmd.ExecuteScalar());
             oConex.MtCerrarConexion();
-            return filas > 0;
+            return conteo > 0;
         }
         public DataTable MtObtenerProgramaPorId(int idPrograma)
         {
@@ -137,6 +137,20 @@ namespace sistemaPlanMejoramientos.Datos
             int filas = cmd.ExecuteNonQuery();
             oConex.MtCerrarConexion();
             return filas > 0;
+        }
+
+        public bool MtObtenerProgramaPorCodigoExcluyendo(string codigo, int idPrograma)
+        {
+            SqlConnection cn = oConex.MtAbrirConexion();
+            string query = @"SELECT COUNT(*) FROM programas 
+                     WHERE codigoPrograma = @codigo 
+                     AND idPrograma != @idPrograma";
+            SqlCommand cmd = new SqlCommand(query, cn);
+            cmd.Parameters.AddWithValue("@codigo", codigo);
+            cmd.Parameters.AddWithValue("@idPrograma", idPrograma);
+            int conteo = Convert.ToInt32(cmd.ExecuteScalar());
+            oConex.MtCerrarConexion();
+            return conteo > 0;
         }
     }
 }

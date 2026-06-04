@@ -161,5 +161,41 @@ namespace sistemaPlanMejoramientos.Datos
             oConex.MtCerrarConexion();
             return resultado != null ? Convert.ToInt32(resultado) : 0;
         }
+
+        public bool MtExisteFicha(string codigoFicha)
+        {
+            SqlConnection cn = oConex.MtAbrirConexion();
+
+            string query = "SELECT COUNT(*) FROM fichas WHERE codigoFicha = @codigoFicha";
+
+            SqlCommand cmd = new SqlCommand(query, cn);
+            cmd.Parameters.AddWithValue("@codigoFicha", codigoFicha);
+
+            int cantidad = Convert.ToInt32(cmd.ExecuteScalar());
+
+            oConex.MtCerrarConexion();
+
+            return cantidad > 0;
+        }
+
+        public bool MtExisteFichaEditar(int idFicha, string codigoFicha)
+        {
+            SqlConnection cn = oConex.MtAbrirConexion();
+
+            string query = @"SELECT COUNT(*) 
+                     FROM fichas 
+                     WHERE codigoFicha = @codigoFicha
+                     AND idFicha <> @idFicha";
+
+            SqlCommand cmd = new SqlCommand(query, cn);
+            cmd.Parameters.AddWithValue("@codigoFicha", codigoFicha);
+            cmd.Parameters.AddWithValue("@idFicha", idFicha);
+
+            int cantidad = Convert.ToInt32(cmd.ExecuteScalar());
+
+            oConex.MtCerrarConexion();
+
+            return cantidad > 0;
+        }
     }
 }

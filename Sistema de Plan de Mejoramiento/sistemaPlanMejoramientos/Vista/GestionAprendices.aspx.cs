@@ -1,4 +1,4 @@
-﻿using sistemaPlanMejoramientos.Datos;
+﻿using sistemaPlanMejoramientos.Logica;
 using System;
 using System.Data;
 using System.Linq;
@@ -9,9 +9,9 @@ namespace sistemaPlanMejoramientos.Vista
 {
     public partial class GestionAprendices : System.Web.UI.Page
     {
-        ClAprendizD oAprendizD = new ClAprendizD();
-        ClFichaD oFichaD = new ClFichaD();
-        ClUsuarioD oUsuarioD = new ClUsuarioD();
+        ClAprendizL oAprendizL = new ClAprendizL();
+        ClFichaL oFichaL = new ClFichaL();
+        ClUsuarioL oUsuarioL = new ClUsuarioL();
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -21,7 +21,6 @@ namespace sistemaPlanMejoramientos.Vista
                 CargarFichas();
                 ListarAprendices();
             }
-
 
             hfMensajeTipo.Value = "";
             hfMensajeTxt.Value = "";
@@ -50,7 +49,7 @@ namespace sistemaPlanMejoramientos.Vista
         {
             try
             {
-                DataTable dtFichas = oFichaD.MtListarFichas();
+                DataTable dtFichas = oFichaL.MtListarFichas();
                 ddlFicha.DataSource = dtFichas;
                 ddlFicha.DataTextField = "codigoFicha";
                 ddlFicha.DataValueField = "idFicha";
@@ -67,7 +66,7 @@ namespace sistemaPlanMejoramientos.Vista
         {
             try
             {
-                DataTable dt = oAprendizD.MtListarAprendices(txtBuscar.Text.Trim());
+                DataTable dt = oAprendizL.MtListarAprendices(txtBuscar.Text.Trim());
 
                 gvAprendices.PageIndex = (int)ViewState["PaginaActual"];
                 gvAprendices.DataSource = dt;
@@ -154,14 +153,14 @@ namespace sistemaPlanMejoramientos.Vista
 
                 if (esNuevo)
                 {
-                    if (oUsuarioD.MtExisteCorreo(correo))
+                    if (oUsuarioL.MtExisteCorreo(correo))
                     {
                         hfAbrirModal.Value = "crear";
                         SetMensaje("warning", "El correo ya está registrado como usuario en el sistema.");
                         return;
                     }
 
-                    int idUsuarioNuevo = oUsuarioD.MtCrearUsuarioConRetorno(correo, documento, 3);
+                    int idUsuarioNuevo = oUsuarioL.MtCrearUsuarioConRetorno(correo, documento, 3);
                     if (idUsuarioNuevo <= 0)
                     {
                         hfAbrirModal.Value = "crear";
@@ -169,7 +168,7 @@ namespace sistemaPlanMejoramientos.Vista
                         return;
                     }
 
-                    int idCentro = oFichaD.MtObtenerIdCentroPorFicha(idFicha);
+                    int idCentro = oFichaL.MtObtenerIdCentroPorFicha(idFicha);
                     if (idCentro <= 0)
                     {
                         hfAbrirModal.Value = "crear";
@@ -177,7 +176,7 @@ namespace sistemaPlanMejoramientos.Vista
                         return;
                     }
 
-                    int idAprendizNuevo = oAprendizD.MtCrearAprendizConRetorno(
+                    int idAprendizNuevo = oAprendizL.MtCrearAprendizConRetorno(
                         tipoDoc, documento, nombres, apellidos,
                         correo, telefono, estadoAcademico, idUsuarioNuevo, idFicha, idCentro);
 
@@ -188,13 +187,13 @@ namespace sistemaPlanMejoramientos.Vista
                         return;
                     }
 
-                    oAprendizD.MtRegistrarFichaIntermedia(idFicha, idAprendizNuevo);
+                    oAprendizL.MtRegistrarFichaIntermedia(idFicha, idAprendizNuevo);
                     resultado = true;
                 }
                 else
                 {
                     int idAprendiz = Convert.ToInt32(hfIdAprendiz.Value);
-                    resultado = oAprendizD.MtActualizarAprendiz(
+                    resultado = oAprendizL.MtActualizarAprendiz(
                         idAprendiz, tipoDoc, documento, nombres, apellidos,
                         correo, telefono, estadoAcademico, idFicha);
                 }
@@ -266,13 +265,13 @@ namespace sistemaPlanMejoramientos.Vista
                 try
                 {
                     int idAprendiz = Convert.ToInt32(e.CommandArgument);
-                    int idUsuarioVinculado = oAprendizD.MtObtenerIdUsuarioPorAprendiz(idAprendiz);
-                    bool eliminado = oAprendizD.MtEliminarAprendiz(idAprendiz);
+                    int idUsuarioVinculado = oAprendizL.MtObtenerIdUsuarioPorAprendiz(idAprendiz);
+                    bool eliminado = oAprendizL.MtEliminarAprendiz(idAprendiz);
 
                     if (eliminado)
                     {
                         if (idUsuarioVinculado > 0)
-                            oUsuarioD.MtEliminarUsuario(idUsuarioVinculado);
+                            oUsuarioL.MtEliminarUsuario(idUsuarioVinculado);
 
                         LimpiarFormulario();
                         ListarAprendices();

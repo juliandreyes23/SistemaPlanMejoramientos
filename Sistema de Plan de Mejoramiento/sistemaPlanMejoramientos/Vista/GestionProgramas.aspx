@@ -78,7 +78,8 @@
                                 <asp:ListItem Value="" Text="-- Seleccione Nivel --"></asp:ListItem>
                                 <asp:ListItem Value="Tecnólogo" Text="Tecnólogo"></asp:ListItem>
                                 <asp:ListItem Value="Técnico" Text="Técnico"></asp:ListItem>
-                                <asp:ListItem Value="Especialización" Text="Especialización"></asp:ListItem>
+                                <asp:ListItem Value="Operario" Text="Operario"></asp:ListItem>
+                                <asp:ListItem Value="Auxiliar" Text="Auxiliar"></asp:ListItem>
                             </asp:DropDownList>
                         </div>
                         <div class="mb-2">

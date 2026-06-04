@@ -25,6 +25,12 @@ namespace sistemaPlanMejoramientos.Logica
             return oResultadoD.MtListarResultadoAprendizaje();
         }
 
+        public DataTable MtCargarPrograma()
+        {
+            return oResultadoD.MtCargarPrograma();
+        }
+        
+
         public bool MtActualizarResultado(int idResultadoAprendizaje, string descripcion, int idCompetencia)
         {
             if (idResultadoAprendizaje <= 0 || string.IsNullOrWhiteSpace(descripcion) || idCompetencia <= 0)

@@ -98,5 +98,16 @@ namespace sistemaPlanMejoramientos.Datos
             oConex.MtCerrarConexion();
             return filas > 0;
         }
+        public DataTable MtListarCentros()
+        {
+            SqlConnection cn = oConex.MtAbrirConexion();
+            string query = "SELECT idCentro, nombre FROM centros WHERE estado = 'Activo'";
+            SqlCommand cmd = new SqlCommand(query, cn);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            oConex.MtCerrarConexion();
+            return dt;
+        }
     }
 }

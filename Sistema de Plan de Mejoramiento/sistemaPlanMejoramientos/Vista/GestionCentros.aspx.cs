@@ -134,7 +134,7 @@ namespace sistemaPlanMejoramientos.Vista
             }
             catch (Exception ex)
             {
-                SetMensaje("error", "Ocurrió un error: " + ex.Message);
+                SetMensaje("warning", "Ocurrió un error: " + ex.Message);
             }
         }
 

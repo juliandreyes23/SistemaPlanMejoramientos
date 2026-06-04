@@ -1,5 +1,4 @@
 ﻿using OfficeOpenXml;
-using sistemaPlanMejoramientos.Datos;
 using sistemaPlanMejoramientos.Logica;
 using System;
 using System.Data;
@@ -12,7 +11,7 @@ namespace sistemaPlanMejoramientos.Vista
     public partial class CargaMasivaAprendices : System.Web.UI.Page
     {
         ClAprendizL oAprendizL = new ClAprendizL();
-        ClUsuarioD oUsuarioD = new ClUsuarioD();
+        ClUsuarioL oUsuarioL = new ClUsuarioL();
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -93,7 +92,7 @@ namespace sistemaPlanMejoramientos.Vista
                         if (idFicha <= 0) { sinFicha++; continue; }
 
                         string correoFila = worksheet.Cells[fila, 5].Value?.ToString().Trim() ?? "";
-                        bool correoYaExiste = !string.IsNullOrEmpty(correoFila) && oUsuarioD.MtExisteCorreo(correoFila);
+                        bool correoYaExiste = !string.IsNullOrEmpty(correoFila) && oUsuarioL.MtExisteCorreo(correoFila);
 
                         DataRow row = dtParaBulk.NewRow();
                         row["tipoDocumento"] = worksheet.Cells[fila, 1].Value?.ToString().Trim() ?? "";
@@ -126,7 +125,7 @@ namespace sistemaPlanMejoramientos.Vista
 
                     if (!string.IsNullOrEmpty(correoNuevo))
                     {
-                        int idUsuarioNuevo = oUsuarioD.MtCrearUsuarioConRetorno(correoNuevo, doc, 3);
+                        int idUsuarioNuevo = oUsuarioL.MtCrearUsuarioConRetorno(correoNuevo, doc, 3);
                         r["idUsuario"] = idUsuarioNuevo > 0 ? (object)idUsuarioNuevo : DBNull.Value;
                     }
                 }
@@ -140,7 +139,7 @@ namespace sistemaPlanMejoramientos.Vista
                         if (r["idUsuario"] != DBNull.Value)
                         {
                             int idU = Convert.ToInt32(r["idUsuario"]);
-                            oUsuarioD.MtEliminarUsuario(idU);
+                            oUsuarioL.MtEliminarUsuario(idU);
                         }
                     }
 

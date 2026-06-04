@@ -16,16 +16,19 @@
             border-color: rgba(255, 255, 255, 0.15);
             color: #ffffff;
         }
+
         .pagination .page-item.active .page-link {
             background-color: #39b54a;
             border-color: #39b54a;
             color: #ffffff;
         }
+
         .pagination .page-link:hover {
             background-color: rgba(57, 181, 74, 0.2);
             border-color: #39b54a;
             color: #39b54a;
         }
+
         .pagination .page-item.disabled .page-link {
             background-color: rgba(31, 41, 55, 0.4);
             border-color: rgba(255, 255, 255, 0.08);
@@ -82,26 +85,34 @@
                     <div class="card card-custom p-4">
                         <h4 class="mb-3 text-light">Competencias Registradas</h4>
 
-                        <div class="row mb-4">
-                            <div class="col-md-9 col-lg-8">
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text bg-dark border-secondary text-secondary">
-                                        <i class="bi bi-search"></i>
-                                    </span>
-                                    <asp:TextBox ID="txtBuscar" runat="server"
-                                        CssClass="form-control bg-dark border-secondary text-white"
-                                        placeholder="Buscar por descripción o programa...">
-                                    </asp:TextBox>
-                                    <asp:LinkButton ID="btnBuscar" runat="server" CssClass="btn btn-sena" OnClick="btnBuscar_Click">
-                                        Buscar
-                                    </asp:LinkButton>
-                                    <asp:LinkButton ID="btnLimpiarBuscar" runat="server" CssClass="btn btn-outline-secondary"
-                                        OnClick="btnLimpiarBuscar_Click" ToolTip="Limpiar Filtro">
-                                        <i class="bi bi-arrow-clockwise"></i>
-                                    </asp:LinkButton>
+                        <asp:Panel ID="pnlBusqueda" runat="server" DefaultButton="btnBuscar">
+                            <div class="row mb-4">
+                                <div class="col-md-9 col-lg-8">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-dark border-secondary text-secondary">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+
+                                        <asp:TextBox ID="txtBuscar" runat="server"
+                                            CssClass="form-control bg-dark border-secondary text-white"
+                                            placeholder="Buscar por descripción o programa...">
+                                        </asp:TextBox>
+
+                                        <asp:Button ID="btnBuscar" runat="server"
+                                            Text="Buscar"
+                                            CssClass="btn btn-sena"
+                                            OnClick="btnBuscar_Click" />
+
+                                        <asp:LinkButton ID="btnLimpiarBuscar" runat="server"
+                                            CssClass="btn btn-outline-secondary"
+                                            OnClick="btnLimpiarBuscar_Click"
+                                            ToolTip="Limpiar Filtro">
+                    <i class="bi bi-arrow-clockwise"></i>
+                                        </asp:LinkButton>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </asp:Panel>
 
                         <div class="table-responsive">
                             <asp:GridView ID="gvCompetencias" runat="server" AutoGenerateColumns="False"
@@ -142,6 +153,7 @@
                                 de <strong style="color: #39b54a;">
                                     <asp:Literal ID="litTotalPaginas" runat="server" /></strong>
                                 &nbsp;·&nbsp;
+                               
                                 <asp:Literal ID="litTotalRegistros" runat="server" />
                                 registros
                             </small>
@@ -168,6 +180,7 @@
                                         </asp:LinkButton>
                                     </li>
                                     </ul>
+                               
                                 </FooterTemplate>
                             </asp:Repeater>
                         </div>

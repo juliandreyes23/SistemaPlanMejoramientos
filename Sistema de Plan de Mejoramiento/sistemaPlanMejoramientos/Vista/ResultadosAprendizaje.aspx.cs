@@ -4,7 +4,6 @@ using System.Data.SqlClient;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using sistemaPlanMejoramientos.Logica;
-using sistemaPlanMejoramientos.Datos;
 
 namespace sistemaPlanMejoramientos.Vista
 {
@@ -42,19 +41,13 @@ namespace sistemaPlanMejoramientos.Vista
 
         private void CargarProgramas()
         {
-            ClConexion oConex = new ClConexion();
-            SqlConnection cn = oConex.MtAbrirConexion();
-            string query = "SELECT idPrograma, nombre FROM programas ORDER BY nombre";
-            SqlCommand cmd = new SqlCommand(query, cn);
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
-            oConex.MtCerrarConexion();
 
             ddlPrograma.Items.Clear();
             ddlPrograma.Items.Add(new ListItem("-- Seleccione un programa --", "0"));
-            foreach (DataRow row in dt.Rows)
+            foreach (DataRow row in oLogica.MtCargarPrograma().Rows)
                 ddlPrograma.Items.Add(new ListItem(row["nombre"].ToString(), row["idPrograma"].ToString()));
+            
+
         }
 
         protected void ddlPrograma_SelectedIndexChanged(object sender, EventArgs e)
@@ -225,16 +218,6 @@ namespace sistemaPlanMejoramientos.Vista
             {
                 try
                 {
-                    ClConexion oConex = new ClConexion();
-                    SqlConnection cn = oConex.MtAbrirConexion();
-
-                    SqlCommand cmdDep = new SqlCommand(
-                        "DELETE FROM planResultados WHERE idResultadoAprendizaje = @id", cn);
-                    cmdDep.Parameters.AddWithValue("@id", id);
-                    cmdDep.ExecuteNonQuery();
-
-                    oConex.MtCerrarConexion();
-
                     bool ok = oLogica.MtEliminarResultado(id);
                     hfMensajeTipo.Value = ok ? "success" : "error";
                     hfMensajeTxt.Value = ok ? "Resultado eliminado correctamente." : "Error al eliminar.";

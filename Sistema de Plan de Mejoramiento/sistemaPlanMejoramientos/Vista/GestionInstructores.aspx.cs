@@ -1,8 +1,6 @@
 ﻿using sistemaPlanMejoramientos.Logica;
-using sistemaPlanMejoramientos.Datos;
 using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -13,7 +11,7 @@ namespace sistemaPlanMejoramientos.Vista
     public partial class GestionInstructores : System.Web.UI.Page
     {
         ClInstructorL oInstructorL = new ClInstructorL();
-        ClConexion oConex = new ClConexion();
+        ClUsuarioL oUsuarioL = new ClUsuarioL();
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -28,8 +26,11 @@ namespace sistemaPlanMejoramientos.Vista
             if (!IsPostBack)
             {
                 ViewState["PaginaActual"] = 0;
-                CargarCentros();
                 CargarInstructores();
+            }
+            else
+            {
+                CargarInstructores(txtBuscar.Text.Trim());
             }
 
             hfMensajeTipo.Value = "";
@@ -38,16 +39,9 @@ namespace sistemaPlanMejoramientos.Vista
 
         private void CargarCentros()
         {
-            if (ddlCentro.Items.Count > 0) return; 
-
             try
             {
-                SqlConnection cn = oConex.MtAbrirConexion();
-                SqlCommand cmd = new SqlCommand("SELECT idCentro, nombre FROM centros WHERE estado = 'Activo'", cn);
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                oConex.MtCerrarConexion();
+                DataTable dt = oInstructorL.MtListarCentros();
 
                 ddlCentro.DataSource = dt;
                 ddlCentro.DataTextField = "nombre";
@@ -77,9 +71,7 @@ namespace sistemaPlanMejoramientos.Vista
                         r["especialidad"].ToString().ToLower().Contains(f)
                     );
 
-                    dt = filasFiltradas.Any()
-                        ? filasFiltradas.CopyToDataTable()
-                        : dt.Clone();
+                    dt = filasFiltradas.Any() ? filasFiltradas.CopyToDataTable() : dt.Clone();
 
                     litSinResultados.Text = !filasFiltradas.Any()
                         ? "<div class='alert alert-warning text-center py-2 mt-2'>No se encontraron instructores con ese criterio.</div>"
@@ -145,75 +137,91 @@ namespace sistemaPlanMejoramientos.Vista
 
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
-            string tipoDoc = ddlTipoDoc.SelectedValue;
-            string documento = txtDocumento.Text.Trim();
-            string nombres = txtNombres.Text.Trim();
-            string apellidos = txtApellidos.Text.Trim();
-            string correo = txtCorreo.Text.Trim();
-            string telefono = txtTelefono.Text.Trim();
-            string especialidad = txtEspecialidad.Text.Trim();
-
-            bool esNuevo = string.IsNullOrEmpty(hfIdInstructor.Value);
-
-            if (esNuevo)
+            try
             {
-                int idCentro = Convert.ToInt32(ddlCentro.SelectedValue);
-                if (idCentro == 0)
+                string tipoDoc = ddlTipoDoc.SelectedValue;
+                string documento = txtDocumento.Text.Trim();
+                string nombres = txtNombres.Text.Trim();
+                string apellidos = txtApellidos.Text.Trim();
+                string correo = txtCorreo.Text.Trim();
+                string telefono = txtTelefono.Text.Trim();
+                string especialidad = txtEspecialidad.Text.Trim();
+
+                bool esNuevo = string.IsNullOrEmpty(hfIdInstructor.Value);
+
+                if (esNuevo)
                 {
-                    SetMensaje("warning", "Por favor seleccione un centro de formación.");
-                    return;
+                    int idCentro = Convert.ToInt32(ddlCentro.SelectedValue);
+                    if (idCentro == 0)
+                    {
+                        SetMensaje("warning", "Por favor seleccione un centro de formación.");
+                        return;
+                    }
+
+                    if (oUsuarioL.MtExisteCorreo(correo))
+                    {
+                        SetMensaje("warning", "El correo ya está registrado en el sistema.");
+                        return;
+                    }
+
+                    int idUsuarioCreado = oUsuarioL.MtCrearUsuarioInstructor(correo, documento);
+
+                    if (idUsuarioCreado > 0)
+                    {
+                        bool registrado = oInstructorL.MtCrearInstructor(
+                            tipoDoc, documento, nombres, apellidos,
+                            correo, telefono, especialidad, idUsuarioCreado, idCentro);
+
+                        if (registrado)
+                        {
+                            LimpiarFormulario();
+                            CargarCentros();
+                            CargarInstructores();
+                            SetMensaje("success", "¡Instructor registrado y cuenta de acceso creada correctamente!");
+                        }
+                        else
+                        {
+                            SetMensaje("error", "No se pudo asociar el perfil del instructor.");
+                        }
+                    }
+                    else
+                    {
+                        SetMensaje("warning", "No se pudo crear el usuario de acceso.");
+                    }
                 }
-
-                int idUsuarioCreado = CrearUsuarioAutomatico(correo, documento);
-
-                if (idUsuarioCreado > 0)
+                else
                 {
-                    bool registrado = oInstructorL.MtCrearInstructor(
-                        tipoDoc, documento, nombres, apellidos,
-                        correo, telefono, especialidad, idUsuarioCreado, idCentro);
+                    int idInstructor = Convert.ToInt32(hfIdInstructor.Value);
+                    int idCentro = Convert.ToInt32(ddlCentro.SelectedValue);
 
-                    if (registrado)
+                    if (idCentro == 0)
+                    {
+                        SetMensaje("warning", "Por favor seleccione un centro de formación.");
+                        return;
+                    }
+
+                    bool actualizado = oInstructorL.MtActualizarInstructor(
+                        idInstructor, nombres, apellidos, correo, telefono, especialidad, idCentro);
+
+                    if (actualizado)
                     {
                         LimpiarFormulario();
                         CargarCentros();
                         CargarInstructores();
-                        SetMensaje("success", "¡Instructor registrado y cuenta de acceso creada correctamente!");
+                        SetMensaje("success", "¡Datos del instructor actualizados con éxito!");
                     }
                     else
                     {
-                        SetMensaje("error", "No se pudo asociar el perfil del instructor.");
+                        SetMensaje("error", "Error al intentar actualizar el instructor.");
                     }
                 }
-                else
-                {
-                    SetMensaje("warning", "No se pudo crear el usuario de acceso. El correo podría estar duplicado.");
-                }
             }
-            else
+            catch (Exception ex)
             {
-                int idInstructor = Convert.ToInt32(hfIdInstructor.Value);
-                int idCentro = Convert.ToInt32(ddlCentro.SelectedValue);
-
-                if (idCentro == 0)
-                {
-                    SetMensaje("warning", "Por favor seleccione un centro de formación.");
-                    return;
-                }
-
-                bool actualizado = oInstructorL.MtActualizarInstructor(
-                    idInstructor, nombres, apellidos, correo, telefono, especialidad, idCentro);
-
-                if (actualizado)
-                {
-                    LimpiarFormulario();
-                    CargarCentros();
-                    CargarInstructores();
-                    SetMensaje("success", "¡Datos del instructor actualizados con éxito!");
-                }
-                else
-                {
-                    SetMensaje("error", "Error al intentar actualizar el instructor.");
-                }
+                string msg = ex.Message.Contains("UNIQUE") || ex.Message.Contains("duplicate")
+                    ? "El correo o documento ya se encuentra registrado."
+                    : "Error inesperado: " + ex.Message;
+                SetMensaje("error", msg);
             }
         }
 
@@ -230,25 +238,25 @@ namespace sistemaPlanMejoramientos.Vista
                 hfIdInstructor.Value = idInstructor.ToString();
 
                 HiddenField hfTipo = (HiddenField)fila.Cells[1].FindControl("hfTipoDoc");
-                HiddenField hfNum = (HiddenField)fila.Cells[1].FindControl("hfNumDoc");
+                HiddenField hfNum = (HiddenField)fila.Cells[2].FindControl("hfNumDoc");
 
                 if (hfTipo != null) ddlTipoDoc.SelectedValue = hfTipo.Value;
                 if (hfNum != null) txtDocumento.Text = hfNum.Value;
 
-                txtNombres.Text = HttpUtility.HtmlDecode(fila.Cells[2].Text).Trim();
-                txtApellidos.Text = HttpUtility.HtmlDecode(fila.Cells[3].Text).Trim();
-                txtCorreo.Text = HttpUtility.HtmlDecode(fila.Cells[4].Text).Trim();
-                txtTelefono.Text = HttpUtility.HtmlDecode(fila.Cells[5].Text).Trim();
-                txtEspecialidad.Text = HttpUtility.HtmlDecode(fila.Cells[6].Text).Trim();
+                txtNombres.Text = HttpUtility.HtmlDecode(fila.Cells[3].Text).Trim();
+                txtApellidos.Text = HttpUtility.HtmlDecode(fila.Cells[4].Text).Trim();
+                txtCorreo.Text = HttpUtility.HtmlDecode(fila.Cells[5].Text).Trim();
+                txtTelefono.Text = HttpUtility.HtmlDecode(fila.Cells[6].Text).Trim();
+                txtEspecialidad.Text = HttpUtility.HtmlDecode(fila.Cells[7].Text).Trim();
 
-                string centroNombre = HttpUtility.HtmlDecode(fila.Cells[7].Text).Trim();
+                string centroNombre = HttpUtility.HtmlDecode(fila.Cells[8].Text).Trim();
                 ListItem itemCentro = ddlCentro.Items.FindByText(centroNombre);
                 if (itemCentro != null)
                     ddlCentro.SelectedValue = itemCentro.Value;
 
                 ddlTipoDoc.Enabled = false;
                 txtDocumento.Enabled = false;
-                ddlCentro.Enabled = false;
+                ddlCentro.Enabled = true; 
 
                 lblTituloForm.Text = "Modificar Instructor";
                 btnGuardar.Text = "Actualizar Datos";
@@ -279,31 +287,20 @@ namespace sistemaPlanMejoramientos.Vista
             }
         }
 
-        private int CrearUsuarioAutomatico(string correo, string documento)
+        protected void btnCancelar_Click(object sender, EventArgs e) => LimpiarFormulario();
+        protected void lnkVolver_Click(object sender, EventArgs e) => Response.Redirect("~/Vista/Dashboard.aspx");
+
+        protected void txtBuscar_TextChanged(object sender, EventArgs e)
         {
-            int idGenerado = 0;
-            try
-            {
-                SqlConnection cn = oConex.MtAbrirConexion();
-                string query = "INSERT INTO usuarios (correo, password, idRol) OUTPUT INSERTED.idUsuario VALUES (@correo, @pass, 2)";
-                SqlCommand cmd = new SqlCommand(query, cn);
-                cmd.Parameters.AddWithValue("@correo", correo);
-                cmd.Parameters.AddWithValue("@pass", documento);
-                idGenerado = (int)cmd.ExecuteScalar();
-                oConex.MtCerrarConexion();
-            }
-            catch { }
-            return idGenerado;
+            ViewState["PaginaActual"] = 0;
+            CargarInstructores(txtBuscar.Text.Trim());
         }
 
-        protected void btnCancelar_Click(object sender, EventArgs e)
+        protected void btnLimpiarBusqueda_Click(object sender, EventArgs e)
         {
-            LimpiarFormulario();
-        }
-
-        protected void lnkVolver_Click(object sender, EventArgs e)
-        {
-            Response.Redirect("~/Vista/Dashboard.aspx");
+            txtBuscar.Text = "";
+            ViewState["PaginaActual"] = 0;
+            CargarInstructores();
         }
 
         private void LimpiarFormulario()
@@ -328,19 +325,6 @@ namespace sistemaPlanMejoramientos.Vista
         {
             hfMensajeTipo.Value = tipo;
             hfMensajeTxt.Value = texto;
-        }
-
-        protected void txtBuscar_TextChanged(object sender, EventArgs e)
-        {
-            ViewState["PaginaActual"] = 0;
-            CargarInstructores(txtBuscar.Text.Trim());
-        }
-
-        protected void btnLimpiarBusqueda_Click(object sender, EventArgs e)
-        {
-            txtBuscar.Text = "";
-            ViewState["PaginaActual"] = 0;
-            CargarInstructores();
         }
     }
 }

@@ -85,5 +85,20 @@ namespace sistemaPlanMejoramientos.Datos
 
             return filas > 0;
         }
+
+        public DataTable MtCargarPrograma()
+        {
+            SqlConnection cn = oConex.MtAbrirConexion();
+            string query = "SELECT idPrograma, nombre FROM programas ORDER BY nombre";
+            SqlCommand cmd = new SqlCommand(query, cn);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            oConex.MtCerrarConexion();
+
+            return dt;
+        }
+    
+
     }
 }

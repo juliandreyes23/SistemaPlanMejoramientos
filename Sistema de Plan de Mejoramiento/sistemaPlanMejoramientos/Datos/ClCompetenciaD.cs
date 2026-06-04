@@ -110,5 +110,34 @@ namespace sistemaPlanMejoramientos.Datos
             oConex.MtCerrarConexion();
             return dt;
         }
+
+        public DataTable MtBuscarCompetencias(string filtro)
+        {
+            SqlConnection cn = oConex.MtAbrirConexion();
+
+            string query = @"SELECT c.idCompetencia,
+                            c.descripcion AS DescripcionCompetencia,
+                            p.idPrograma,
+                            p.nombre AS NombrePrograma,
+                            p.codigoPrograma
+                     FROM competencias c
+                     INNER JOIN programas p
+                        ON c.idPrograma = p.idPrograma
+                     WHERE c.descripcion LIKE @filtro
+                        OR p.nombre LIKE @filtro
+                        OR p.codigoPrograma LIKE @filtro";
+
+            SqlCommand cmd = new SqlCommand(query, cn);
+            cmd.Parameters.AddWithValue("@filtro", "%" + filtro + "%");
+
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+
+            da.Fill(dt);
+
+            oConex.MtCerrarConexion();
+
+            return dt;
+        }
     }
 }

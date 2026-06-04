@@ -1,15 +1,15 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Logica;
+using System;
 using System.Data;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using sistemaPlanMejoramientos.Datos;
 
 namespace sistemaPlanMejoramientos.Vista
 {
     public partial class FrmUsuarios : System.Web.UI.Page
     {
-        ClUsuarioD oUsuarioD = new ClUsuarioD();
+        ClUsuarioL oUsuarioL = new ClUsuarioL();
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -31,7 +31,7 @@ namespace sistemaPlanMejoramientos.Vista
 
         private void CargarUsuarios()
         {
-            DataTable dt = oUsuarioD.MtListarUsuarios(txtBuscar.Text.Trim());
+            DataTable dt = oUsuarioL.MtListarUsuarios(txtBuscar.Text.Trim());
 
             gvUsuarios.PageIndex = (int)ViewState["PaginaActual"];
             gvUsuarios.DataSource = dt;
@@ -99,57 +99,79 @@ namespace sistemaPlanMejoramientos.Vista
 
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
-            string correo = txtCorreo.Text.Trim();
-            string password = txtPassword.Text;
-
-            if (string.IsNullOrEmpty(ddlRol.SelectedValue))
+            try
             {
-                SetMensaje("warning", "Por favor, seleccione un rol para el usuario.");
-                return;
-            }
+                string correo = txtCorreo.Text.Trim();
+                string password = txtPassword.Text;
 
-            int idRol = Convert.ToInt32(ddlRol.SelectedValue);
-            bool esNuevo = string.IsNullOrEmpty(hfIdUsuario.Value);
-
-            if (esNuevo)
-            {
-                if (string.IsNullOrEmpty(password))
+                if (string.IsNullOrEmpty(ddlRol.SelectedValue))
                 {
-                    SetMensaje("warning", "Por favor, digite una contraseña.");
-                    return;
-                }
-                if (oUsuarioD.MtExisteCorreo(correo))
-                {
-                    SetMensaje("warning", "El correo electrónico ya se encuentra registrado.");
+                    SetMensaje("warning", "Por favor, seleccione un rol para el usuario.");
                     return;
                 }
 
-                bool registrado = oUsuarioD.MtCrearUsuario(correo, password, idRol);
-                if (registrado)
+                int idRol = Convert.ToInt32(ddlRol.SelectedValue);
+                bool esNuevo = string.IsNullOrEmpty(hfIdUsuario.Value);
+
+                if (esNuevo)
                 {
-                    SetMensaje("success", "¡Usuario creado con éxito!");
-                    LimpiarFormulario();
-                    CargarUsuarios();
+                    if (string.IsNullOrEmpty(password))
+                    {
+                        SetMensaje("warning", "Por favor, digite una contraseña.");
+                        return;
+                    }
+
+                    if (oUsuarioL.MtExisteCorreo(correo))
+                    {
+                        SetMensaje("warning", "El correo electrónico ya se encuentra registrado.");
+                        return;
+                    }
+
+                    bool registrado = oUsuarioL.MtCrearUsuario(correo, password, idRol);
+
+                    if (registrado)
+                    {
+                        SetMensaje("success", "¡Usuario creado con éxito!");
+                        LimpiarFormulario();
+                        CargarUsuarios();
+                    }
+                    else
+                    {
+                        SetMensaje("error", "Error al registrar el usuario.");
+                    }
                 }
                 else
                 {
-                    SetMensaje("error", "Error al registrar el usuario.");
+                    int idUsuario = Convert.ToInt32(hfIdUsuario.Value);
+
+                    bool actualizado = oUsuarioL.MtActualizarUsuario(idUsuario, correo, password, idRol);
+
+                    if (actualizado)
+                    {
+                        SetMensaje("success", "¡Usuario actualizado con éxito!");
+                        LimpiarFormulario();
+                        CargarUsuarios();
+                    }
+                    else
+                    {
+                        SetMensaje("error", "Error al actualizar el usuario.");
+                    }
                 }
             }
-            else
+            catch (System.Data.SqlClient.SqlException ex)
             {
-                int idUsuario = Convert.ToInt32(hfIdUsuario.Value);
-                bool actualizado = oUsuarioD.MtActualizarUsuario(idUsuario, correo, password, idRol);
-                if (actualizado)
+                if (ex.Number == 2627 || ex.Number == 2601)
                 {
-                    SetMensaje("success", "¡Usuario actualizado con éxito!");
-                    LimpiarFormulario();
-                    CargarUsuarios();
+                    SetMensaje("warning", "No se puede guardar el usuario porque existen datos duplicados.");
                 }
                 else
                 {
-                    SetMensaje("error", "Error al actualizar el usuario.");
+                    SetMensaje("error", "Ocurrió un error en la base de datos.");
                 }
+            }
+            catch (Exception)
+            {
+                SetMensaje("error", "Ocurrió un error inesperado.");
             }
         }
 
@@ -159,7 +181,7 @@ namespace sistemaPlanMejoramientos.Vista
 
             if (e.CommandName == "Editar")
             {
-                DataTable dt = oUsuarioD.MtBuscarUsuarioPorId(idUsuario);
+                DataTable dt = oUsuarioL.MtBuscarUsuarioPorId(idUsuario);
                 if (dt.Rows.Count > 0)
                 {
                     DataRow fila = dt.Rows[0];
@@ -175,15 +197,15 @@ namespace sistemaPlanMejoramientos.Vista
             }
             else if (e.CommandName == "Eliminar")
             {
-                int idAprendizVinculado = oUsuarioD.MtObtenerIdAprendizPorUsuario(idUsuario);
-                bool eliminado = oUsuarioD.MtEliminarUsuario(idUsuario);
+                int idAprendizVinculado = oUsuarioL.MtObtenerIdAprendiz(idUsuario);
+                bool eliminado = oUsuarioL.MtEliminarUsuario(idUsuario);
 
                 if (eliminado)
                 {
                     if (idAprendizVinculado > 0)
                     {
-                        ClAprendizD oAprendizD = new ClAprendizD();
-                        oAprendizD.MtEliminarAprendiz(idAprendizVinculado);
+                        ClAprendizL oAprendizL = new ClAprendizL();
+                        oAprendizL.MtEliminarAprendiz(idAprendizVinculado);
                     }
 
                     SetMensaje("success", "¡Usuario y su aprendiz vinculado eliminados correctamente!");

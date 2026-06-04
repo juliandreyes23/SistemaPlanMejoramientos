@@ -126,34 +126,37 @@ namespace sistemaPlanMejoramientos.Vista
 
                 if (esNuevo)
                 {
-
-                    bool dt = oProgramaL.MtObtenerProgramaPorCodigo(codigo);
-                    if (dt = false)
+                    if (oProgramaL.MtObtenerProgramaPorCodigo(codigo))
                     {
-                            bool insertado = oProgramaL.MtCrearPrograma(codigo, nombre, version, nivel, duracion, estado, idCentro);
+                        SetMensaje("warning", "Ya existe un programa registrado con ese código.");
+                        return;
+                    }
 
-                        if (insertado)
-                        {
-                            SetMensaje("success", "¡Programa registrado exitosamente!");
-                            LimpiarFormulario();
-                            CargarProgramas();
-                        }
-                        else
-                        {
-                            SetMensaje("error", "Error al registrar el programa.");
-                        }
+                    bool insertado = oProgramaL.MtCrearPrograma(codigo, nombre, version, nivel, duracion, estado, idCentro);
+
+                    if (insertado)
+                    {
+                        SetMensaje("success", "¡Programa registrado exitosamente!");
+                        LimpiarFormulario();
+                        CargarProgramas();
                     }
                     else
                     {
-                        SetMensaje("error", "No se puede crear un Programa con Codigo ya Registrado.");
+                        SetMensaje("error", "Error al registrar el programa.");
                     }
-
-                    
                 }
                 else
                 {
                     int idPrograma = Convert.ToInt32(hfIdPrograma.Value);
+
+                    if (oProgramaL.MtObtenerProgramaPorCodigoExcluyendo(codigo, idPrograma))
+                    {
+                        SetMensaje("warning", "Ya existe otro programa registrado con ese código.");
+                        return;
+                    }
+
                     bool actualizado = oProgramaL.MtActualizarPrograma(idPrograma, codigo, nombre, version, nivel, duracion, estado, idCentro);
+
                     if (actualizado)
                     {
                         SetMensaje("success", "¡Programa modificado correctamente!");
@@ -178,7 +181,6 @@ namespace sistemaPlanMejoramientos.Vista
 
             if (e.CommandName == "Editar")
             {
-                //int idPrograma = Convert.ToInt32(gvProgramas.DataKeys[Convert.ToInt32(e.CommandArgument)].Value);
                 int idPrograma = Convert.ToInt32(e.CommandArgument);
                 hfIdPrograma.Value = idPrograma.ToString();
 

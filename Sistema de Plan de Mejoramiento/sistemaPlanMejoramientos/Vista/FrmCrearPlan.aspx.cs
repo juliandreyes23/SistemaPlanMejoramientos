@@ -10,7 +10,6 @@ namespace sistemaPlanMejoramientos.Instructor
     public partial class FrmCrearPlan : System.Web.UI.Page
     {
         ClPlanMejoramientoL oPlanL = new ClPlanMejoramientoL();
-        ClFichaL oFichaL = new ClFichaL();
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -26,6 +25,9 @@ namespace sistemaPlanMejoramientos.Instructor
                 CargarAprendices();
                 txtFechaLimite.Text = DateTime.Now.AddDays(15).ToString("yyyy-MM-dd");
             }
+
+            hfMensajeTipo.Value = "";
+            hfMensajeTxt.Value = "";
         }
 
         private void CargarAprendices()
@@ -105,6 +107,7 @@ namespace sistemaPlanMejoramientos.Instructor
                 SetMensaje("warning", "Selecciona un aprendiz.");
                 return;
             }
+
 
             string[] partes = ddlAprendiz.SelectedValue.Split('|');
             int idAprendiz = Convert.ToInt32(partes[0]);

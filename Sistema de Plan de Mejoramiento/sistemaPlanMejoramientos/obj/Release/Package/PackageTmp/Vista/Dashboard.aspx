@@ -57,15 +57,8 @@
         }
 
         @keyframes pulse {
-            0%,100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            50% {
-                opacity: .5;
-                transform: scale(1.4);
-            }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .5; transform: scale(1.4); }
         }
 
         .nav-right {
@@ -99,10 +92,10 @@
             transition: all .2s;
         }
 
-            .nav-btn:hover {
-                background: rgba(255,255,255,.1);
-                color: #fff;
-            }
+        .nav-btn:hover {
+            background: rgba(255,255,255,.1);
+            color: #fff;
+        }
 
         .hero {
             background: #042940;
@@ -111,29 +104,29 @@
             overflow: hidden;
         }
 
-            .hero::before {
-                content: '';
-                position: absolute;
-                top: -60px;
-                right: -60px;
-                width: 320px;
-                height: 320px;
-                background: #005C53;
-                border-radius: 50%;
-                opacity: .35;
-            }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 320px;
+            height: 320px;
+            background: #005C53;
+            border-radius: 50%;
+            opacity: .35;
+        }
 
-            .hero::after {
-                content: '';
-                position: absolute;
-                bottom: 20px;
-                right: 80px;
-                width: 160px;
-                height: 160px;
-                background: #9FC131;
-                border-radius: 50%;
-                opacity: .08;
-            }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 20px;
+            right: 80px;
+            width: 160px;
+            height: 160px;
+            background: #9FC131;
+            border-radius: 50%;
+            opacity: .08;
+        }
 
         .hero-inner {
             position: relative;
@@ -172,9 +165,9 @@
             margin-bottom: 10px;
         }
 
-            .hero-title span {
-                color: #9FC131;
-            }
+        .hero-title span {
+            color: #9FC131;
+        }
 
         .hero-sub {
             font-size: 13px;
@@ -224,7 +217,7 @@
 
         .main-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 14px;
             margin-bottom: 28px;
             align-items: stretch;
@@ -242,37 +235,36 @@
             text-decoration: none;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             min-height: 180px;
         }
 
-            .mod-card::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 3px;
-                background: #042940;
-                transform: scaleX(0);
-                transition: transform .25s;
-                transform-origin: left;
-            }
+        .mod-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #042940;
+            transform: scaleX(0);
+            transition: transform .25s;
+            transform-origin: left;
+        }
 
-            .mod-card:hover {
-                transform: translateY(-4px);
-                border-color: #c5d0db;
-                box-shadow: 0 8px 24px rgba(0,0,0,.07);
-            }
+        .mod-card:hover {
+            transform: translateY(-4px);
+            border-color: #c5d0db;
+            box-shadow: 0 8px 24px rgba(0,0,0,.07);
+        }
 
-                .mod-card:hover::after {
-                    transform: scaleX(1);
-                }
+        .mod-card:hover::after {
+            transform: scaleX(1);
+        }
 
-                .mod-card:hover .mod-action {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+        .mod-card:hover .mod-action {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         .mod-ico {
             width: 44px;
@@ -286,30 +278,16 @@
             flex-shrink: 0;
         }
 
-            .mod-ico.ct {
-                background: #FFF3E0;
-                color: #E65100;
-            }
-
-            .mod-ico.u {
-                background: #042940;
-                color: #9FC131;
-            }
-
-            .mod-ico.p {
-                background: #E1F5EE;
-                color: #0F6E56;
-            }
-
-            .mod-ico.f {
-                background: #FAEEDA;
-                color: #854F0B;
-            }
-
-            .mod-ico.ap {
-                background: #EEEDFE;
-                color: #534AB7;
-            }
+        .mod-ico.ct  { background: #FFF3E0; color: #E65100; }
+        .mod-ico.u   { background: #042940; color: #9FC131; }
+        .mod-ico.cp  { background: #E8F5E9; color: #2E7D32; }
+        .mod-ico.p   { background: #E1F5EE; color: #0F6E56; }
+        .mod-ico.f   { background: #FAEEDA; color: #854F0B; }
+        .mod-ico.ap  { background: #EEEDFE; color: #534AB7; }
+        .mod-ico.in  { background: #FAECE7; color: #993C1D; }
+        .mod-ico.as  { background: #042940; color: #9FC131; }
+        .mod-ico.ex  { background: #E6F1FB; color: #185FA5; }
+        .mod-ico.ra  { background: #E1F5EE; color: #0F6E56; }
 
         .mod-body {
             flex: 1;
@@ -358,16 +336,16 @@
             transition: all .25s;
         }
 
-            .bot-card:hover {
-                transform: translateY(-4px);
-                border-color: #c5d0db;
-                box-shadow: 0 8px 24px rgba(0,0,0,.07);
-            }
+        .bot-card:hover {
+            transform: translateY(-4px);
+            border-color: #c5d0db;
+            box-shadow: 0 8px 24px rgba(0,0,0,.07);
+        }
 
-            .bot-card.accent {
-                background: #042940;
-                border-color: #042940;
-            }
+        .bot-card.accent {
+            background: #042940;
+            border-color: #042940;
+        }
 
         .bot-top {
             display: flex;
@@ -377,15 +355,13 @@
         }
 
         .bot-title {
-            font-family: 'Syne',sans-serif;
+            font-family: 'Syne', sans-serif;
             font-size: 15px;
             font-weight: 700;
             color: #042940;
         }
 
-        .bot-card.accent .bot-title {
-            color: #fff;
-        }
+        .bot-card.accent .bot-title { color: #fff; }
 
         .bot-sub {
             font-size: 12px;
@@ -394,9 +370,7 @@
             line-height: 1.5;
         }
 
-        .bot-card.accent .bot-sub {
-            color: rgba(255,255,255,.5);
-        }
+        .bot-card.accent .bot-sub { color: rgba(255,255,255,.5); }
 
         .bot-link {
             display: inline-flex;
@@ -444,100 +418,21 @@
             background: rgba(159,193,49,.3);
         }
 
-            .mini-bar.hi {
-                background: #9FC131;
-            }
-
-        .mod-ico.in {
-            background: #FAECE7;
-            color: #993C1D;
-        }
-
-        .mod-ico.as {
-            background: #042940;
-            color: #9FC131;
-        }
-
-        .mod-ico.ex {
-            background: #E6F1FB;
-            color: #185FA5;
-        }
-
-        @media (max-width: 1100px) {
-            .main-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .main-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .bot-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 500px) {
-            .hero-visual {
-                display: none;
-            }
-
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .bot-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .dash-body {
-                padding: 16px;
-            }
-        }
-        /* =========================
-   RESPONSIVE DASHBOARD
-========================= */
-
-        @media (max-width: 1200px) {
-
-            .main-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
+        .mini-bar.hi { background: #9FC131; }
 
         @media (max-width: 992px) {
-
             .hero-inner {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 25px;
             }
-
-            .hero-text {
-                max-width: 100%;
-            }
-
-            .main-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .bot-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .nav {
-                padding: 0 18px;
-            }
-
-            .dash-body {
-                padding: 20px;
-            }
+            .hero-text { max-width: 100%; }
+            .bot-grid { grid-template-columns: repeat(2, 1fr); }
+            .nav { padding: 0 18px; }
+            .dash-body { padding: 20px; }
         }
 
         @media (max-width: 768px) {
-
             .nav {
                 flex-direction: column;
                 height: auto;
@@ -545,74 +440,27 @@
                 gap: 12px;
                 align-items: flex-start;
             }
-
             .nav-right {
                 width: 100%;
                 justify-content: space-between;
             }
-
-            .hero {
-                padding: 28px 20px;
-            }
-
-            .hero-title {
-                font-size: 22px;
-            }
-
-            .hero-sub {
-                font-size: 12px;
-            }
-
-            .hero-visual {
-                display: none;
-            }
-
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .bot-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .mod-card,
-            .bot-card {
-                min-height: auto;
-            }
-
-            .dash-body {
-                padding: 16px;
-            }
+            .hero { padding: 28px 20px; }
+            .hero-title { font-size: 22px; }
+            .hero-sub { font-size: 12px; }
+            .hero-visual { display: none; }
+            .bot-grid { grid-template-columns: 1fr; }
+            .mod-card, .bot-card { min-height: auto; }
+            .dash-body { padding: 16px; }
         }
 
         @media (max-width: 480px) {
-
-            .hero-title {
-                font-size: 20px;
-            }
-
-            .hero-badge {
-                font-size: 10px;
-            }
-
-            .section-label {
-                font-size: 11px;
-            }
-
-            .mod-title,
-            .bot-title {
-                font-size: 13px;
-            }
-
-            .mod-desc,
-            .bot-sub {
-                font-size: 11px;
-            }
-
-            .nav-btn {
-                width: 100%;
-                text-align: center;
-            }
+            .hero-title { font-size: 20px; }
+            .hero-badge { font-size: 10px; }
+            .section-label { font-size: 11px; }
+            .mod-title, .bot-title { font-size: 13px; }
+            .mod-desc, .bot-sub { font-size: 11px; }
+            .nav-btn { width: 100%; text-align: center; }
+            .hero-visual { display: none; }
         }
     </style>
 </head>
@@ -623,7 +471,6 @@
             <div class="nav-brand">
                 <div class="nav-dot"></div>
                 SENA Admin
-       
             </div>
             <div class="nav-right">
                 <div>
@@ -640,10 +487,8 @@
                 <div class="hero-text">
                     <div class="hero-badge">
                         <i class="bi bi-layout-sidebar"></i>Panel principal
-               
                     </div>
-                    <h1 class="hero-title">Planes de<br>
-                        <span>Mejoramiento</span></h1>
+                    <h1 class="hero-title">Planes de<br><span>Mejoramiento</span></h1>
                     <p class="hero-sub">Administra centros, programas, fichas, instructores y aprendices desde un solo lugar.</p>
                 </div>
                 <div class="hero-visual">
@@ -666,7 +511,6 @@
                 <div class="section-rule"></div>
             </div>
 
-            <%-- 5 cards en un solo grid alineado --%>
             <div class="main-grid">
 
                 <a href="GestionCentros.aspx" class="mod-card">
@@ -686,6 +530,17 @@
                         <div class="mod-body">
                             <div class="mod-title">Usuarios</div>
                             <div class="mod-desc">Credenciales y accesos al sistema.</div>
+                        </div>
+                    </div>
+                    <span class="mod-action">Gestionar <i class="bi bi-arrow-right"></i></span>
+                </a>
+
+                <a href="GestionCompetencias.aspx" class="mod-card">
+                    <div>
+                        <div class="mod-ico cp"><i class="bi bi-award-fill"></i></div>
+                        <div class="mod-body">
+                            <div class="mod-title">Competencias</div>
+                            <div class="mod-desc">Administración de competencias y resultados de aprendizaje.</div>
                         </div>
                     </div>
                     <span class="mod-action">Gestionar <i class="bi bi-arrow-right"></i></span>
@@ -719,6 +574,17 @@
                         <div class="mod-body">
                             <div class="mod-title">Aprendices</div>
                             <div class="mod-desc">Registro y estado académico.</div>
+                        </div>
+                    </div>
+                    <span class="mod-action">Gestionar <i class="bi bi-arrow-right"></i></span>
+                </a>
+
+                <a href="ResultadosAprendizaje.aspx" class="mod-card">
+                    <div>
+                        <div class="mod-ico ra"><i class="bi bi-check2-square"></i></div>
+                        <div class="mod-body">
+                            <div class="mod-title">Resultados de Aprendizaje</div>
+                            <div class="mod-desc">Gestión de resultados asociados a cada competencia.</div>
                         </div>
                     </div>
                     <span class="mod-action">Gestionar <i class="bi bi-arrow-right"></i></span>

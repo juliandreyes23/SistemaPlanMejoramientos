@@ -152,11 +152,16 @@
                                 PagerStyle-CssClass="d-none">
                                 <Columns>
                                     <asp:BoundField DataField="idInstructor" HeaderText="ID" ItemStyle-Width="40px" ItemStyle-HorizontalAlign="Center" />
-                                    <asp:TemplateField HeaderText="Documento" ItemStyle-Width="110px">
+                                    <asp:TemplateField HeaderText="Tipo Doc." ItemStyle-Width="80px" ItemStyle-HorizontalAlign="Center">
                                         <ItemTemplate>
                                             <asp:HiddenField ID="hfTipoDoc" runat="server" Value='<%# Eval("tipoDocumento") %>' />
+                                            <%# Eval("tipoDocumento") %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="No. Documento" ItemStyle-Width="120px">
+                                        <ItemTemplate>
                                             <asp:HiddenField ID="hfNumDoc" runat="server" Value='<%# Eval("numeroDocumento") %>' />
-                                            <%# Eval("tipoDocumento") %> - <%# Eval("numeroDocumento") %>
+                                            <%# Eval("numeroDocumento") %>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:BoundField DataField="nombres" HeaderText="Nombres" />

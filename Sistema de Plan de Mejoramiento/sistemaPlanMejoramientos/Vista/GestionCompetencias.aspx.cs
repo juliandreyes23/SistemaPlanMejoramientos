@@ -3,13 +3,13 @@ using System.Data;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using sistemaPlanMejoramientos.Logica;
-using sistemaPlanMejoramientos.Datos;
 
 namespace sistemaPlanMejoramientos.Vista
 {
     public partial class GestionCompetencias : Page
     {
         ClCompetenciaL oCompetenciaL = new ClCompetenciaL();
+        ClProgramaL oProgramaL = new ClProgramaL();
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -19,12 +19,17 @@ namespace sistemaPlanMejoramientos.Vista
                 ViewState["PaginaActual"] = 0;
                 CargarCompetencias("");
             }
+            if (string.IsNullOrEmpty(Request["__EVENTTARGET"]))
+            {
+                hfMensajeTipo.Value = "";
+                hfMensajeTxt.Value = "";
+            }
+
         }
 
         private void CargarProgramas()
         {
-            ClProgramaD oProgramaD = new ClProgramaD();
-            DataTable dt = oProgramaD.MtListarProgramas();
+            DataTable dt = oProgramaL.MtListarProgramas();  
             ddlPrograma.Items.Clear();
             ddlPrograma.Items.Add(new ListItem("-- Seleccione un programa --", "0"));
             foreach (DataRow row in dt.Rows)
@@ -38,13 +43,15 @@ namespace sistemaPlanMejoramientos.Vista
 
         private void CargarCompetencias(string filtro)
         {
-            DataTable dt = oCompetenciaL.MtListarCompetencias();
+            DataTable dt;
 
             if (!string.IsNullOrWhiteSpace(filtro))
             {
-                dt.DefaultView.RowFilter =
-                    $"DescripcionCompetencia LIKE '%{filtro}%' OR NombrePrograma LIKE '%{filtro}%' OR codigoPrograma LIKE '%{filtro}%'";
-                dt = dt.DefaultView.ToTable();
+                dt = oCompetenciaL.MtBuscarCompetencias(filtro);
+            }
+            else
+            {
+                dt = oCompetenciaL.MtListarCompetencias();
             }
 
             int pageSize = 10;
@@ -71,7 +78,12 @@ namespace sistemaPlanMejoramientos.Vista
             if (totalPaginas > 1)
             {
                 int[] paginas = new int[totalPaginas];
-                for (int i = 0; i < totalPaginas; i++) paginas[i] = i;
+
+                for (int i = 0; i < totalPaginas; i++)
+                {
+                    paginas[i] = i;
+                }
+
                 rptPaginacion.DataSource = paginas;
                 rptPaginacion.DataBind();
             }

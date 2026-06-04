@@ -8,6 +8,8 @@ namespace sistemaPlanMejoramientos.Instructor
 {
     public partial class DashboardInstructor : System.Web.UI.Page
     {
+        ClFichaL oFichaL = new ClFichaL();
+        ClPlanMejoramientoL oPlanL = new ClPlanMejoramientoL();
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["correo"] == null || Session["rol"] == null)
@@ -35,10 +37,10 @@ namespace sistemaPlanMejoramientos.Instructor
             {
                 int idInstructor = Convert.ToInt32(Session["idInstructor"]);
 
-                ClFichaL oFichaL = new ClFichaL();
+                
                 lblTotalFichas.Text = oFichaL.MtContarFichasPorInstructor(idInstructor).ToString();
 
-                ClPlanMejoramientoL oPlanL = new ClPlanMejoramientoL();
+                
                 lblPlanesInternos.Text = oPlanL.MtContarPlanesPorTipo(idInstructor, "Interno").ToString();
                 lblPlanesComite.Text   = oPlanL.MtContarPlanesPorTipo(idInstructor, "Comité").ToString();
             }

@@ -9,6 +9,8 @@ namespace sistemaPlanMejoramientos.Vista
     {
         ClPlanMejoramientoL oPlanL = new ClPlanMejoramientoL();
         ClEvidenciaL oEvidL = new ClEvidenciaL();
+        ClEvaluacionL oEvalL = new ClEvaluacionL();
+
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -96,7 +98,6 @@ namespace sistemaPlanMejoramientos.Vista
                 pnlSinEvidencias.Visible = false;
             }
 
-            ClEvaluacionL oEvalL = new ClEvaluacionL();
             DataTable dtCrit = oEvalL.MtConsultarEvaluacionPorPlan(idPlan);
 
             if (dtCrit.Rows.Count == 0)

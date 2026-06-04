@@ -25,6 +25,20 @@ namespace sistemaPlanMejoramientos.Datos
             return filas > 0;
         }
 
+        public int CrearUsuarioInstructor(string correo, string documento)
+        {
+            SqlConnection cn = oConex.MtAbrirConexion();
+            string query = @"INSERT INTO usuarios (correo, password, idRol) 
+                     OUTPUT INSERTED.idUsuario 
+                     VALUES (@correo, @pass, 2)";
+            SqlCommand cmd = new SqlCommand(query, cn);
+            cmd.Parameters.AddWithValue("@correo", correo);
+            cmd.Parameters.AddWithValue("@pass", MtEncriptarCadena(documento));
+            object resultado = cmd.ExecuteScalar();
+            oConex.MtCerrarConexion();
+            return resultado != null ? Convert.ToInt32(resultado) : 0;
+        }
+
         public DataTable MtListarUsuarios()
         {
             return MtListarUsuarios("");
@@ -363,6 +377,39 @@ namespace sistemaPlanMejoramientos.Datos
             object resultado = cmd.ExecuteScalar();
             oConex.MtCerrarConexion();
             return resultado != null && resultado != DBNull.Value ? Convert.ToInt32(resultado) : 0;
+        }
+
+        public int MtObtenerIdCentroAdmin(int idUsuario)
+        {
+            SqlConnection cn = oConex.MtAbrirConexion();
+            string query = "SELECT idCentro FROM administradores WHERE idUsuario = @idUsuario";
+            SqlCommand cmd = new SqlCommand(query, cn);
+            cmd.Parameters.AddWithValue("@idUsuario", idUsuario);
+            object resultado = cmd.ExecuteScalar();
+            oConex.MtCerrarConexion();
+            return resultado != null ? Convert.ToInt32(resultado) : 0;
+        }
+
+        public int MtObtenerIdInstructor(int idUsuario)
+        {
+            SqlConnection cn = oConex.MtAbrirConexion();
+            string query = "SELECT idInstructor FROM instructores WHERE idUsuario = @idUsuario";
+            SqlCommand cmd = new SqlCommand(query, cn);
+            cmd.Parameters.AddWithValue("@idUsuario", idUsuario);
+            object resultado = cmd.ExecuteScalar();
+            oConex.MtCerrarConexion();
+            return resultado != null ? Convert.ToInt32(resultado) : 0;
+        }
+
+        public int MtObtenerIdAprendiz(int idUsuario)
+        {
+            SqlConnection cn = oConex.MtAbrirConexion();
+            string query = "SELECT idAprendiz FROM aprendices WHERE idUsuario = @idUsuario";
+            SqlCommand cmd = new SqlCommand(query, cn);
+            cmd.Parameters.AddWithValue("@idUsuario", idUsuario);
+            object resultado = cmd.ExecuteScalar();
+            oConex.MtCerrarConexion();
+            return resultado != null ? Convert.ToInt32(resultado) : 0;
         }
     }
 }
