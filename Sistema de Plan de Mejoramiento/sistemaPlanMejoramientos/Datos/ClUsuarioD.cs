@@ -98,12 +98,47 @@ namespace sistemaPlanMejoramientos.Datos
         public bool MtEliminarUsuario(int idUsuario)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
-            string query = @"DELETE FROM usuarios WHERE idUsuario = @idUsuario";
-            SqlCommand cmd = new SqlCommand(query, cn);
-            cmd.Parameters.AddWithValue("@idUsuario", idUsuario);
-            int filas = cmd.ExecuteNonQuery();
-            oConex.MtCerrarConexion();
-            return filas > 0;
+            SqlTransaction transaction = cn.BeginTransaction();
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand("", cn, transaction);
+                cmd.Parameters.AddWithValue("@idUsuario", idUsuario);
+
+                cmd.CommandText = @"UPDATE instructores 
+                            SET idUsuario = NULL 
+                            WHERE idUsuario = @idUsuario";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"UPDATE aprendices 
+                            SET idUsuario = NULL 
+                            WHERE idUsuario = @idUsuario";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM administradores 
+                            WHERE idUsuario = @idUsuario";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM recuperacionPassword 
+                            WHERE idUsuario = @idUsuario";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM usuarios 
+                            WHERE idUsuario = @idUsuario";
+                int filas = cmd.ExecuteNonQuery();
+
+                transaction.Commit();
+                return filas > 0;
+            }
+            catch
+            {
+                transaction.Rollback();
+                return false;
+            }
+            finally
+            {
+                oConex.MtCerrarConexion();
+            }
         }
 
         public DataTable MtLogin(string correo, string password)

@@ -222,12 +222,19 @@ namespace sistemaPlanMejoramientos.Vista
                     }
                     else
                     {
-                        SetMensaje("error", "No se pudo eliminar el programa. Puede tener fichas asociadas.");
+                        SetMensaje("error", "No se pudo eliminar el programa.");
                     }
                 }
                 catch (Exception ex)
                 {
-                    SetMensaje("error", "Error al intentar eliminar: " + ex.Message);
+                    if (ex.Message.Contains("REFERENCE") || ex.Message.Contains("FK_"))
+                    {
+                        SetMensaje("error", "No se puede eliminar este programa porque tiene competencias o fichas asociadas.");
+                    }
+                    else
+                    {
+                        SetMensaje("error", "Error al intentar eliminar: " + ex.Message);
+                    }
                 }
             }
         }

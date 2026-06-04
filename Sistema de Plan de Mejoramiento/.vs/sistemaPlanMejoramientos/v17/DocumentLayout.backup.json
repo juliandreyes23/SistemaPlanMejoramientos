@@ -3,24 +3,32 @@
   "WorkspaceRootPath": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|c:\\users\\julia\\downloads\\git plan de mejoramineto\\sistema de plan de mejoramiento\\sistemaplanmejoramientos\\vista\\frmcrearplan.aspx.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|solutionrelative:sistemaplanmejoramientos\\vista\\frmcrearplan.aspx.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|c:\\users\\julia\\downloads\\git plan de mejoramineto\\sistema de plan de mejoramiento\\sistemaplanmejoramientos\\datos\\clcentrod.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|solutionrelative:sistemaplanmejoramientos\\datos\\clcentrod.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaplanmejoramientos\\vista\\frmcrearplan.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}",
-      "RelativeMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|solutionrelative:sistemaplanmejoramientos\\vista\\frmcrearplan.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}"
+      "AbsoluteMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|c:\\users\\julia\\downloads\\git plan de mejoramineto\\sistema de plan de mejoramiento\\sistemaplanmejoramientos\\datos\\clinstructord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|solutionrelative:sistemaplanmejoramientos\\datos\\clinstructord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaplanmejoramientos\\vista\\gestioncompetencias.aspx.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|c:\\users\\julia\\downloads\\git plan de mejoramineto\\sistema de plan de mejoramiento\\sistemaplanmejoramientos\\vista\\gestionprogramas.aspx.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|solutionrelative:sistemaplanmejoramientos\\vista\\gestionprogramas.aspx.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|c:\\users\\julia\\downloads\\git plan de mejoramineto\\sistema de plan de mejoramiento\\sistemaplanmejoramientos\\vista\\gestionprogramas.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}",
+      "RelativeMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|solutionrelative:sistemaplanmejoramientos\\vista\\gestionprogramas.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|c:\\users\\julia\\downloads\\git plan de mejoramineto\\sistema de plan de mejoramiento\\sistemaplanmejoramientos\\datos\\clcompetenciad.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|solutionrelative:sistemaplanmejoramientos\\datos\\clcompetenciad.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|c:\\users\\julia\\downloads\\git plan de mejoramineto\\sistema de plan de mejoramiento\\sistemaplanmejoramientos\\vista\\gestioncompetencias.aspx.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|solutionrelative:sistemaplanmejoramientos\\vista\\gestioncompetencias.aspx.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaplanmejoramientos\\vista\\gestioncompetencias.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}",
+      "AbsoluteMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|c:\\users\\julia\\downloads\\git plan de mejoramineto\\sistema de plan de mejoramiento\\sistemaplanmejoramientos\\vista\\gestioncompetencias.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}",
       "RelativeMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|solutionrelative:sistemaplanmejoramientos\\vista\\gestioncompetencias.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaplanmejoramientos\\vista\\dashboard.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}",
-      "RelativeMoniker": "D:0:0:{95A6BB8E-FD7A-4048-A991-4AF80C3036D3}|sistemaPlanMejoramientos\\sistemaPlanMejoramientos.csproj|solutionrelative:sistemaplanmejoramientos\\vista\\dashboard.aspx||{57312C73-6202-49E9-B1E1-40EA1A6DC1F6}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,48 +38,89 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "FrmCrearPlan.aspx.cs",
-              "DocumentMoniker": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Vista\\FrmCrearPlan.aspx.cs",
-              "RelativeDocumentMoniker": "sistemaPlanMejoramientos\\Vista\\FrmCrearPlan.aspx.cs",
-              "ToolTip": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Vista\\FrmCrearPlan.aspx.cs",
-              "RelativeToolTip": "sistemaPlanMejoramientos\\Vista\\FrmCrearPlan.aspx.cs",
-              "ViewState": "AgIAAHIAAAAAAAAAAAAowIQAAAAtAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "ClInstructorD.cs",
+              "DocumentMoniker": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Datos\\ClInstructorD.cs",
+              "RelativeDocumentMoniker": "sistemaPlanMejoramientos\\Datos\\ClInstructorD.cs",
+              "ToolTip": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Datos\\ClInstructorD.cs",
+              "RelativeToolTip": "sistemaPlanMejoramientos\\Datos\\ClInstructorD.cs",
+              "ViewState": "AgIAAIcAAAAAAAAAAAAkwJIAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-03T21:01:13.441Z",
+              "WhenOpened": "2026-06-04T23:06:29.622Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "FrmCrearPlan.aspx",
-              "DocumentMoniker": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Vista\\FrmCrearPlan.aspx",
-              "RelativeDocumentMoniker": "sistemaPlanMejoramientos\\Vista\\FrmCrearPlan.aspx",
-              "ToolTip": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Vista\\FrmCrearPlan.aspx",
-              "RelativeToolTip": "sistemaPlanMejoramientos\\Vista\\FrmCrearPlan.aspx",
-              "LogicalView": "7651a703-06e5-11d1-8ebd-00a0c90f26ea",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000195|",
-              "WhenOpened": "2026-06-03T21:01:11.511Z"
+              "DocumentIndex": 0,
+              "Title": "ClCentroD.cs",
+              "DocumentMoniker": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Datos\\ClCentroD.cs",
+              "RelativeDocumentMoniker": "sistemaPlanMejoramientos\\Datos\\ClCentroD.cs",
+              "ToolTip": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Datos\\ClCentroD.cs",
+              "RelativeToolTip": "sistemaPlanMejoramientos\\Datos\\ClCentroD.cs",
+              "ViewState": "AgIAAFwAAAAAAAAAAAAowGgAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-04T23:00:16.658Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "GestionProgramas.aspx.cs",
+              "DocumentMoniker": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Vista\\GestionProgramas.aspx.cs",
+              "RelativeDocumentMoniker": "sistemaPlanMejoramientos\\Vista\\GestionProgramas.aspx.cs",
+              "ToolTip": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Vista\\GestionProgramas.aspx.cs",
+              "RelativeToolTip": "sistemaPlanMejoramientos\\Vista\\GestionProgramas.aspx.cs",
+              "ViewState": "AgIAANkAAAAAAAAAAAAqwO4AAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-04T22:50:30.903Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "GestionProgramas.aspx",
+              "DocumentMoniker": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Vista\\GestionProgramas.aspx",
+              "RelativeDocumentMoniker": "sistemaPlanMejoramientos\\Vista\\GestionProgramas.aspx",
+              "ToolTip": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Vista\\GestionProgramas.aspx",
+              "RelativeToolTip": "sistemaPlanMejoramientos\\Vista\\GestionProgramas.aspx",
+              "LogicalView": "7651a703-06e5-11d1-8ebd-00a0c90f26ea",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000195|",
+              "WhenOpened": "2026-06-04T22:50:28.383Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ClCompetenciaD.cs",
+              "DocumentMoniker": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Datos\\ClCompetenciaD.cs",
+              "RelativeDocumentMoniker": "sistemaPlanMejoramientos\\Datos\\ClCompetenciaD.cs",
+              "ToolTip": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Datos\\ClCompetenciaD.cs",
+              "RelativeToolTip": "sistemaPlanMejoramientos\\Datos\\ClCompetenciaD.cs",
+              "ViewState": "AgIAAD4AAAAAAAAAAAAowGsAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-04T22:46:11.107Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "GestionCompetencias.aspx.cs",
               "DocumentMoniker": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Vista\\GestionCompetencias.aspx.cs",
               "RelativeDocumentMoniker": "sistemaPlanMejoramientos\\Vista\\GestionCompetencias.aspx.cs",
               "ToolTip": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Vista\\GestionCompetencias.aspx.cs",
               "RelativeToolTip": "sistemaPlanMejoramientos\\Vista\\GestionCompetencias.aspx.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAxwBkAAAANAAAAAAAAAA==",
+              "ViewState": "AgIAAMkAAAAAAAAAAAAiwNIAAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-03T20:39:17.946Z"
+              "WhenOpened": "2026-06-04T22:45:06.217Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "GestionCompetencias.aspx",
               "DocumentMoniker": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Vista\\GestionCompetencias.aspx",
               "RelativeDocumentMoniker": "sistemaPlanMejoramientos\\Vista\\GestionCompetencias.aspx",
@@ -79,19 +128,8 @@
               "RelativeToolTip": "sistemaPlanMejoramientos\\Vista\\GestionCompetencias.aspx",
               "LogicalView": "7651a703-06e5-11d1-8ebd-00a0c90f26ea",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000195|",
-              "WhenOpened": "2026-06-03T20:34:32.247Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Dashboard.aspx",
-              "DocumentMoniker": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Vista\\Dashboard.aspx",
-              "RelativeDocumentMoniker": "sistemaPlanMejoramientos\\Vista\\Dashboard.aspx",
-              "ToolTip": "C:\\Users\\julia\\Downloads\\Git Plan de Mejoramineto\\Sistema de Plan de Mejoramiento\\sistemaPlanMejoramientos\\Vista\\Dashboard.aspx",
-              "RelativeToolTip": "sistemaPlanMejoramientos\\Vista\\Dashboard.aspx",
-              "LogicalView": "7651a703-06e5-11d1-8ebd-00a0c90f26ea",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000195|",
-              "WhenOpened": "2026-06-03T20:18:36.977Z"
+              "WhenOpened": "2026-06-04T22:45:02.079Z",
+              "EditorCaption": ""
             }
           ]
         }

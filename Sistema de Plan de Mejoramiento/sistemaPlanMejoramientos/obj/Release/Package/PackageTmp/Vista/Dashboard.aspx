@@ -217,10 +217,9 @@
 
         .main-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 14px;
             margin-bottom: 28px;
-            align-items: stretch;
         }
 
         .mod-card {
@@ -235,7 +234,7 @@
             text-decoration: none;
             display: flex;
             flex-direction: column;
-            min-height: 180px;
+            min-height: 160px;
         }
 
         .mod-card::after {
@@ -421,39 +420,29 @@
         .mini-bar.hi { background: #9FC131; }
 
         @media (max-width: 992px) {
-            .hero-inner {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 25px;
-            }
-            .hero-text { max-width: 100%; }
+            .main-grid { grid-template-columns: repeat(3, 1fr); }
             .bot-grid { grid-template-columns: repeat(2, 1fr); }
+            .hero-inner { flex-direction: column; align-items: flex-start; gap: 25px; }
+            .hero-text { max-width: 100%; }
             .nav { padding: 0 18px; }
             .dash-body { padding: 20px; }
         }
 
         @media (max-width: 768px) {
-            .nav {
-                flex-direction: column;
-                height: auto;
-                padding: 14px;
-                gap: 12px;
-                align-items: flex-start;
-            }
-            .nav-right {
-                width: 100%;
-                justify-content: space-between;
-            }
+            .main-grid { grid-template-columns: repeat(2, 1fr); }
+            .bot-grid { grid-template-columns: 1fr; }
+            .nav { flex-direction: column; height: auto; padding: 14px; gap: 12px; align-items: flex-start; }
+            .nav-right { width: 100%; justify-content: space-between; }
             .hero { padding: 28px 20px; }
             .hero-title { font-size: 22px; }
             .hero-sub { font-size: 12px; }
             .hero-visual { display: none; }
-            .bot-grid { grid-template-columns: 1fr; }
             .mod-card, .bot-card { min-height: auto; }
             .dash-body { padding: 16px; }
         }
 
         @media (max-width: 480px) {
+            .main-grid { grid-template-columns: repeat(2, 1fr); }
             .hero-title { font-size: 20px; }
             .hero-badge { font-size: 10px; }
             .section-label { font-size: 11px; }

@@ -1,4 +1,5 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Inicio.aspx.cs" Inherits="sistemaPlanMejoramientos.Vista.Inicio" %>
+
 <!DOCTYPE html>
 <html lang="es">
 <head runat="server">
@@ -12,14 +13,21 @@
 <body>
     <form id="form1" runat="server">
 
-        <nav class="navbar navbar-expand-lg navbar-custom">
+        <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
             <div class="container-fluid px-4">
                 <a class="navbar-brand d-flex align-items-center gap-2" href="Inicio.aspx">
                     <div class="brand-icon">S</div>
                     <span class="brand-text">SENA <span class="brand-sub">Mejoramiento</span></span>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
-                    <span class="navbar-toggler-icon"></span>
+                <button class="navbar-toggler custom-toggler" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navMain"
+                    aria-controls="navMain"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation">
+
+                    <span class="custom-menu-icon">☰</span>
+
                 </button>
                 <div class="collapse navbar-collapse" id="navMain">
                     <ul class="navbar-nav ms-auto align-items-center gap-1">
@@ -50,7 +58,9 @@
                 <div class="row align-items-center min-vh-100 py-5 justify-content-center text-center">
                     <div class="col-lg-7">
                         <div class="hero-badge">Sistema Institucional</div>
-                        <h1 class="hero-title">Planes de<br /><span class="hero-accent">Mejoramiento</span><br />SENA</h1>
+                        <h1 class="hero-title">Planes de<br />
+                            <span class="hero-accent">Mejoramiento</span><br />
+                            SENA</h1>
                         <p class="hero-desc">Plataforma integral para la gestión, seguimiento y evaluación de planes de mejoramiento institucional. Optimiza procesos con trazabilidad y transparencia.</p>
                         <div class="hero-actions d-flex gap-3 flex-wrap justify-content-center">
                             <a href="FrmLogin.aspx" class="btn btn-hero-primary">Acceder al Sistema</a>

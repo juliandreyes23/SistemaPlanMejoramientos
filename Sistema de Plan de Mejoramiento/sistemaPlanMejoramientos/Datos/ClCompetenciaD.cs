@@ -49,14 +49,14 @@ namespace sistemaPlanMejoramientos.Datos
             return dt;
         }
 
-        public bool MtActualizarCompetencia (int idCompetencia, string descripcion, int idPrograma)
+        public bool MtActualizarCompetencia(int idCompetencia, string descripcion, int idPrograma)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
             string query = @"UPDATE competencias SET descripcion = @descripcion , idPrograma = @idPrograma
             WHERE idCompetencia = @idCompetencia";
 
-            SqlCommand cmd = new SqlCommand (query, cn);
+            SqlCommand cmd = new SqlCommand(query, cn);
             cmd.Parameters.AddWithValue("@idCompetencia", idCompetencia);
             cmd.Parameters.AddWithValue("@descripcion", descripcion);
             cmd.Parameters.AddWithValue("@idPrograma", idPrograma);
@@ -67,20 +67,44 @@ namespace sistemaPlanMejoramientos.Datos
 
             return filas > 0;
         }
-        public bool MtEliminarCompetencia (int idCompetencia)
+        public bool MtEliminarCompetencia(int idCompetencia)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
+            SqlTransaction transaction = cn.BeginTransaction();
 
-            string query = @"DELETE FROM competencias WHERE idCompetencia = @idCompetencia";
+            try
+            {
+                SqlCommand cmd = new SqlCommand("", cn, transaction);
+                cmd.Parameters.AddWithValue("@idCompetencia", idCompetencia);
 
-            SqlCommand cmd = new SqlCommand(query, cn);
-            cmd.Parameters.AddWithValue("@idCompetencia", idCompetencia);
+                cmd.CommandText = @"DELETE FROM planResultados 
+                            WHERE idResultadoAprendizaje IN (
+                                SELECT idResultadoAprendizaje 
+                                FROM resultadoAprendizaje 
+                                WHERE idCompetencia = @idCompetencia
+                            )";
+                cmd.ExecuteNonQuery();
 
-            int filas = cmd.ExecuteNonQuery();
+                cmd.CommandText = @"DELETE FROM resultadoAprendizaje 
+                            WHERE idCompetencia = @idCompetencia";
+                cmd.ExecuteNonQuery();
 
-            oConex.MtCerrarConexion();
+                cmd.CommandText = @"DELETE FROM competencias 
+                            WHERE idCompetencia = @idCompetencia";
+                int filas = cmd.ExecuteNonQuery();
 
-            return filas > 0;
+                transaction.Commit();
+                return filas > 0;
+            }
+            catch
+            {
+                transaction.Rollback();
+                return false;
+            }
+            finally
+            {
+                oConex.MtCerrarConexion();
+            }
         }
 
         public DataTable MtCargarCompetencias(int idPrograma)

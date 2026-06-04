@@ -244,26 +244,35 @@
                     <div class="card card-custom p-4">
                         <h4 class="mb-3" style="color: #ffffff;">Centros Registrados</h4>
 
-                        <div class="row mb-4">
-                            <div class="col-md-9 col-lg-8">
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text" style="background: rgba(31,41,55,0.7); border-color: rgba(255,255,255,0.2); color: #94a3b8;">
-                                        <i class="bi bi-search"></i>
-                                    </span>
-                                    <asp:TextBox ID="txtBuscar" runat="server"
-                                        CssClass="form-control"
-                                        placeholder="Buscar por código, nombre, regional, municipio...">
-                                    </asp:TextBox>
-                                    <asp:LinkButton ID="btnBuscar" runat="server" CssClass="btn btn-sena" OnClick="btnBuscar_Click" CausesValidation="false">
-                                        Buscar
-                                    </asp:LinkButton>
-                                    <asp:LinkButton ID="btnLimpiarBuscar" runat="server" CssClass="btn btn-outline-secondary" CausesValidation="false"
-                                        OnClick="btnLimpiarBuscar_Click" ToolTip="Limpiar filtro">
-                                        <i class="bi bi-arrow-clockwise"></i>
-                                    </asp:LinkButton>
+                        <asp:Panel ID="pnlBusqueda" runat="server" DefaultButton="btnBuscar">
+                            <div class="row mb-4">
+                                <div class="col-md-9 col-lg-8">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text" style="background: rgba(31,41,55,0.7); border-color: rgba(255,255,255,0.2); color: #94a3b8;">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+
+                                        <asp:TextBox ID="txtBuscar" runat="server"
+                                            CssClass="form-control"
+                                            placeholder="Buscar por código, nombre, regional, municipio...">
+                                        </asp:TextBox>
+
+                                        <asp:Button ID="btnBuscar" runat="server"
+                                            Text="Buscar"
+                                            CssClass="btn btn-sena"
+                                            CausesValidation="false"
+                                            OnClick="btnBuscar_Click" />
+
+                                        <asp:LinkButton ID="btnLimpiarBuscar" runat="server"
+                                            CssClass="btn btn-outline-secondary"
+                                            CausesValidation="false"
+                                            OnClick="btnLimpiarBuscar_Click">
+                    <i class="bi bi-arrow-clockwise"></i>
+                                        </asp:LinkButton>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </asp:Panel>
 
                         <div class="table-responsive table-responsive-custom">
                             <asp:GridView ID="gvCentros" runat="server"

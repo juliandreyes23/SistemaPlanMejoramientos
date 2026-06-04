@@ -79,12 +79,58 @@ namespace sistemaPlanMejoramientos.Datos
         public bool MtEliminarInstructor(int idInstructor)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
-            string query = @"DELETE FROM instructores WHERE idInstructor = @idInstructor";
-            SqlCommand cmd = new SqlCommand(query, cn);
-            cmd.Parameters.AddWithValue("@idInstructor", idInstructor);
-            int filas = cmd.ExecuteNonQuery();
-            oConex.MtCerrarConexion();
-            return filas > 0;
+            SqlTransaction transaction = cn.BeginTransaction();
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand("", cn, transaction);
+                cmd.Parameters.AddWithValue("@idInstructor", idInstructor);
+
+                cmd.CommandText = @"DELETE FROM planResultados
+                            WHERE idPlanMejoramiento IN (
+                                SELECT idPlanMejoramiento FROM planesMejoramiento
+                                WHERE idInstructor = @idInstructor
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM evaluaciones
+                            WHERE idPlanMejoramiento IN (
+                                SELECT idPlanMejoramiento FROM planesMejoramiento
+                                WHERE idInstructor = @idInstructor
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM evidencias
+                            WHERE idPlanMejoramiento IN (
+                                SELECT idPlanMejoramiento FROM planesMejoramiento
+                                WHERE idInstructor = @idInstructor
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM planesMejoramiento
+                            WHERE idInstructor = @idInstructor";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM fichaInstructor
+                            WHERE idInstructor = @idInstructor";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM instructores
+                            WHERE idInstructor = @idInstructor";
+                int filas = cmd.ExecuteNonQuery();
+
+                transaction.Commit();
+                return filas > 0;
+            }
+            catch
+            {
+                transaction.Rollback();
+                return false;
+            }
+            finally
+            {
+                oConex.MtCerrarConexion();
+            }
         }
 
         public bool MtAsignarInstructorAFicha(int idInstructor, int idFicha)

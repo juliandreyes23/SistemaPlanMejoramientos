@@ -95,16 +95,130 @@ namespace sistemaPlanMejoramientos.Datos
         public bool MtEliminarCentro(int idCentro)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
+            SqlTransaction transaction = cn.BeginTransaction();
 
-            string query = @"DELETE FROM centros WHERE idCentro = @idCentro";
+            try
+            {
+                SqlCommand cmd = new SqlCommand("", cn, transaction);
+                cmd.Parameters.AddWithValue("@idCentro", idCentro);
 
-            SqlCommand cmd = new SqlCommand(query, cn);
-            cmd.Parameters.AddWithValue("@idCentro", idCentro);
+                cmd.CommandText = @"DELETE FROM planResultados
+                            WHERE idPlanMejoramiento IN (
+                                SELECT idPlanMejoramiento FROM planesMejoramiento
+                                WHERE idAprendiz IN (
+                                    SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
+                                )
+                            )";
+                cmd.ExecuteNonQuery();
 
-            int filas = cmd.ExecuteNonQuery();
-            oConex.MtCerrarConexion();
+                cmd.CommandText = @"DELETE FROM evaluaciones
+                            WHERE idPlanMejoramiento IN (
+                                SELECT idPlanMejoramiento FROM planesMejoramiento
+                                WHERE idAprendiz IN (
+                                    SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
+                                )
+                            )";
+                cmd.ExecuteNonQuery();
 
-            return filas > 0;
+                cmd.CommandText = @"DELETE FROM evidencias
+                            WHERE idPlanMejoramiento IN (
+                                SELECT idPlanMejoramiento FROM planesMejoramiento
+                                WHERE idAprendiz IN (
+                                    SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
+                                )
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM planesMejoramiento
+                            WHERE idAprendiz IN (
+                                SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM planResultados
+                            WHERE idResultadoAprendizaje IN (
+                                SELECT ra.idResultadoAprendizaje
+                                FROM resultadoAprendizaje ra
+                                INNER JOIN competencias c ON ra.idCompetencia = c.idCompetencia
+                                INNER JOIN programas p ON c.idPrograma = p.idPrograma
+                                WHERE p.idCentro = @idCentro
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM resultadoAprendizaje
+                            WHERE idCompetencia IN (
+                                SELECT c.idCompetencia FROM competencias c
+                                INNER JOIN programas p ON c.idPrograma = p.idPrograma
+                                WHERE p.idCentro = @idCentro
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM competencias
+                            WHERE idPrograma IN (
+                                SELECT idPrograma FROM programas WHERE idCentro = @idCentro
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM fichaAprendiz
+                            WHERE idFicha IN (
+                                SELECT idFicha FROM fichas WHERE idCentro = @idCentro
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM fichaAprendiz
+                            WHERE idAprendiz IN (
+                                SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM fichaInstructor
+                            WHERE idFicha IN (
+                                SELECT idFicha FROM fichas WHERE idCentro = @idCentro
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM fichaInstructor
+                            WHERE idInstructor IN (
+                                SELECT idInstructor FROM instructores WHERE idCentro = @idCentro
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM fichas WHERE idCentro = @idCentro";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM programas WHERE idCentro = @idCentro";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"UPDATE aprendices SET idUsuario = NULL WHERE idCentro = @idCentro";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"UPDATE instructores SET idUsuario = NULL WHERE idCentro = @idCentro";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM aprendices WHERE idCentro = @idCentro";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM instructores WHERE idCentro = @idCentro";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM administradores WHERE idCentro = @idCentro";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM centros WHERE idCentro = @idCentro";
+                int filas = cmd.ExecuteNonQuery();
+
+                transaction.Commit();
+                return filas > 0;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw ex;
+            }
+            finally
+            {
+                oConex.MtCerrarConexion();
+            }
         }
 
         public DataTable MtObtenerCentroPorId(int idCentro)
