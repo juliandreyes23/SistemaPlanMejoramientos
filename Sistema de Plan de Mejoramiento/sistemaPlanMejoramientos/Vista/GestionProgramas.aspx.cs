@@ -1,6 +1,6 @@
 ﻿using sistemaPlanMejoramientos.Logica;
+using sistemaPlanMejoramientos.Modelo;
 using System;
-using System.Data;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -33,20 +33,22 @@ namespace sistemaPlanMejoramientos.Vista
 
         private void CargarCentrosDropdown()
         {
-            DataTable dt = oCentroL.MtListarCentros("");
-            ddlCentro.DataSource = dt;
+            var lista = oCentroL.MtListarCentrosActivos();
+
+            ddlCentro.DataSource = lista;
             ddlCentro.DataTextField = "nombre";
             ddlCentro.DataValueField = "idCentro";
             ddlCentro.DataBind();
+
             ddlCentro.Items.Insert(0, new ListItem("-- Seleccione Centro --", ""));
         }
 
         private void CargarProgramas()
         {
-            DataTable dt = oProgramaL.MtListarProgramas(txtBuscar.Text.Trim());
+            var lista = oProgramaL.MtListarProgramas(txtBuscar.Text.Trim());
 
             gvProgramas.PageIndex = (int)ViewState["PaginaActual"];
-            gvProgramas.DataSource = dt;
+            gvProgramas.DataSource = lista;
             gvProgramas.DataBind();
 
             int totalPaginas = gvProgramas.PageCount;
@@ -54,9 +56,9 @@ namespace sistemaPlanMejoramientos.Vista
 
             litPaginaActual.Text = ((int)ViewState["PaginaActual"] + 1).ToString();
             litTotalPaginas.Text = totalPaginas.ToString();
-            litTotalRegistros.Text = dt.Rows.Count.ToString();
+            litTotalRegistros.Text = lista.Count.ToString();
 
-            var paginas = Enumerable.Range(0, totalPaginas).Cast<object>().ToList();
+            var paginas = Enumerable.Range(0, totalPaginas).ToList();
             rptPaginacion.DataSource = paginas;
             rptPaginacion.DataBind();
         }
@@ -69,18 +71,18 @@ namespace sistemaPlanMejoramientos.Vista
 
         protected void rptPaginacion_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
-            if (e.CommandName != "Pagina") return;
-
             int paginaActual = (int)ViewState["PaginaActual"];
             int totalPaginas = (int)ViewState["TotalPaginas"];
 
             if (e.CommandArgument.ToString() == "anterior")
             {
-                if (paginaActual > 0) ViewState["PaginaActual"] = paginaActual - 1;
+                if (paginaActual > 0)
+                    ViewState["PaginaActual"] = paginaActual - 1;
             }
             else if (e.CommandArgument.ToString() == "siguiente")
             {
-                if (paginaActual < totalPaginas - 1) ViewState["PaginaActual"] = paginaActual + 1;
+                if (paginaActual < totalPaginas - 1)
+                    ViewState["PaginaActual"] = paginaActual + 1;
             }
             else
             {
@@ -114,10 +116,12 @@ namespace sistemaPlanMejoramientos.Vista
                 string duracion = txtDuracion.Text.Trim();
                 string estado = ddlEstado.SelectedValue;
 
-                if (string.IsNullOrEmpty(codigo) || string.IsNullOrEmpty(nombre) ||
-                    string.IsNullOrEmpty(nivel) || string.IsNullOrEmpty(ddlCentro.SelectedValue))
+                if (string.IsNullOrEmpty(codigo) ||
+                    string.IsNullOrEmpty(nombre) ||
+                    string.IsNullOrEmpty(nivel) ||
+                    string.IsNullOrEmpty(ddlCentro.SelectedValue))
                 {
-                    SetMensaje("warning", "Por favor complete todos los campos obligatorios.");
+                    SetMensaje("warning", "Complete los campos obligatorios");
                     return;
                 }
 
@@ -128,79 +132,72 @@ namespace sistemaPlanMejoramientos.Vista
                 {
                     if (oProgramaL.MtObtenerProgramaPorCodigo(codigo))
                     {
-                        SetMensaje("warning", "Ya existe un programa registrado con ese código.");
+                        SetMensaje("warning", "Ya existe ese código");
                         return;
                     }
 
-                    bool insertado = oProgramaL.MtCrearPrograma(codigo, nombre, version, nivel, duracion, estado, idCentro);
+                    bool ok = oProgramaL.MtCrearPrograma(codigo, nombre, version, nivel, duracion, estado, idCentro);
 
-                    if (insertado)
+                    SetMensaje(ok ? "success" : "error",
+                        ok ? "Programa creado" : "Error al crear");
+
+                    if (ok)
                     {
-                        SetMensaje("success", "¡Programa registrado exitosamente!");
                         LimpiarFormulario();
                         CargarProgramas();
-                    }
-                    else
-                    {
-                        SetMensaje("error", "Error al registrar el programa.");
                     }
                 }
                 else
                 {
                     int idPrograma = Convert.ToInt32(hfIdPrograma.Value);
 
-                    if (oProgramaL.MtObtenerProgramaPorCodigoExcluyendo(codigo, idPrograma))
+                    bool duplicado = oProgramaL.MtObtenerProgramaPorCodigoExcluyendo(codigo, idPrograma);
+                    if (duplicado)
                     {
-                        SetMensaje("warning", "Ya existe otro programa registrado con ese código.");
+                        SetMensaje("warning", "Código ya existe");
                         return;
                     }
 
-                    bool actualizado = oProgramaL.MtActualizarPrograma(idPrograma, codigo, nombre, version, nivel, duracion, estado, idCentro);
+                    bool ok = oProgramaL.MtActualizarPrograma(
+                        idPrograma, codigo, nombre, version, nivel, duracion, estado, idCentro);
 
-                    if (actualizado)
+                    SetMensaje(ok ? "success" : "error",
+                        ok ? "Programa actualizado" : "Error al actualizar");
+
+                    if (ok)
                     {
-                        SetMensaje("success", "¡Programa modificado correctamente!");
                         LimpiarFormulario();
                         CargarProgramas();
-                    }
-                    else
-                    {
-                        SetMensaje("error", "Error al modificar el programa.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                SetMensaje("error", "Ocurrió un error: " + ex.Message);
+                SetMensaje("error", ex.Message);
             }
         }
 
         protected void gvProgramas_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            if (e.CommandArgument == null || string.IsNullOrEmpty(e.CommandArgument.ToString())) return;
+            if (e.CommandArgument == null) return;
+
+            int idPrograma = Convert.ToInt32(e.CommandArgument);
 
             if (e.CommandName == "Editar")
             {
-                int idPrograma = Convert.ToInt32(e.CommandArgument);
-                hfIdPrograma.Value = idPrograma.ToString();
+                var prog = oProgramaL.MtObtenerProgramaPorId(idPrograma);
 
-                DataTable dt = oProgramaL.MtObtenerProgramaPorId(idPrograma);
-                if (dt.Rows.Count > 0)
+                if (prog != null)
                 {
-                    DataRow r = dt.Rows[0];
-                    txtCodigo.Text = r["codigoPrograma"].ToString();
-                    txtNombre.Text = r["nombre"].ToString();
-                    txtVersion.Text = r["version"].ToString();
-                    txtDuracion.Text = r["duracion"].ToString();
+                    hfIdPrograma.Value = prog.idPrograma.ToString();
+                    txtCodigo.Text = prog.codigoPrograma;
+                    txtNombre.Text = prog.nombre;
+                    txtVersion.Text = prog.version;
+                    txtDuracion.Text = prog.duracion;
 
-                    if (ddlNivel.Items.FindByValue(r["nivel"].ToString()) != null)
-                        ddlNivel.SelectedValue = r["nivel"].ToString();
-
-                    if (ddlEstado.Items.FindByValue(r["estado"].ToString()) != null)
-                        ddlEstado.SelectedValue = r["estado"].ToString();
-
-                    if (ddlCentro.Items.FindByValue(r["idCentro"].ToString()) != null)
-                        ddlCentro.SelectedValue = r["idCentro"].ToString();
+                    ddlNivel.SelectedValue = prog.nivel;
+                    ddlEstado.SelectedValue = prog.estado;
+                    ddlCentro.SelectedValue = prog.idCentro.ToString();
                 }
 
                 lblTituloForm.Text = "Modificar Programa";
@@ -209,37 +206,14 @@ namespace sistemaPlanMejoramientos.Vista
             }
             else if (e.CommandName == "Eliminar")
             {
-                try
-                {
-                    int idPrograma = Convert.ToInt32(e.CommandArgument);
-                    bool eliminado = oProgramaL.MtEliminarPrograma(idPrograma);
+                bool ok = oProgramaL.MtEliminarPrograma(idPrograma);
 
-                    if (eliminado)
-                    {
-                        SetMensaje("success", "¡Programa eliminado correctamente!");
-                        CargarProgramas();
-                        if (hfIdPrograma.Value == idPrograma.ToString()) LimpiarFormulario();
-                    }
-                    else
-                    {
-                        SetMensaje("error", "No se pudo eliminar el programa.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (ex.Message.Contains("REFERENCE") || ex.Message.Contains("FK_"))
-                    {
-                        SetMensaje("error", "No se puede eliminar este programa porque tiene competencias o fichas asociadas.");
-                    }
-                    else
-                    {
-                        SetMensaje("error", "Error al intentar eliminar: " + ex.Message);
-                    }
-                }
+                SetMensaje(ok ? "success" : "error",
+                    ok ? "Eliminado" : "No se pudo eliminar");
+
+                CargarProgramas();
             }
         }
-
-        protected void gvProgramas_RowDataBound(object sender, GridViewRowEventArgs e) { }
 
         protected void btnCancelar_Click(object sender, EventArgs e)
         {
@@ -250,7 +224,19 @@ namespace sistemaPlanMejoramientos.Vista
         {
             Response.Redirect("~/Vista/Dashboard.aspx");
         }
+        protected void gvProgramas_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                LinkButton btnEliminar = (LinkButton)e.Row.FindControl("btnEliminar");
+                if (btnEliminar != null)
+                    btnEliminar.Attributes.Add("onclick", "return confirmarEliminar(this);");
 
+                LinkButton btnEditar = (LinkButton)e.Row.FindControl("btnEditar");
+                if (btnEditar != null)
+                    btnEditar.Attributes.Add("onclick", "return confirmarEditar(this);");
+            }
+        }
         private void LimpiarFormulario()
         {
             hfIdPrograma.Value = "";
@@ -261,6 +247,7 @@ namespace sistemaPlanMejoramientos.Vista
             ddlNivel.SelectedIndex = 0;
             ddlEstado.SelectedIndex = 0;
             ddlCentro.SelectedIndex = 0;
+
             lblTituloForm.Text = "Registrar Programa";
             btnGuardar.Text = "Guardar Programa";
             btnCancelar.Visible = false;

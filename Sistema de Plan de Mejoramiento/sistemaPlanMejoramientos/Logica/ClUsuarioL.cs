@@ -1,7 +1,9 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Datos;
+using sistemaPlanMejoramientos.Modelo;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Text.RegularExpressions;
-using sistemaPlanMejoramientos.Datos;
 
 namespace sistemaPlanMejoramientos.Logica
 {
@@ -45,17 +47,17 @@ namespace sistemaPlanMejoramientos.Logica
                 return 0;
             if (oUsuarioD.MtExisteCorreo(correo))
                 return -1;
-            return oUsuarioD.CrearUsuarioInstructor(correo, documento);
+            return oUsuarioD.MtCrearUsuarioInstructor(correo, documento);
         }
 
-        public DataTable MtListarUsuarios()
+        public List<ClUsuarioM> MtListarUsuarios()
         {
-            return oUsuarioD.MtListarUsuarios() ?? new DataTable();
+            return oUsuarioD.MtListarUsuarios() ?? new List<ClUsuarioM>();
         }
 
-        public DataTable MtListarUsuarios(string filtro)
+        public List<ClUsuarioM> MtListarUsuarios(string filtro)
         {
-            return oUsuarioD.MtListarUsuarios(filtro) ?? new DataTable();
+            return oUsuarioD.MtListarUsuarios(filtro) ?? new List<ClUsuarioM>();
         }
 
         public bool MtActualizarUsuario(int idUsuario, string correo, string password, int idRol)
@@ -72,17 +74,19 @@ namespace sistemaPlanMejoramientos.Logica
             return oUsuarioD.MtEliminarUsuario(idUsuario);
         }
 
-        public DataTable MtLogin(string correo, string password)
+        public ClUsuarioM MtLogin(string correo, string password)
         {
-            if (string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(password))
-                return new DataTable();
+            if (!ValidarFormatoCorreo(correo) || string.IsNullOrWhiteSpace(password))
+                return null;
+
             return oUsuarioD.MtLogin(correo, password);
         }
 
-        public DataTable MtBuscarUsuarioPorId(int idUsuario)
+        public ClUsuarioM MtBuscarUsuarioPorId(int idUsuario)
         {
             if (idUsuario <= 0)
-                return new DataTable();
+                return null;
+
             return oUsuarioD.MtBuscarUsuarioPorId(idUsuario);
         }
 

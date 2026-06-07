@@ -198,7 +198,7 @@ namespace sistemaPlanMejoramientos.Vista
                 ws.Cells[1, 6].Value = "telefono";
                 ws.Cells[1, 7].Value = "codigoFicha";
 
-                ws.Cells[2, 1].Value = "CC";
+                ws.Cells[2, 1].Value = "Cédula de Cuidadanía";
                 ws.Cells[2, 2].Value = "123456";
                 ws.Cells[2, 3].Value = "Juan";
                 ws.Cells[2, 4].Value = "Perez";

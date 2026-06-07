@@ -1,9 +1,11 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Logica;
+using sistemaPlanMejoramientos.Modelo;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using sistemaPlanMejoramientos.Logica;
 
 namespace sistemaPlanMejoramientos.Vista
 {
@@ -33,35 +35,43 @@ namespace sistemaPlanMejoramientos.Vista
         private void CargarCombos()
         {
             ddlInstructores.DataSource = oAsignacionL.MtListarInstructores();
+            ddlInstructores.DataTextField = "nombres";
             ddlInstructores.DataValueField = "idInstructor";
-            ddlInstructores.DataTextField = "NombreCompleto";
             ddlInstructores.DataBind();
             ddlInstructores.Items.Insert(0, new ListItem("-- Seleccione Instructor --", "0"));
 
             ddlFichas.DataSource = oAsignacionL.MtListarFichas();
+            ddlFichas.DataTextField = "codigoFicha";
             ddlFichas.DataValueField = "idFicha";
-            ddlFichas.DataTextField = "TextoFicha";
             ddlFichas.DataBind();
             ddlFichas.Items.Insert(0, new ListItem("-- Seleccione Ficha --", "0"));
         }
 
         private void CargarAsignaciones()
         {
-            DataTable dt = oAsignacionL.MtListarAsignaciones();
+            List<ClFichaInstructorM> lista = oAsignacionL.MtListarAsignaciones();
 
-            gvAsignaciones.PageIndex = (int)ViewState["PaginaActual"];
-            gvAsignaciones.DataSource = dt;
-            gvAsignaciones.DataBind();
+            int pageSize = gvAsignaciones.PageSize;
+            int paginaActual = ViewState["PaginaActual"] != null ? (int)ViewState["PaginaActual"] : 0;
 
-            int totalPaginas = gvAsignaciones.PageCount;
+            int totalRegistros = lista.Count;
+            int totalPaginas = (int)Math.Ceiling((double)totalRegistros / pageSize);
+
             ViewState["TotalPaginas"] = totalPaginas;
 
-            litPaginaActual.Text = ((int)ViewState["PaginaActual"] + 1).ToString();
-            litTotalPaginas.Text = totalPaginas.ToString();
-            litTotalRegistros.Text = dt.Rows.Count.ToString();
+            var datosPaginados = lista
+                .Skip(paginaActual * pageSize)
+                .Take(pageSize)
+                .ToList();
 
-            var paginas = Enumerable.Range(0, totalPaginas).Cast<object>().ToList();
-            rptPaginacion.DataSource = paginas;
+            gvAsignaciones.DataSource = datosPaginados;
+            gvAsignaciones.DataBind();
+
+            litPaginaActual.Text = (paginaActual + 1).ToString();
+            litTotalPaginas.Text = totalPaginas.ToString();
+            litTotalRegistros.Text = totalRegistros.ToString();
+
+            rptPaginacion.DataSource = Enumerable.Range(0, totalPaginas).ToList();
             rptPaginacion.DataBind();
         }
 

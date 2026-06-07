@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Web;
 using sistemaPlanMejoramientos.Datos;
+using sistemaPlanMejoramientos.Modelo;
 
 namespace sistemaPlanMejoramientos.Logica
 {
     public class ClPlanMejoramientoL
     {
         ClPlanMejoramientoD oPlanD = new ClPlanMejoramientoD();
-        ClEvidenciaD oEvidenciaD = new ClEvidenciaD();  
+        ClEvidenciaD oEvidenciaD = new ClEvidenciaD();
 
         public int MtCrearPlanMejoramiento(string tipoPlan, DateTime fechaAsignacion, DateTime fechaLimite,
                                            string actividades, string observaciones, string estadoPlan,
@@ -24,8 +22,8 @@ namespace sistemaPlanMejoramientos.Logica
                 return 0;
 
             return oPlanD.MtCrearPlanMejoramiento(tipoPlan, fechaAsignacion, fechaLimite,
-                                                   actividades, observaciones, estadoPlan,
-                                                   idAprendiz, idInstructor);
+                                                  actividades, observaciones, estadoPlan,
+                                                  idAprendiz, idInstructor);
         }
 
         public bool MtAsociarResultadoAPlan(int idPlanMejoramiento, int idResultadoAprendizaje)
@@ -34,7 +32,7 @@ namespace sistemaPlanMejoramientos.Logica
             return oPlanD.MtAsociarResultadoAPlan(idPlanMejoramiento, idResultadoAprendizaje);
         }
 
-        public DataTable MtListarPlanes()
+        public List<ClPlanMejoramientoM> MtListarPlanes()
         {
             return oPlanD.MtListarPlanes();
         }
@@ -57,15 +55,15 @@ namespace sistemaPlanMejoramientos.Logica
             return oPlanD.MtContarPlanesPorTipo(idInstructor, tipoPlan);
         }
 
-        public DataTable MtListarAprendicesPorInstructor(int idInstructor)
+        public List<ClAprendizM> MtListarAprendicesPorInstructor(int idInstructor)
         {
-            if (idInstructor <= 0) return new DataTable();
+            if (idInstructor <= 0) return new List<ClAprendizM>();
             return oPlanD.MtListarAprendicesPorInstructor(idInstructor);
         }
 
-        public DataTable MtListarResultadosPorFicha(int idFicha)
+        public List<ClResultadoAprendizajeM> MtListarResultadosPorFicha(int idFicha)
         {
-            if (idFicha <= 0) return new DataTable();
+            if (idFicha <= 0) return new List<ClResultadoAprendizajeM>();
             return oPlanD.MtListarResultadosPorFicha(idFicha);
         }
 
@@ -75,15 +73,14 @@ namespace sistemaPlanMejoramientos.Logica
             return oPlanD.MtExistePlanComitePendiente(idAprendiz);
         }
 
-        public DataTable MtListarPlanesPendientesEvaluacion(int idInstructor)
+        public List<ClPlanMejoramientoM> MtListarPlanesPendientesEvaluacion(int idInstructor)
         {
-            if (idInstructor <= 0) return new DataTable();
+            if (idInstructor <= 0) return new List<ClPlanMejoramientoM>();
             return oPlanD.MtListarPlanesPendientesEvaluacion(idInstructor);
         }
 
         public bool MtCancelarAprendiz(int idAprendiz)
         {
-            if (idAprendiz <= 0) return false;
             return oPlanD.MtCancelarAprendiz(idAprendiz);
         }
 
@@ -95,6 +92,7 @@ namespace sistemaPlanMejoramientos.Logica
                 return "Error";
 
             bool vencido = DateTime.Now.Date > fechaLimite.Date;
+
             if (vencido)
             {
                 producto = "No Aprobado";
@@ -125,9 +123,11 @@ namespace sistemaPlanMejoramientos.Logica
             if (tipoPlan == "Interno")
             {
                 bool yaExisteComite = oPlanD.MtExistePlanComitePendiente(idAprendiz);
+
                 if (!yaExisteComite)
                 {
                     DateTime hoy = DateTime.Now;
+
                     int idComite = oPlanD.MtCrearPlanMejoramiento(
                         "Comité",
                         hoy,
@@ -138,9 +138,11 @@ namespace sistemaPlanMejoramientos.Logica
                         idAprendiz,
                         idInstructor
                     );
+
                     if (idComite > 0)
                         MtCopiarResultadosAlComite(idPlanMejoramiento, idComite);
                 }
+
                 return "Comite";
             }
             else if (tipoPlan == "Comité")
@@ -154,21 +156,24 @@ namespace sistemaPlanMejoramientos.Logica
 
         private void MtCopiarResultadosAlComite(int idPlanInterno, int idPlanComite)
         {
-            DataTable resultados = oEvidenciaD.MtListarResultadosPorPlan(idPlanInterno);
-            foreach (DataRow row in resultados.Rows)
+
+            var resultados = oPlanD.MtListarResultadosPorFicha(idPlanInterno);
+
+            foreach (var r in resultados)
             {
-                int idResultado = Convert.ToInt32(row["idResultadoAprendizaje"]);
-                oPlanD.MtAsociarResultadoAPlan(idPlanComite, idResultado);
+                oPlanD.MtAsociarResultadoAPlan(idPlanComite, r.idResultadoAprendizaje);
             }
         }
-        public DataTable MtListarPlanesInternosPorInstructor(int idInstructor, string filtroNombre, string filtroEstado)
+
+        public List<ClPlanMejoramientoM> MtListarPlanesInternosPorInstructor(int idInstructor, string filtroNombre, string filtroEstado)
         {
-            if (idInstructor <= 0) return new DataTable();
+            if (idInstructor <= 0) return new List<ClPlanMejoramientoM>();
             return oPlanD.MtListarPlanesInternosPorInstructor(idInstructor, filtroNombre, filtroEstado);
         }
-        public DataTable MtListarPlanesComitePorInstructor(int idInstructor, string filtroNombre, string filtroEstado)
+
+        public List<ClPlanMejoramientoM> MtListarPlanesComitePorInstructor(int idInstructor, string filtroNombre, string filtroEstado)
         {
-            if (idInstructor <= 0) return new DataTable();
+            if (idInstructor <= 0) return new List<ClPlanMejoramientoM>();
             return oPlanD.MtListarPlanesComitePorInstructor(idInstructor, filtroNombre, filtroEstado);
         }
     }

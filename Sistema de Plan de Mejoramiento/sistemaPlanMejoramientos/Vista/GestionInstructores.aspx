@@ -66,8 +66,8 @@
                             <div class="col-md-5">
                                 <label class="form-label small text-muted">Tipo Doc.</label>
                                 <asp:DropDownList ID="ddlTipoDoc" runat="server" CssClass="form-select">
-                                    <asp:ListItem Value="CC" Text="C.C."></asp:ListItem>
-                                    <asp:ListItem Value="CE" Text="C.E."></asp:ListItem>
+                                    <asp:ListItem Value="Cédula de Ciudadanía" Text="Cédula de Ciudadanía"></asp:ListItem>
+                                    <asp:ListItem Value="Cédula de Extranjería" Text="Cédula de Extranjería"></asp:ListItem>
                                 </asp:DropDownList>
                             </div>
 
@@ -169,7 +169,7 @@
                                     <asp:BoundField DataField="correo" HeaderText="Correo" />
                                     <asp:BoundField DataField="telefono" HeaderText="Teléfono" ItemStyle-Width="100px" />
                                     <asp:BoundField DataField="especialidad" HeaderText="Especialidad" />
-                                    <asp:BoundField DataField="centro" HeaderText="Centro" />
+                                    <asp:BoundField DataField="nombreCentro" HeaderText="Centro" />
                                     <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="110px" ItemStyle-HorizontalAlign="Center">
                                         <ItemTemplate>
                                             <asp:LinkButton ID="btnEditar" runat="server" CommandName="Editar"

@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Data;
-using System.Data.SqlClient;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using sistemaPlanMejoramientos.Logica;
+using sistemaPlanMejoramientos.Modelo;
 
 namespace sistemaPlanMejoramientos.Vista
 {
@@ -18,36 +19,28 @@ namespace sistemaPlanMejoramientos.Vista
             {
                 ViewState["PaginaActual"] = 0;
                 ViewState["FiltroActual"] = "";
+
                 CargarProgramas();
-                CargarGrilla(null);
+                CargarGrilla("");
             }
             else
             {
                 hfMensajeTipo.Value = "";
                 hfMensajeTxt.Value = "";
-
-                int idPrograma;
-                if (int.TryParse(ddlPrograma.SelectedValue, out idPrograma) && idPrograma > 0)
-                {
-                    DataTable tb = oCompetencia.MtCargarCompetencia(idPrograma);
-                    string valorCompetencia = Request.Form[ddlCompetencia.UniqueID];
-                    if (!string.IsNullOrEmpty(valorCompetencia))
-                        ddlCompetencia.SelectedValue = valorCompetencia;
-                }
             }
         }
 
-
-
         private void CargarProgramas()
         {
-
             ddlPrograma.Items.Clear();
             ddlPrograma.Items.Add(new ListItem("-- Seleccione un programa --", "0"));
-            foreach (DataRow row in oLogica.MtCargarPrograma().Rows)
-                ddlPrograma.Items.Add(new ListItem(row["nombre"].ToString(), row["idPrograma"].ToString()));
-            
 
+            var programas = oLogica.MtCargarPrograma(); 
+
+            foreach (var p in programas)
+            {
+                ddlPrograma.Items.Add(new ListItem(p.nombre, p.idPrograma.ToString()));
+            }
         }
 
         protected void ddlPrograma_SelectedIndexChanged(object sender, EventArgs e)
@@ -59,61 +52,67 @@ namespace sistemaPlanMejoramientos.Vista
 
             if (idPrograma > 0)
             {
-                DataTable tb = oCompetencia.MtCargarCompetencia(idPrograma);
+                var competencias = oCompetencia.MtCargarCompetencias(idPrograma);
 
-                foreach (DataRow row in tb.Rows)
+                foreach (var c in competencias)
                 {
-                    ddlCompetencia.Items.Add(
-                        new ListItem(
-                            row["descripcion"].ToString(),
-                            row["idCompetencia"].ToString()
-                        )
-                    );
+                    ddlCompetencia.Items.Add(new ListItem(
+                        c.descripcion,
+                        c.idCompetencia.ToString()
+                    ));
                 }
             }
         }
 
-
-
         private void CargarGrilla(string filtro)
         {
-            DataTable dt = oLogica.MtListarResultadoAprendizaje();
+            var lista = oLogica.MtListarResultadoAprendizaje(); 
 
             if (!string.IsNullOrWhiteSpace(filtro))
             {
                 string f = filtro.ToLower();
-                DataTable dtFiltrado = dt.Clone();
-                foreach (DataRow row in dt.Rows)
-                {
-                    string desc = row["DescripcionResultado"].ToString().ToLower();
-                    string comp = row["DescripcionCompetencia"].ToString().ToLower();
-                    if (desc.Contains(f) || comp.Contains(f))
-                        dtFiltrado.ImportRow(row);
-                }
-                dt = dtFiltrado;
+
+                lista = lista.Where(x =>
+                    (x.descripcion ?? "").ToLower().Contains(f) ||
+                    (x.nombreCompetencia ?? "").ToLower().Contains(f) ||
+                    (x.competencia?.programa?.nombre ?? "").ToLower().Contains(f)
+                ).ToList();
             }
+
+            var data = lista.Select(x => new
+            {
+                idResultadoAprendizaje = x.idResultadoAprendizaje,
+                DescripcionResultado = x.descripcion,
+                DescripcionCompetencia = x.nombreCompetencia,
+                NombrePrograma = x.competencia.programa.nombre 
+            }).ToList();
 
             int pageSize = gvResultados.PageSize;
             int paginaActual = Convert.ToInt32(ViewState["PaginaActual"]);
-            int totalRegistros = dt.Rows.Count;
+
+            int totalRegistros = data.Count;
             int totalPaginas = (int)Math.Ceiling((double)totalRegistros / pageSize);
             if (totalPaginas == 0) totalPaginas = 1;
 
-            if (paginaActual >= totalPaginas) paginaActual = totalPaginas - 1;
+            if (paginaActual >= totalPaginas)
+                paginaActual = totalPaginas - 1;
+
             ViewState["PaginaActual"] = paginaActual;
             ViewState["TotalPaginas"] = totalPaginas;
 
-            gvResultados.PageIndex = paginaActual;
-            gvResultados.DataSource = dt;
+            var paged = data
+                .Skip(paginaActual * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            gvResultados.DataSource = paged;
             gvResultados.DataBind();
 
             litPaginaActual.Text = (paginaActual + 1).ToString();
             litTotalPaginas.Text = totalPaginas.ToString();
             litTotalRegistros.Text = totalRegistros.ToString();
 
-            int[] paginas = new int[totalPaginas];
-            for (int i = 0; i < totalPaginas; i++) paginas[i] = i;
-            rptPaginacion.DataSource = paginas;
+            rptPaginacion.DataSource = Enumerable.Range(0, totalPaginas);
             rptPaginacion.DataBind();
         }
 
@@ -129,6 +128,7 @@ namespace sistemaPlanMejoramientos.Vista
 
             int paginaActual = Convert.ToInt32(ViewState["PaginaActual"]);
             int totalPaginas = Convert.ToInt32(ViewState["TotalPaginas"]);
+
             string arg = e.CommandArgument.ToString();
 
             if (arg == "anterior")
@@ -148,10 +148,6 @@ namespace sistemaPlanMejoramientos.Vista
             CargarGrilla(ViewState["FiltroActual"] as string);
         }
 
-        protected void gvResultados_RowDataBound(object sender, GridViewRowEventArgs e)
-        {
-        }
-
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
             int idPrograma = int.Parse(ddlPrograma.SelectedValue);
@@ -161,133 +157,107 @@ namespace sistemaPlanMejoramientos.Vista
 
             if (idPrograma <= 0 || idCompetencia <= 0 || string.IsNullOrWhiteSpace(descripcion))
             {
-                hfMensajeTipo.Value = "warning";
-                hfMensajeTxt.Value = "Complete todos los campos obligatorios.";
+                SetMensaje("warning", "Complete todos los campos obligatorios.");
                 CargarGrilla(ViewState["FiltroActual"] as string);
                 return;
             }
 
             bool ok;
-            string msg;
 
             if (idResultado == 0)
-            {
                 ok = oLogica.MtCrearResultado(descripcion, idCompetencia);
-                msg = ok ? "Resultado registrado correctamente." : "Error al registrar. Verifique los datos.";
-            }
             else
-            {
                 ok = oLogica.MtActualizarResultado(idResultado, descripcion, idCompetencia);
-                msg = ok ? "Resultado actualizado correctamente." : "Error al actualizar.";
-            }
 
-            hfMensajeTipo.Value = ok ? "success" : "error";
-            hfMensajeTxt.Value = msg;
+            SetMensaje(ok ? "success" : "error",
+                ok ? "Operación realizada correctamente." : "Error al guardar.");
 
             if (ok) LimpiarFormulario();
-            ViewState["PaginaActual"] = 0;
-            CargarGrilla(null);
-        }
 
-        protected void btnCancelar_Click(object sender, EventArgs e)
-        {
-            LimpiarFormulario();
-        }
-
-        protected void btnBuscar_Click(object sender, EventArgs e)
-        {
-            string filtro = txtBuscar.Text.Trim();
-            ViewState["FiltroActual"] = filtro;
-            ViewState["PaginaActual"] = 0;
-            CargarGrilla(filtro);
-        }
-
-        protected void btnRefresh_Click(object sender, EventArgs e)
-        {
-            txtBuscar.Text = "";
-            ViewState["FiltroActual"] = "";
             ViewState["PaginaActual"] = 0;
             CargarGrilla(null);
         }
 
         protected void gvResultados_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            int id = int.Parse(e.CommandArgument.ToString());
+            int id = Convert.ToInt32(e.CommandArgument);
+
+            var lista = oLogica.MtListarResultadoAprendizaje();
+            var item = lista.FirstOrDefault(x => x.idResultadoAprendizaje == id);
+
+            if (item == null) return;
 
             if (e.CommandName == "Eliminar")
             {
-                try
-                {
-                    bool ok = oLogica.MtEliminarResultado(id);
-                    hfMensajeTipo.Value = ok ? "success" : "error";
-                    hfMensajeTxt.Value = ok ? "Resultado eliminado correctamente." : "Error al eliminar.";
-                }
-                catch (Exception ex)
-                {
-                    hfMensajeTipo.Value = "error";
-                    hfMensajeTxt.Value = "No se pudo eliminar: " + ex.Message;
-                }
+                bool ok = oLogica.MtEliminarResultado(id);
+
+                SetMensaje(ok ? "success" : "error",
+                    ok ? "Eliminado correctamente." : "Error al eliminar.");
 
                 CargarGrilla(ViewState["FiltroActual"] as string);
             }
-            else if (e.CommandName == "Editar")
+
+            if (e.CommandName == "Editar")
             {
-                DataTable dt = oLogica.MtListarResultadoAprendizaje();
-                DataRow[] rows = dt.Select("idResultadoAprendizaje = " + id);
+                hfIdResultado.Value = item.idResultadoAprendizaje.ToString();
+                txtDescripcion.Text = item.descripcion;
 
-                if (rows.Length > 0)
-                {
-                    DataRow row = rows[0];
+                CargarProgramas();
+                ddlPrograma.SelectedValue = "0";
 
-                    hfIdResultado.Value = id.ToString();
-                    txtDescripcion.Text = row["DescripcionResultado"].ToString();
+                ddlCompetencia.Items.Clear();
+                ddlCompetencia.Items.Add(new ListItem("-- Seleccione una competencia --", "0"));
 
-                    string idProg = row["idPrograma"].ToString();
+                ddlCompetencia.SelectedValue = item.idCompetencia.ToString();
 
-                    CargarProgramas();
-                    ddlPrograma.SelectedValue = idProg;
-
-                    ddlCompetencia.Items.Clear();
-                    ddlCompetencia.Items.Add(new ListItem("-- Seleccione una competencia --", "0"));
-
-                    DataTable tb = oCompetencia.MtCargarCompetencia(int.Parse(idProg));
-
-                    foreach (DataRow item in tb.Rows)
-                    {
-                        ddlCompetencia.Items.Add(
-                            new ListItem(
-                                item["descripcion"].ToString(),
-                                item["idCompetencia"].ToString()
-                            )
-                        );
-                    }
-
-                    string idCompetencia = row["idCompetencia"].ToString();
-
-                    if (ddlCompetencia.Items.FindByValue(idCompetencia) != null)
-                    {
-                        ddlCompetencia.SelectedValue = idCompetencia;
-                    }
-
-                    lblTituloForm.Text = "Actualizar Resultado";
-                    btnCancelar.Visible = true;
-                    btnGuardar.Text = "Actualizar Resultado";
-                }
+                lblTituloForm.Text = "Actualizar Resultado";
+                btnGuardar.Text = "Actualizar Resultado";
+                btnCancelar.Visible = true;
 
                 CargarGrilla(ViewState["FiltroActual"] as string);
             }
         }
+        protected void btnCancelar_Click(object sender, EventArgs e)
+        {
+            LimpiarFormulario();
+        }
+        protected void btnBuscar_Click(object sender, EventArgs e)
+        {
+            ViewState["PaginaActual"] = 0;
+            ViewState["FiltroActual"] = txtBuscar.Text.Trim();
+            CargarGrilla(ViewState["FiltroActual"] as string);
+        }
+        protected void btnRefresh_Click(object sender, EventArgs e)
+        {
+            ViewState["FiltroActual"] = "";
+            ViewState["PaginaActual"] = 0;
 
+            txtBuscar.Text = "";
+
+            CargarGrilla("");
+        }
+        protected void gvResultados_RowDataBound(object sender, GridViewRowEventArgs e)
+{
+
+}
         private void LimpiarFormulario()
         {
             hfIdResultado.Value = "0";
             txtDescripcion.Text = "";
             ddlPrograma.SelectedIndex = 0;
+
             ddlCompetencia.Items.Clear();
             ddlCompetencia.Items.Add(new ListItem("-- Seleccione una competencia --", "0"));
+
             lblTituloForm.Text = "Registrar Resultado";
-            btnCancelar.Visible = false;
             btnGuardar.Text = "Guardar Resultado";
+            btnCancelar.Visible = false;
+        }
+
+        private void SetMensaje(string tipo, string texto)
+        {
+            hfMensajeTipo.Value = tipo;
+            hfMensajeTxt.Value = texto;
         }
     }
 }

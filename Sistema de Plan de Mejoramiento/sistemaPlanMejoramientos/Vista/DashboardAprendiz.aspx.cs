@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Data;
+using System.Linq;
 using sistemaPlanMejoramientos.Logica;
+using sistemaPlanMejoramientos.Modelo;
 
 namespace sistemaPlanMejoramientos.Aprendiz
 {
@@ -27,45 +28,50 @@ namespace sistemaPlanMejoramientos.Aprendiz
         private void CargarDatosAprendiz()
         {
             int idUsuario = Convert.ToInt32(Session["idUsuario"]);
-            DataTable dt = oEvidenciaL.MtObtenerAprendizPorUsuario(idUsuario);
-            if (dt.Rows.Count > 0)
+
+            ClAprendizM aprendiz =
+                oEvidenciaL.MtObtenerAprendizPorUsuario(idUsuario);
+
+            if (aprendiz == null) return;
+
+            Session["idAprendiz"] = aprendiz.idAprendiz;
+
+            lblAprendiz.Text = $"{aprendiz.nombres} {aprendiz.apellidos}";
+
+            string estado = aprendiz.estadoAcademico;
+
+            string cssEstado =
+                estado == "Cancelado" ? "cancelado" :
+                (estado == "Aplazado" || estado == "Condicionado") ? "aplazado" : "";
+
+            lblEstadoBadge.Text =
+                $"<span class='estado-badge {cssEstado}'>" +
+                $"<i class='bi bi-circle-fill' style='font-size:7px'></i> {estado}</span>";
+
+            if (aprendiz.ficha != null)
             {
-                DataRow r = dt.Rows[0];
-                Session["idAprendiz"] = r["idAprendiz"];
-                Session["nombreAprendiz"] = r["nombres"].ToString() + " " + r["apellidos"].ToString();
-                Session["tipoDocumento"] = r["tipoDocumento"].ToString();
-                Session["numeroDocumento"] = r["numeroDocumento"].ToString();
-                Session["correoAprendiz"] = r["correo"].ToString();
-                Session["telefono"] = r["telefono"].ToString();
-                Session["estadoAcademico"] = r["estadoAcademico"].ToString();
-                Session["codigoFicha"] = r["codigoFicha"].ToString();
-                Session["nombrePrograma"] = r["nombrePrograma"].ToString();
-                Session["jornada"] = r["jornada"].ToString();
-
-                lblAprendiz.Text = Session["nombreAprendiz"].ToString();
-
-                string estado = r["estadoAcademico"].ToString();
-                string cssEstado = estado == "Cancelado" ? "cancelado" :
-                                   (estado == "Aplazado" || estado == "Condicionado") ? "aplazado" : "";
-                lblEstadoBadge.Text = $"<span class='estado-badge {cssEstado}'>" +
-                                      $"<i class='bi bi-circle-fill' style='font-size:7px'></i> {estado}</span>";
+                Session["codigoFicha"] = aprendiz.ficha.codigoFicha;
+                Session["nombrePrograma"] = aprendiz.ficha.programa?.nombre;
+                Session["jornada"] = aprendiz.ficha.jornada;
             }
         }
 
         private void CargarMetricas()
         {
             if (Session["idAprendiz"] == null) return;
+
             int idAprendiz = Convert.ToInt32(Session["idAprendiz"]);
 
-            lblPlanesPendientes.Text = oEvidenciaL.MtContarPlanesPorEstado(idAprendiz, "Pendiente").ToString();
-            lblPlanesAprobados.Text = oEvidenciaL.MtContarPlanesPorEstado(idAprendiz, "Aprobado").ToString();
+            lblPlanesPendientes.Text =
+                oEvidenciaL.MtContarPlanesPorEstado(idAprendiz, "Pendiente").ToString();
 
-            DataTable dtPlanes = oEvidenciaL.MtListarPlanesPorAprendiz(idAprendiz);
-            int comite = 0;
-            foreach (DataRow r in dtPlanes.Rows)
-                if (r["tipoPlan"].ToString() == "Comité" && r["estadoPlan"].ToString() == "Pendiente")
-                    comite++;
-            lblPlanesComite.Text = comite.ToString();
+            lblPlanesAprobados.Text =
+                oEvidenciaL.MtContarPlanesPorEstado(idAprendiz, "Aprobado").ToString();
+
+            var planes = oEvidenciaL.MtListarPlanesPorAprendiz(idAprendiz);
+
+            lblPlanesComite.Text =
+                planes.Count(p => p.tipoPlan == "Comité" && p.estadoPlan == "Pendiente").ToString();
         }
 
         protected void btnCerrarSesion_Click(object sender, EventArgs e)

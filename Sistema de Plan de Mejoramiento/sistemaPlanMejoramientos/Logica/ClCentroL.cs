@@ -1,9 +1,10 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Datos;
+using sistemaPlanMejoramientos.Modelo;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Web;
-using sistemaPlanMejoramientos.Datos;
 
 namespace sistemaPlanMejoramientos.Logica
 {
@@ -62,12 +63,12 @@ namespace sistemaPlanMejoramientos.Logica
             );
         }
 
-        public DataTable MtListarCentros()
+        public List<ClCentroM> MtListarCentros()
         {
             return oCentroD.MtListarCentros();
         }
 
-        public DataTable MtListarCentros(string filtro)
+        public List<ClCentroM> MtListarCentros(string filtro)
         {
             if (filtro == null) filtro = "";
             return oCentroD.MtListarCentros(filtro.Trim());
@@ -78,48 +79,12 @@ namespace sistemaPlanMejoramientos.Logica
             if (idCentro <= 0)
                 throw new Exception("El identificador del centro no es válido.");
 
-            if (string.IsNullOrWhiteSpace(codigoCentro))
-                throw new Exception("El código del centro es obligatorio.");
+            ClCentroM centroExistente = oCentroD.MtObtenerCentroPorId(idCentro);
 
-            if (string.IsNullOrWhiteSpace(nombre))
-                throw new Exception("El nombre del centro es obligatorio.");
-
-            if (string.IsNullOrWhiteSpace(regional))
-                throw new Exception("La regional es obligatoria.");
-
-            if (string.IsNullOrWhiteSpace(municipio))
-                throw new Exception("El municipio es obligatorio.");
-
-            if (string.IsNullOrWhiteSpace(departamento))
-                throw new Exception("El departamento es obligatorio.");
-
-            if (string.IsNullOrWhiteSpace(estado))
-                throw new Exception("El estado es obligatorio.");
-
-            if (codigoCentro.Trim().Length > 50)
-                throw new Exception("El código del centro no puede superar los 50 caracteres.");
-
-            if (nombre.Trim().Length > 150)
-                throw new Exception("El nombre del centro no puede superar los 150 caracteres.");
-
-            if (regional.Trim().Length > 100)
-                throw new Exception("La regional no puede superar los 100 caracteres.");
-
-            if (municipio.Trim().Length > 100)
-                throw new Exception("El municipio no puede superar los 100 caracteres.");
-
-            if (departamento.Trim().Length > 100)
-                throw new Exception("El departamento no puede superar los 100 caracteres.");
-
-            if (estado != "Activo" && estado != "Inactivo")
-                throw new Exception("El estado debe ser 'Activo' o 'Inactivo'.");
-
-            DataTable dtExistente = oCentroD.MtObtenerCentroPorId(idCentro);
-            if (dtExistente.Rows.Count == 0)
+            if (centroExistente == null)
                 throw new Exception("El centro que intenta actualizar no existe.");
 
-            string codigoActual = dtExistente.Rows[0]["codigoCentro"].ToString();
-            if (!codigoActual.Equals(codigoCentro.Trim(), StringComparison.OrdinalIgnoreCase))
+            if (!centroExistente.codigoCentro.Equals(codigoCentro.Trim(), StringComparison.OrdinalIgnoreCase))
             {
                 if (oCentroD.MtExisteCodigoCentro(codigoCentro.Trim()))
                     throw new Exception($"Ya existe otro centro registrado con el código '{codigoCentro}'.");
@@ -141,14 +106,15 @@ namespace sistemaPlanMejoramientos.Logica
             if (idCentro <= 0)
                 throw new Exception("El identificador del centro no es válido.");
 
-            DataTable dt = oCentroD.MtObtenerCentroPorId(idCentro);
-            if (dt.Rows.Count == 0)
+            ClCentroM centro = oCentroD.MtObtenerCentroPorId(idCentro);
+
+            if (centro == null)
                 throw new Exception("El centro que intenta eliminar no existe.");
 
             return oCentroD.MtEliminarCentro(idCentro);
         }
 
-        public DataTable MtObtenerCentroPorId(int idCentro)
+        public ClCentroM MtObtenerCentroPorId(int idCentro)
         {
             if (idCentro <= 0)
                 throw new Exception("El identificador del centro no es válido.");
@@ -156,7 +122,7 @@ namespace sistemaPlanMejoramientos.Logica
             return oCentroD.MtObtenerCentroPorId(idCentro);
         }
 
-        public DataTable MtListarCentrosActivos()
+        public List<ClCentroM> MtListarCentrosActivos()
         {
             return oCentroD.MtListarCentrosActivos();
         }

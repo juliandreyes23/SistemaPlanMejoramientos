@@ -1,4 +1,5 @@
 ﻿using sistemaPlanMejoramientos.Datos;
+using sistemaPlanMejoramientos.Modelo;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,7 +12,7 @@ namespace sistemaPlanMejoramientos.Logica
     {
         ClRolD oRolD = new ClRolD();
 
-        public DataTable MtListarRoles()
+        public List<ClRolM> MtListarRoles()
         {
             return oRolD.MtListarRoles();
         }

@@ -1,6 +1,8 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Datos;
+using sistemaPlanMejoramientos.Modelo;
+using System;
+using System.Collections.Generic;
 using System.Data;
-using sistemaPlanMejoramientos.Datos;
 
 namespace sistemaPlanMejoramientos.Logica
 {
@@ -21,12 +23,12 @@ namespace sistemaPlanMejoramientos.Logica
                 nombres, apellidos, correo, telefono, especialidad, idUsuario, idCentro);
         }
 
-        public DataTable MtListarInstructores()
+        public List<ClInstructoresM> MtListarInstructores()
         {
             return oInstructorD.MtListarInstructores();
         }
 
-        public DataTable MtListarCentros()
+        public List<ClCentroM> MtListarCentros()
         {
             return oInstructorD.MtListarCentros();
         }

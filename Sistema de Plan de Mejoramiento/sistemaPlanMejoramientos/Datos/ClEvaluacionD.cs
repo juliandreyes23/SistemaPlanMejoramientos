@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using sistemaPlanMejoramientos.Logica;
+using sistemaPlanMejoramientos.Modelo;
+using System;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 
 namespace sistemaPlanMejoramientos.Datos
 {
@@ -11,24 +9,44 @@ namespace sistemaPlanMejoramientos.Datos
     {
         ClConexion oConex = new ClConexion();
 
-        public DataTable MtConsultarEvaluacionPorPlan(int idPlanMejoramiento)
+        public ClEvaluacionM MtConsultarEvaluacionPorPlan(int idPlanMejoramiento)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
-            string query = @"SELECT idEvaluacion, idPlanMejoramiento, criterioProducto,criterioConocimiento, criterioDesempeno, observaciones
-            FROM evaluaciones
-            WHERE idPlanMejoramiento = @idPlanMejoramiento";
+            string query = @"SELECT idEvaluacion,
+                                    idPlanMejoramiento,
+                                    criterioProducto,
+                                    criterioConocimiento,
+                                    criterioDesempeno,
+                                    observaciones
+                             FROM evaluaciones
+                             WHERE idPlanMejoramiento = @idPlanMejoramiento";
 
             SqlCommand cmd = new SqlCommand(query, cn);
 
             cmd.Parameters.AddWithValue("@idPlanMejoramiento", idPlanMejoramiento);
 
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+            SqlDataReader rd = cmd.ExecuteReader();
 
+            ClEvaluacionM evaluacion = null;
+
+            if (rd.Read())
+            {
+                evaluacion = new ClEvaluacionM
+                {
+                    idEvaluacion = Convert.ToInt32(rd["idEvaluacion"]),
+                    idPlanMejoramiento = Convert.ToInt32(rd["idPlanMejoramiento"]),
+                    criterioProducto = rd["criterioProducto"].ToString(),
+                    criterioConocimiento = rd["criterioConocimiento"].ToString(),
+                    criterioDesempeno = rd["criterioDesempeno"].ToString(),
+                    observaciones = rd["observaciones"].ToString()
+                };
+            }
+
+            rd.Close();
             oConex.MtCerrarConexion();
-            return dt;
+
+            return evaluacion;
         }
     }
 }

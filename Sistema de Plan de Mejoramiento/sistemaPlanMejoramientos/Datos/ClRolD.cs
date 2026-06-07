@@ -1,9 +1,7 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Modelo;
+using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 
 namespace sistemaPlanMejoramientos.Datos
 {
@@ -11,21 +9,33 @@ namespace sistemaPlanMejoramientos.Datos
     {
         ClConexion oConex = new ClConexion();
 
-        public DataTable MtListarRoles()
+        public List<ClRolM> MtListarRoles()
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
-            string query = "SELECT idRol, nombreRol FROM roles";
+            string query = @"SELECT idRol, nombreRol
+                             FROM roles";
 
             SqlCommand cmd = new SqlCommand(query, cn);
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
 
-            da.Fill(dt);
+            SqlDataReader rd = cmd.ExecuteReader();
+
+            List<ClRolM> lista = new List<ClRolM>();
+
+            while (rd.Read())
+            {
+                lista.Add(new ClRolM
+                {
+                    idRol = Convert.ToInt32(rd["idRol"]),
+                    nombreRol = rd["nombreRol"].ToString()
+                });
+            }
+
+            rd.Close();
 
             oConex.MtCerrarConexion();
 
-            return dt;
+            return lista;
         }
     }
 }

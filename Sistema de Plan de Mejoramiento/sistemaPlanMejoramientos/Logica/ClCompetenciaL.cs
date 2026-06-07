@@ -1,9 +1,10 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Datos;
+using sistemaPlanMejoramientos.Modelo;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Web;
-using sistemaPlanMejoramientos.Datos;
 
 namespace sistemaPlanMejoramientos.Logica
 {
@@ -20,7 +21,7 @@ namespace sistemaPlanMejoramientos.Logica
             return oCompetenciaD.MtCrearCompetencia(descripcion, idPrograma);
         }
 
-        public DataTable MtListarCompetencias()
+        public List<ClCompetenciasM> MtListarCompetencias()
         {
             return oCompetenciaD.MtListarCompetencias();
         }
@@ -43,17 +44,23 @@ namespace sistemaPlanMejoramientos.Logica
             return oCompetenciaD.MtEliminarCompetencia(idCompetencia);
         }
 
-        public DataTable MtCargarCompetencia(int idPrograma)
+        public List<ClCompetenciasM> MtCargarCompetencias(int idPrograma)
         {
+            if (idPrograma <= 0)
+                return new List<ClCompetenciasM>();
+
             return oCompetenciaD.MtCargarCompetencias(idPrograma);
         }
-        public DataTable MListarCompetencia()
+        public List<ClCompetenciasM> MtListaCompetencia()
         {
             return oCompetenciaD.MtListaCompetencia();
         }
 
-        public DataTable MtBuscarCompetencias(string filtro)
+        public List<ClCompetenciasM> MtBuscarCompetencias(string filtro)
         {
+            if (string.IsNullOrWhiteSpace(filtro))
+                return new List<ClCompetenciasM>();
+
             return oCompetenciaD.MtBuscarCompetencias(filtro);
         }
     }

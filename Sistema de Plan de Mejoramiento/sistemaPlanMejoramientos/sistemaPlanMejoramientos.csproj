@@ -157,11 +157,13 @@
     <Compile Include="Logica\ClResultadoAprendizajeL.cs" />
     <Compile Include="Logica\ClRolL.cs" />
     <Compile Include="Logica\ClUsuarioL.cs" />
+    <Compile Include="Modelo\ClAdministradorM.cs" />
     <Compile Include="Modelo\ClAprendizM.cs" />
+    <Compile Include="Modelo\ClAsignacionM.cs" />
     <Compile Include="Modelo\ClCentroM.cs" />
     <Compile Include="Modelo\ClCompetenciasM.cs" />
-    <Compile Include="Modelo\ClEvaluacionesM.cs" />
-    <Compile Include="Modelo\ClEvidenciasM.cs" />
+    <Compile Include="Modelo\ClEvaluacionM.cs" />
+    <Compile Include="Modelo\ClEvidenciaM.cs" />
     <Compile Include="Modelo\ClFichaAprendizM.cs" />
     <Compile Include="Modelo\ClFichaInstructorM.cs" />
     <Compile Include="Modelo\ClFichasM.cs" />

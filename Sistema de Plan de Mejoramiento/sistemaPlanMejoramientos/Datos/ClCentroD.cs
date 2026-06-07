@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
+using sistemaPlanMejoramientos.Modelo;
 
 namespace sistemaPlanMejoramientos.Datos
 {
@@ -32,36 +30,52 @@ namespace sistemaPlanMejoramientos.Datos
             return filas > 0;
         }
 
-        public DataTable MtListarCentros()
+        public List<ClCentroM> MtListarCentros()
         {
             return MtListarCentros("");
         }
 
-        public DataTable MtListarCentros(string filtro)
+        public List<ClCentroM> MtListarCentros(string filtro)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
             string query = @"SELECT idCentro, codigoCentro, nombre, regional, municipio, departamento, estado
                              FROM centros
                              WHERE (@filtro = '' OR
-                                    CAST(idCentro AS NVARCHAR)  LIKE '%' + @filtro + '%' OR
-                                    codigoCentro                LIKE '%' + @filtro + '%' OR
-                                    nombre                      LIKE '%' + @filtro + '%' OR
-                                    regional                    LIKE '%' + @filtro + '%' OR
-                                    municipio                   LIKE '%' + @filtro + '%' OR
-                                    departamento                LIKE '%' + @filtro + '%' OR
-                                    estado                      LIKE '%' + @filtro + '%')
+                                    CAST(idCentro AS NVARCHAR) LIKE '%' + @filtro + '%' OR
+                                    codigoCentro LIKE '%' + @filtro + '%' OR
+                                    nombre LIKE '%' + @filtro + '%' OR
+                                    regional LIKE '%' + @filtro + '%' OR
+                                    municipio LIKE '%' + @filtro + '%' OR
+                                    departamento LIKE '%' + @filtro + '%' OR
+                                    estado LIKE '%' + @filtro + '%')
                              ORDER BY idCentro ASC";
 
             SqlCommand cmd = new SqlCommand(query, cn);
             cmd.Parameters.AddWithValue("@filtro", filtro.Trim());
 
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+            SqlDataReader rd = cmd.ExecuteReader();
 
+            List<ClCentroM> lista = new List<ClCentroM>();
+
+            while (rd.Read())
+            {
+                lista.Add(new ClCentroM
+                {
+                    idCentro = Convert.ToInt32(rd["idCentro"]),
+                    codigoCentro = rd["codigoCentro"].ToString(),
+                    nombre = rd["nombre"].ToString(),
+                    regional = rd["regional"].ToString(),
+                    municipio = rd["municipio"].ToString(),
+                    departamento = rd["departamento"].ToString(),
+                    estado = rd["estado"].ToString()
+                });
+            }
+
+            rd.Close();
             oConex.MtCerrarConexion();
-            return dt;
+
+            return lista;
         }
 
         public bool MtActualizarCentro(int idCentro, string codigoCentro, string nombre, string regional, string municipio, string departamento, string estado)
@@ -70,11 +84,11 @@ namespace sistemaPlanMejoramientos.Datos
 
             string query = @"UPDATE centros
                              SET codigoCentro = @codigoCentro,
-                                 nombre       = @nombre,
-                                 regional     = @regional,
-                                 municipio    = @municipio,
+                                 nombre = @nombre,
+                                 regional = @regional,
+                                 municipio = @municipio,
                                  departamento = @departamento,
-                                 estado       = @estado
+                                 estado = @estado
                              WHERE idCentro = @idCentro";
 
             SqlCommand cmd = new SqlCommand(query, cn);
@@ -103,90 +117,115 @@ namespace sistemaPlanMejoramientos.Datos
                 cmd.Parameters.AddWithValue("@idCentro", idCentro);
 
                 cmd.CommandText = @"DELETE FROM planResultados
-                            WHERE idPlanMejoramiento IN (
-                                SELECT idPlanMejoramiento FROM planesMejoramiento
-                                WHERE idAprendiz IN (
-                                    SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
-                                )
-                            )";
+                    WHERE idPlanMejoramiento IN (
+                        SELECT idPlanMejoramiento FROM planesMejoramiento
+                        WHERE idAprendiz IN (
+                            SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
+                        )
+                    )";
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"DELETE FROM evaluaciones
-                            WHERE idPlanMejoramiento IN (
-                                SELECT idPlanMejoramiento FROM planesMejoramiento
-                                WHERE idAprendiz IN (
-                                    SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
-                                )
-                            )";
+                    WHERE idPlanMejoramiento IN (
+                        SELECT idPlanMejoramiento FROM planesMejoramiento
+                        WHERE idAprendiz IN (
+                            SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
+                        )
+                    )";
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"DELETE FROM evidencias
-                            WHERE idPlanMejoramiento IN (
-                                SELECT idPlanMejoramiento FROM planesMejoramiento
-                                WHERE idAprendiz IN (
-                                    SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
-                                )
-                            )";
+                    WHERE idPlanMejoramiento IN (
+                        SELECT idPlanMejoramiento FROM planesMejoramiento
+                        WHERE idAprendiz IN (
+                            SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
+                        )
+                    )";
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"DELETE FROM planesMejoramiento
-                            WHERE idAprendiz IN (
-                                SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
-                            )";
+                    WHERE idAprendiz IN (
+                        SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
+                    )";
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"DELETE FROM planResultados
-                            WHERE idResultadoAprendizaje IN (
-                                SELECT ra.idResultadoAprendizaje
-                                FROM resultadoAprendizaje ra
-                                INNER JOIN competencias c ON ra.idCompetencia = c.idCompetencia
-                                INNER JOIN programas p ON c.idPrograma = p.idPrograma
-                                WHERE p.idCentro = @idCentro
-                            )";
+                    WHERE idResultadoAprendizaje IN (
+                        SELECT ra.idResultadoAprendizaje
+                        FROM resultadoAprendizaje ra
+                        INNER JOIN competencias c ON ra.idCompetencia = c.idCompetencia
+                        INNER JOIN programas p ON c.idPrograma = p.idPrograma
+                        WHERE p.idCentro = @idCentro
+                    )";
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"DELETE FROM resultadoAprendizaje
-                            WHERE idCompetencia IN (
-                                SELECT c.idCompetencia FROM competencias c
-                                INNER JOIN programas p ON c.idPrograma = p.idPrograma
-                                WHERE p.idCentro = @idCentro
-                            )";
+                    WHERE idCompetencia IN (
+                        SELECT c.idCompetencia
+                        FROM competencias c
+                        INNER JOIN programas p ON c.idPrograma = p.idPrograma
+                        WHERE p.idCentro = @idCentro
+                    )";
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"DELETE FROM competencias
-                            WHERE idPrograma IN (
-                                SELECT idPrograma FROM programas WHERE idCentro = @idCentro
-                            )";
+                    WHERE idPrograma IN (
+                        SELECT idPrograma FROM programas WHERE idCentro = @idCentro
+                    )";
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"DELETE FROM fichaAprendiz
-                            WHERE idFicha IN (
-                                SELECT idFicha FROM fichas WHERE idCentro = @idCentro
-                            )";
+                    WHERE idFicha IN (
+                        SELECT idFicha FROM fichas WHERE idCentro = @idCentro
+                    )";
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"DELETE FROM fichaAprendiz
-                            WHERE idAprendiz IN (
-                                SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
-                            )";
+                    WHERE idAprendiz IN (
+                        SELECT idAprendiz FROM aprendices WHERE idCentro = @idCentro
+                    )";
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"DELETE FROM fichaInstructor
-                            WHERE idFicha IN (
-                                SELECT idFicha FROM fichas WHERE idCentro = @idCentro
-                            )";
+                    WHERE idFicha IN (
+                        SELECT idFicha FROM fichas WHERE idCentro = @idCentro
+                    )";
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"DELETE FROM fichaInstructor
-                            WHERE idInstructor IN (
-                                SELECT idInstructor FROM instructores WHERE idCentro = @idCentro
-                            )";
+                    WHERE idInstructor IN (
+                        SELECT idInstructor FROM instructores WHERE idCentro = @idCentro
+                    )";
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"DELETE FROM fichas WHERE idCentro = @idCentro";
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"DELETE FROM programas WHERE idCentro = @idCentro";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM recuperacionPassword
+                    WHERE idUsuario IN (
+                        SELECT idUsuario FROM aprendices WHERE idCentro = @idCentro AND idUsuario IS NOT NULL
+                    )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM recuperacionPassword
+                    WHERE idUsuario IN (
+                        SELECT idUsuario FROM instructores WHERE idCentro = @idCentro AND idUsuario IS NOT NULL
+                    )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM usuarios
+                    WHERE idUsuario IN (
+                        SELECT idUsuario FROM aprendices WHERE idCentro = @idCentro AND idUsuario IS NOT NULL
+                    )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM usuarios
+                    WHERE idUsuario IN (
+                        SELECT idUsuario FROM instructores WHERE idCentro = @idCentro AND idUsuario IS NOT NULL
+                    )";
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"UPDATE aprendices SET idUsuario = NULL WHERE idCentro = @idCentro";
@@ -210,10 +249,10 @@ namespace sistemaPlanMejoramientos.Datos
                 transaction.Commit();
                 return filas > 0;
             }
-            catch (Exception ex)
+            catch
             {
                 transaction.Rollback();
-                throw ex;
+                throw;
             }
             finally
             {
@@ -221,7 +260,7 @@ namespace sistemaPlanMejoramientos.Datos
             }
         }
 
-        public DataTable MtObtenerCentroPorId(int idCentro)
+        public ClCentroM MtObtenerCentroPorId(int idCentro)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
@@ -232,12 +271,28 @@ namespace sistemaPlanMejoramientos.Datos
             SqlCommand cmd = new SqlCommand(query, cn);
             cmd.Parameters.AddWithValue("@idCentro", idCentro);
 
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+            SqlDataReader rd = cmd.ExecuteReader();
 
+            ClCentroM centro = null;
+
+            if (rd.Read())
+            {
+                centro = new ClCentroM
+                {
+                    idCentro = Convert.ToInt32(rd["idCentro"]),
+                    codigoCentro = rd["codigoCentro"].ToString(),
+                    nombre = rd["nombre"].ToString(),
+                    regional = rd["regional"].ToString(),
+                    municipio = rd["municipio"].ToString(),
+                    departamento = rd["departamento"].ToString(),
+                    estado = rd["estado"].ToString()
+                };
+            }
+
+            rd.Close();
             oConex.MtCerrarConexion();
-            return dt;
+
+            return centro;
         }
 
         public bool MtExisteCodigoCentro(string codigoCentro)
@@ -250,6 +305,7 @@ namespace sistemaPlanMejoramientos.Datos
             cmd.Parameters.AddWithValue("@codigoCentro", codigoCentro);
 
             object resultado = cmd.ExecuteScalar();
+
             oConex.MtCerrarConexion();
 
             return Convert.ToInt32(resultado) > 0;
@@ -265,12 +321,13 @@ namespace sistemaPlanMejoramientos.Datos
             cmd.Parameters.AddWithValue("@codigoCentro", codigoCentro);
 
             object resultado = cmd.ExecuteScalar();
+
             oConex.MtCerrarConexion();
 
             return resultado != null ? Convert.ToInt32(resultado) : 0;
         }
 
-        public DataTable MtListarCentrosActivos()
+        public List<ClCentroM> MtListarCentrosActivos()
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
@@ -281,12 +338,24 @@ namespace sistemaPlanMejoramientos.Datos
 
             SqlCommand cmd = new SqlCommand(query, cn);
 
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+            SqlDataReader rd = cmd.ExecuteReader();
 
+            List<ClCentroM> lista = new List<ClCentroM>();
+
+            while (rd.Read())
+            {
+                lista.Add(new ClCentroM
+                {
+                    idCentro = Convert.ToInt32(rd["idCentro"]),
+                    codigoCentro = rd["codigoCentro"].ToString(),
+                    nombre = rd["nombre"].ToString()
+                });
+            }
+
+            rd.Close();
             oConex.MtCerrarConexion();
-            return dt;
+
+            return lista;
         }
     }
 }

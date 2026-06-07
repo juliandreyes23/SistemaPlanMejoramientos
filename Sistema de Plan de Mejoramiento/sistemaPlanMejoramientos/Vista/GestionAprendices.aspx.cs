@@ -1,9 +1,10 @@
 ﻿using sistemaPlanMejoramientos.Logica;
 using System;
-using System.Data;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using sistemaPlanMejoramientos.Modelo;
 
 namespace sistemaPlanMejoramientos.Vista
 {
@@ -26,30 +27,38 @@ namespace sistemaPlanMejoramientos.Vista
             hfMensajeTxt.Value = "";
         }
 
-        protected void btnBuscar_Click(object sender, EventArgs e)
+        private void ListarAprendices()
         {
-            ViewState["PaginaActual"] = 0;
-            ListarAprendices();
-        }
+            try
+            {
+                List<ClAprendizM> lista = oAprendizL.MtListarAprendices(txtBuscar.Text.Trim());
 
-        protected void txtBuscar_TextChanged(object sender, EventArgs e)
-        {
-            ViewState["PaginaActual"] = 0;
-            ListarAprendices();
-        }
+                gvAprendices.PageIndex = (int)ViewState["PaginaActual"];
+                gvAprendices.DataSource = lista;
+                gvAprendices.DataBind();
 
-        protected void btnLimpiarBuscar_Click(object sender, EventArgs e)
-        {
-            txtBuscar.Text = "";
-            ViewState["PaginaActual"] = 0;
-            ListarAprendices();
+                int totalPaginas = gvAprendices.PageCount;
+                ViewState["TotalPaginas"] = totalPaginas;
+
+                litPaginaActual.Text = ((int)ViewState["PaginaActual"] + 1).ToString();
+                litTotalPaginas.Text = totalPaginas.ToString();
+                litTotalRegistros.Text = lista.Count.ToString();
+
+                var paginas = Enumerable.Range(0, totalPaginas).Cast<object>().ToList();
+                rptPaginacion.DataSource = paginas;
+                rptPaginacion.DataBind();
+            }
+            catch (Exception ex)
+            {
+                SetMensaje("error", "Error al listar aprendices: " + ex.Message);
+            }
         }
 
         private void CargarFichas()
         {
             try
             {
-                DataTable dtFichas = oFichaL.MtListarFichas();
+                var dtFichas = oFichaL.MtListarFichas();
                 ddlFicha.DataSource = dtFichas;
                 ddlFicha.DataTextField = "codigoFicha";
                 ddlFicha.DataValueField = "idFicha";
@@ -59,33 +68,6 @@ namespace sistemaPlanMejoramientos.Vista
             catch (Exception ex)
             {
                 SetMensaje("error", "Error cargando fichas: " + ex.Message);
-            }
-        }
-
-        private void ListarAprendices()
-        {
-            try
-            {
-                DataTable dt = oAprendizL.MtListarAprendices(txtBuscar.Text.Trim());
-
-                gvAprendices.PageIndex = (int)ViewState["PaginaActual"];
-                gvAprendices.DataSource = dt;
-                gvAprendices.DataBind();
-
-                int totalPaginas = gvAprendices.PageCount;
-                ViewState["TotalPaginas"] = totalPaginas;
-
-                litPaginaActual.Text = ((int)ViewState["PaginaActual"] + 1).ToString();
-                litTotalPaginas.Text = totalPaginas.ToString();
-                litTotalRegistros.Text = dt.Rows.Count.ToString();
-
-                var paginas = Enumerable.Range(0, totalPaginas).Cast<object>().ToList();
-                rptPaginacion.DataSource = paginas;
-                rptPaginacion.DataBind();
-            }
-            catch (Exception ex)
-            {
-                SetMensaje("error", "Error al listar aprendices: " + ex.Message);
             }
         }
 
@@ -118,14 +100,96 @@ namespace sistemaPlanMejoramientos.Vista
             ListarAprendices();
         }
 
+        protected void gvAprendices_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandArgument == null) return;
+
+            if (e.CommandName == "Editar")
+            {
+                int index = Convert.ToInt32(e.CommandArgument);
+                int idAprendiz = Convert.ToInt32(gvAprendices.DataKeys[index]["idAprendiz"]);
+
+                var lista = oAprendizL.MtListarAprendices("");
+                var a = lista.FirstOrDefault(x => x.idAprendiz == idAprendiz);
+                if (a == null) return;
+
+                CargarFichas();
+
+                hfIdAprendiz.Value = a.idAprendiz.ToString();
+                txtDocumento.Text = a.numeroDocumento;
+                txtNombres.Text = a.nombres;
+                txtApellidos.Text = a.apellidos;
+                txtCorreo.Text = a.correo;
+                txtTelefono.Text = a.telefono;
+
+                if (ddlTipoDoc.Items.FindByValue(a.tipoDocumento) != null)
+                    ddlTipoDoc.SelectedValue = a.tipoDocumento;
+
+                if (ddlEstadoAcademico.Items.FindByValue(a.estadoAcademico) != null)
+                    ddlEstadoAcademico.SelectedValue = a.estadoAcademico;
+
+                if (ddlFicha.Items.FindByValue(a.idFicha.ToString()) != null)
+                    ddlFicha.SelectedValue = a.idFicha.ToString();
+
+                lblTituloForm.Text = "Editar Aprendiz";
+                btnGuardar.Text = "Actualizar Aprendiz";
+                hfAbrirModal.Value = "editar";
+
+                ListarAprendices();
+            }
+            else if (e.CommandName == "Eliminar")
+            {
+                try
+                {
+                    int idAprendiz = Convert.ToInt32(e.CommandArgument);
+                    int idUsuario = oAprendizL.MtObtenerIdUsuarioPorAprendiz(idAprendiz);
+                    bool eliminado = oAprendizL.MtEliminarAprendiz(idAprendiz);
+
+                    if (eliminado)
+                    {
+                        if (idUsuario > 0) oUsuarioL.MtEliminarUsuario(idUsuario);
+                        ListarAprendices();
+                        SetMensaje("success", "Aprendiz eliminado correctamente");
+                    }
+                    else
+                    {
+                        SetMensaje("error", "No se pudo eliminar el aprendiz");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    SetMensaje("error", ex.Message);
+                }
+            }
+        }
+
         protected void gvAprendices_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             if (e.Row.RowType == DataControlRowType.DataRow)
             {
-                LinkButton btnEliminar = (LinkButton)e.Row.FindControl("btnEliminar");
+                var btnEliminar = (LinkButton)e.Row.FindControl("btnEliminar");
                 if (btnEliminar != null)
                     btnEliminar.Attributes.Add("onclick", "return confirmarEliminar(this);");
             }
+        }
+
+        protected void btnBuscar_Click(object sender, EventArgs e)
+        {
+            ViewState["PaginaActual"] = 0;
+            ListarAprendices();
+        }
+
+        protected void txtBuscar_TextChanged(object sender, EventArgs e)
+        {
+            ViewState["PaginaActual"] = 0;
+            ListarAprendices();
+        }
+
+        protected void btnLimpiarBuscar_Click(object sender, EventArgs e)
+        {
+            txtBuscar.Text = "";
+            ViewState["PaginaActual"] = 0;
+            ListarAprendices();
         }
 
         protected void btnGuardar_Click(object sender, EventArgs e)
@@ -138,186 +202,117 @@ namespace sistemaPlanMejoramientos.Vista
                 string apellidos = txtApellidos.Text.Trim();
                 string correo = txtCorreo.Text.Trim();
                 string telefono = txtTelefono.Text.Trim();
-                string estadoAcademico = ddlEstadoAcademico.SelectedValue;
+
+                if (!System.Text.RegularExpressions.Regex.IsMatch(telefono, @"^\d+$"))
+                {
+                    hfAbrirModal.Value = string.IsNullOrEmpty(hfIdAprendiz.Value) ? "crear" : "editar";
+                    SetMensaje("warning", "El teléfono solo puede contener números.");
+                    return;
+                }
+
+                if (telefono.Length != 10)
+                {
+                    hfAbrirModal.Value = string.IsNullOrEmpty(hfIdAprendiz.Value) ? "crear" : "editar";
+                    SetMensaje("warning", "El teléfono debe tener exactamente 10 dígitos.");
+                    return;
+                }
+
+                string estado = ddlEstadoAcademico.SelectedValue;
 
                 if (string.IsNullOrEmpty(ddlFicha.SelectedValue))
                 {
                     hfAbrirModal.Value = string.IsNullOrEmpty(hfIdAprendiz.Value) ? "crear" : "editar";
-                    SetMensaje("warning", "Por favor, seleccione una Ficha de Formación válida.");
+                    SetMensaje("warning", "Seleccione una ficha válida");
                     return;
                 }
 
                 int idFicha = Convert.ToInt32(ddlFicha.SelectedValue);
-                bool resultado = false;
                 bool esNuevo = string.IsNullOrEmpty(hfIdAprendiz.Value);
+                bool resultado = false;
 
                 if (esNuevo)
                 {
                     if (oUsuarioL.MtExisteCorreo(correo))
                     {
                         hfAbrirModal.Value = "crear";
-                        SetMensaje("warning", "El correo ya está registrado como usuario en el sistema.");
+                        SetMensaje("warning", "El correo ya existe");
                         return;
                     }
 
-                    int idUsuarioNuevo = oUsuarioL.MtCrearUsuarioConRetorno(correo, documento, 3);
-                    if (idUsuarioNuevo <= 0)
+                    int idUsuario = oUsuarioL.MtCrearUsuarioConRetorno(correo, documento, 3);
+                    if (idUsuario <= 0)
                     {
                         hfAbrirModal.Value = "crear";
-                        SetMensaje("error", "No se pudo crear el usuario para el aprendiz.");
+                        SetMensaje("error", "No se pudo crear usuario");
                         return;
                     }
 
                     int idCentro = oFichaL.MtObtenerIdCentroPorFicha(idFicha);
-                    if (idCentro <= 0)
-                    {
-                        hfAbrirModal.Value = "crear";
-                        SetMensaje("error", "No se pudo determinar el centro asociado a la ficha seleccionada.");
-                        return;
-                    }
-
-                    int idAprendizNuevo = oAprendizL.MtCrearAprendizConRetorno(
+                    int idAprendiz = oAprendizL.MtCrearAprendizConRetorno(
                         tipoDoc, documento, nombres, apellidos,
-                        correo, telefono, estadoAcademico, idUsuarioNuevo, idFicha, idCentro);
+                        correo, telefono, estado, idUsuario, idFicha, idCentro);
 
-                    if (idAprendizNuevo <= 0)
+                    if (idAprendiz <= 0)
                     {
+                        oUsuarioL.MtEliminarUsuario(idUsuario);
                         hfAbrirModal.Value = "crear";
-                        SetMensaje("error", "No se pudo registrar el aprendiz.");
+                        SetMensaje("error", "No se pudo crear el aprendiz");
                         return;
                     }
 
-                    oAprendizL.MtRegistrarFichaIntermedia(idFicha, idAprendizNuevo);
                     resultado = true;
                 }
                 else
                 {
                     int idAprendiz = Convert.ToInt32(hfIdAprendiz.Value);
                     resultado = oAprendizL.MtActualizarAprendiz(
-                        idAprendiz, tipoDoc, documento, nombres, apellidos,
-                        correo, telefono, estadoAcademico, idFicha);
+                        idAprendiz, tipoDoc, documento, nombres,
+                        apellidos, correo, telefono, estado, idFicha);
                 }
 
                 if (resultado)
                 {
                     LimpiarFormulario();
                     ListarAprendices();
-                    SetMensaje("success", esNuevo
-                        ? "¡Aprendiz registrado! Usuario creado con contraseña = número de documento."
-                        : "¡Aprendiz actualizado con éxito!");
+                    SetMensaje("success", esNuevo ? "Aprendiz creado" : "Aprendiz actualizado");
                 }
                 else
                 {
-                    hfAbrirModal.Value = esNuevo ? "crear" : "editar";
-                    SetMensaje("error", "La base de datos no sufrió cambios. Verifica los datos ingresados.");
+                    hfAbrirModal.Value = "editar";
+                    SetMensaje("error", "No se pudo guardar");
                 }
             }
             catch (Exception ex)
             {
-                hfAbrirModal.Value = string.IsNullOrEmpty(hfIdAprendiz.Value) ? "crear" : "editar";
-                string msg = ex.Message.Contains("UNIQUE KEY") || ex.Message.Contains("duplicate key")
-                    ? "El número de documento ya se encuentra registrado."
-                    : "Error en el proceso de guardado: " + ex.Message;
-                SetMensaje("error", msg);
+                SetMensaje("error", ex.Message);
             }
         }
 
-        protected void gvAprendices_RowCommand(object sender, GridViewCommandEventArgs e)
+        protected void btnNuevo_Click(object sender, EventArgs e)
         {
-            if (e.CommandArgument == null || string.IsNullOrEmpty(e.CommandArgument.ToString())) return;
-
-            if (e.CommandName == "Editar")
-            {
-                LinkButton btnEditar = (LinkButton)e.CommandSource;
-                GridViewRow fila = (GridViewRow)btnEditar.NamingContainer;
-
-                int idAprendizKey = Convert.ToInt32(gvAprendices.DataKeys[fila.RowIndex]["idAprendiz"]);
-                string idFichaKey = gvAprendices.DataKeys[fila.RowIndex]["idFicha"].ToString();
-
-                hfIdAprendiz.Value = idAprendizKey.ToString();
-
-                string tipoDocTabla = Server.HtmlDecode(fila.Cells[1].Text).Trim();
-                ListItem itemTipo = ddlTipoDoc.Items.FindByValue(tipoDocTabla);
-                if (itemTipo != null) ddlTipoDoc.SelectedValue = itemTipo.Value;
-
-                txtDocumento.Text = Server.HtmlDecode(fila.Cells[2].Text).Trim();
-                txtNombres.Text = Server.HtmlDecode(fila.Cells[3].Text).Trim();
-                txtApellidos.Text = Server.HtmlDecode(fila.Cells[4].Text).Trim();
-                txtCorreo.Text = Server.HtmlDecode(fila.Cells[5].Text).Trim();
-                txtTelefono.Text = Server.HtmlDecode(fila.Cells[6].Text).Trim();
-
-                string estadoTabla = Server.HtmlDecode(fila.Cells[7].Text).Trim();
-                ListItem itemEstado = ddlEstadoAcademico.Items.FindByValue(estadoTabla);
-                if (itemEstado != null) ddlEstadoAcademico.SelectedValue = itemEstado.Value;
-
-                ListItem itemFicha = ddlFicha.Items.FindByValue(idFichaKey);
-                if (itemFicha != null) ddlFicha.SelectedValue = itemFicha.Value;
-
-                lblTituloForm.Text = "Modificar Aprendiz: " + txtNombres.Text;
-                btnGuardar.Text = "Actualizar Aprendiz";
-
-                hfAbrirModal.Value = "editar";
-                hfMensajeTipo.Value = "";
-                hfMensajeTxt.Value = "";
-            }
-            else if (e.CommandName == "Eliminar")
-            {
-                try
-                {
-                    int idAprendiz = Convert.ToInt32(e.CommandArgument);
-                    int idUsuarioVinculado = oAprendizL.MtObtenerIdUsuarioPorAprendiz(idAprendiz);
-                    bool eliminado = oAprendizL.MtEliminarAprendiz(idAprendiz);
-
-                    if (eliminado)
-                    {
-                        if (idUsuarioVinculado > 0)
-                            oUsuarioL.MtEliminarUsuario(idUsuarioVinculado);
-
-                        LimpiarFormulario();
-                        ListarAprendices();
-                        SetMensaje("success", "¡Aprendiz y su usuario eliminados con éxito!");
-                    }
-                    else
-                    {
-                        SetMensaje("error", "No se pudo eliminar el aprendiz. Intenta de nuevo.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    SetMensaje("error", "Error al intentar eliminar: " + ex.Message);
-                }
-            }
+            LimpiarFormulario();
+            lblTituloForm.Text = "Registrar Aprendiz";
+            btnGuardar.Text = "Guardar Aprendiz";
+            hfAbrirModal.Value = "crear";
         }
 
         protected void btnCancelar_Click(object sender, EventArgs e)
         {
+            hfAbrirModal.Value = "";
             LimpiarFormulario();
-
-            Control ctrl = sender as Control;
-            if (ctrl != null && ctrl.ID == "btnNuevo")
-            {
-                hfAbrirModal.Value = "crear";
-                pnlAvisoUsuario.Visible = true;
-            }
         }
 
         private void LimpiarFormulario()
         {
             hfIdAprendiz.Value = "";
-            hfAbrirModal.Value = "";
-            hfMensajeTipo.Value = "";
-            hfMensajeTxt.Value = "";
-
             txtDocumento.Text = "";
             txtNombres.Text = "";
             txtApellidos.Text = "";
             txtCorreo.Text = "";
             txtTelefono.Text = "";
-
-            if (ddlTipoDoc.Items.Count > 0) ddlTipoDoc.SelectedIndex = 0;
-            if (ddlEstadoAcademico.Items.Count > 0) ddlEstadoAcademico.SelectedIndex = 0;
-            if (ddlFicha.Items.Count > 0) ddlFicha.SelectedIndex = 0;
-
+            ddlTipoDoc.SelectedIndex = 0;
+            ddlEstadoAcademico.SelectedIndex = 0;
+            ddlFicha.SelectedIndex = 0;
             lblTituloForm.Text = "Registrar Aprendiz";
             btnGuardar.Text = "Guardar Aprendiz";
         }

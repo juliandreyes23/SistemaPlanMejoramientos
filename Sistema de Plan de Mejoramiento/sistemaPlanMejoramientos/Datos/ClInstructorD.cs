@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
+using sistemaPlanMejoramientos.Modelo;
 
 namespace sistemaPlanMejoramientos.Datos
 {
@@ -15,10 +13,13 @@ namespace sistemaPlanMejoramientos.Datos
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
-            string query = @"INSERT INTO instructores (tipoDocumento, numeroDocumento, nombres, apellidos, correo, telefono, especialidad, idUsuario, idCentro)
-            VALUES (@tipoDocumento, @numeroDocumento, @nombres, @apellidos, @correo, @telefono, @especialidad, @idUsuario, @idCentro)";
+            string query = @"INSERT INTO instructores
+                            (tipoDocumento, numeroDocumento, nombres, apellidos, correo, telefono, especialidad, idUsuario, idCentro)
+                             VALUES
+                            (@tipoDocumento, @numeroDocumento, @nombres, @apellidos, @correo, @telefono, @especialidad, @idUsuario, @idCentro)";
 
             SqlCommand cmd = new SqlCommand(query, cn);
+
             cmd.Parameters.AddWithValue("@tipoDocumento", tipoDocumento);
             cmd.Parameters.AddWithValue("@numeroDocumento", numeroDocumento);
             cmd.Parameters.AddWithValue("@nombres", nombres);
@@ -30,39 +31,80 @@ namespace sistemaPlanMejoramientos.Datos
             cmd.Parameters.AddWithValue("@idCentro", idCentro);
 
             int filas = cmd.ExecuteNonQuery();
+
             oConex.MtCerrarConexion();
+
             return filas > 0;
         }
 
-        public DataTable MtListarInstructores()
+        public List<ClInstructoresM> MtListarInstructores()
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
-            string query = @"SELECT i.idInstructor, i.tipoDocumento, i.numeroDocumento, i.nombres,
-                             i.apellidos, i.correo, i.telefono, i.especialidad, u.idUsuario,
-                             c.nombre AS centro, i.idCentro
+            string query = @"SELECT i.idInstructor,
+                                    i.tipoDocumento,
+                                    i.numeroDocumento,
+                                    i.nombres,
+                                    i.apellidos,
+                                    i.correo,
+                                    i.telefono,
+                                    i.especialidad,
+                                    i.idUsuario,
+                                    i.idCentro,
+                                    c.nombre AS centro
                              FROM instructores i
                              INNER JOIN usuarios u ON i.idUsuario = u.idUsuario
                              INNER JOIN centros c ON i.idCentro = c.idCentro";
 
             SqlCommand cmd = new SqlCommand(query, cn);
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+
+            SqlDataReader rd = cmd.ExecuteReader();
+
+            List<ClInstructoresM> lista = new List<ClInstructoresM>();
+
+            while (rd.Read())
+            {
+                lista.Add(new ClInstructoresM
+                {
+                    idInstructor = Convert.ToInt32(rd["idInstructor"]),
+                    tipoDocumento = rd["tipoDocumento"].ToString(),
+                    numeroDocumento = rd["numeroDocumento"].ToString(),
+                    nombres = rd["nombres"].ToString(),
+                    apellidos = rd["apellidos"].ToString(),
+                    correo = rd["correo"].ToString(),
+                    telefono = rd["telefono"].ToString(),
+                    especialidad = rd["especialidad"].ToString(),
+                    idUsuario = Convert.ToInt32(rd["idUsuario"]),
+                    centro = new ClCentroM
+                    {
+                        idCentro = Convert.ToInt32(rd["idCentro"]),
+                        nombre = rd["centro"].ToString()
+                    },
+                    nombreCentro = rd["centro"].ToString()
+                });
+            }
+
+            rd.Close();
             oConex.MtCerrarConexion();
-            return dt;
+
+            return lista;
         }
 
         public bool MtActualizarInstructor(int idInstructor, string nombres, string apellidos, string correo, string telefono, string especialidad, int idCentro)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
-            string query = @"UPDATE instructores SET nombres = @nombres, apellidos = @apellidos,
-                             correo = @correo, telefono = @telefono, especialidad = @especialidad,
-                             idCentro = @idCentro
+            string query = @"UPDATE instructores
+                             SET nombres = @nombres,
+                                 apellidos = @apellidos,
+                                 correo = @correo,
+                                 telefono = @telefono,
+                                 especialidad = @especialidad,
+                                 idCentro = @idCentro
                              WHERE idInstructor = @idInstructor";
 
             SqlCommand cmd = new SqlCommand(query, cn);
+
             cmd.Parameters.AddWithValue("@nombres", nombres);
             cmd.Parameters.AddWithValue("@apellidos", apellidos);
             cmd.Parameters.AddWithValue("@correo", correo);
@@ -72,7 +114,9 @@ namespace sistemaPlanMejoramientos.Datos
             cmd.Parameters.AddWithValue("@idInstructor", idInstructor);
 
             int filas = cmd.ExecuteNonQuery();
+
             oConex.MtCerrarConexion();
+
             return filas > 0;
         }
 
@@ -115,6 +159,10 @@ namespace sistemaPlanMejoramientos.Datos
                             WHERE idInstructor = @idInstructor";
                 cmd.ExecuteNonQuery();
 
+                cmd.CommandText = @"UPDATE instructores SET idUsuario = NULL
+                            WHERE idInstructor = @idInstructor";
+                cmd.ExecuteNonQuery();
+
                 cmd.CommandText = @"DELETE FROM instructores
                             WHERE idInstructor = @idInstructor";
                 int filas = cmd.ExecuteNonQuery();
@@ -136,24 +184,49 @@ namespace sistemaPlanMejoramientos.Datos
         public bool MtAsignarInstructorAFicha(int idInstructor, int idFicha)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
-            string query = @"INSERT INTO fichaInstructor (idInstructor, idFicha) VALUES (@idInstructor, @idFicha)";
+
+            string query = @"INSERT INTO fichaInstructor
+                            (idInstructor, idFicha)
+                             VALUES
+                            (@idInstructor, @idFicha)";
+
             SqlCommand cmd = new SqlCommand(query, cn);
+
             cmd.Parameters.AddWithValue("@idInstructor", idInstructor);
             cmd.Parameters.AddWithValue("@idFicha", idFicha);
+
             int filas = cmd.ExecuteNonQuery();
+
             oConex.MtCerrarConexion();
+
             return filas > 0;
         }
-        public DataTable MtListarCentros()
+
+        public List<ClCentroM> MtListarCentros()
         {
             SqlConnection cn = oConex.MtAbrirConexion();
+
             string query = "SELECT idCentro, nombre FROM centros WHERE estado = 'Activo'";
+
             SqlCommand cmd = new SqlCommand(query, cn);
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+
+            SqlDataReader rd = cmd.ExecuteReader();
+
+            List<ClCentroM> lista = new List<ClCentroM>();
+
+            while (rd.Read())
+            {
+                lista.Add(new ClCentroM
+                {
+                    idCentro = Convert.ToInt32(rd["idCentro"]),
+                    nombre = rd["nombre"].ToString()
+                });
+            }
+
+            rd.Close();
             oConex.MtCerrarConexion();
-            return dt;
+
+            return lista;
         }
     }
 }

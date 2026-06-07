@@ -7,8 +7,9 @@ namespace sistemaPlanMejoramientos.Modelo
 {
     public class ClRolM
     {
-        public int idRol {  get; set; }
+        public int idRol { get; set; }
         public string nombreRol { get; set; }
 
+        public List<ClUsuarioM> usuarios { get; set; }
     }
 }

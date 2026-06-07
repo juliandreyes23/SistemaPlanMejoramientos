@@ -1,6 +1,8 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Datos;
+using sistemaPlanMejoramientos.Modelo;
+using System;
+using System.Collections.Generic;
 using System.Data;
-using sistemaPlanMejoramientos.Datos;
 
 namespace sistemaPlanMejoramientos.Logica
 {
@@ -8,9 +10,20 @@ namespace sistemaPlanMejoramientos.Logica
     {
         ClAsignacionD oAsignacionD = new ClAsignacionD();
 
-        public DataTable MtListarInstructores() => oAsignacionD.MtListarInstructoresCombo();
-        public DataTable MtListarFichas() => oAsignacionD.MtListarFichasCombo();
-        public DataTable MtListarAsignaciones() => oAsignacionD.MtListarAsignaciones();
+        public List<ClInstructoresM> MtListarInstructores()
+        {
+            return oAsignacionD.MtListarInstructoresCombo();
+        }
+
+        public List<ClFichasM> MtListarFichas()
+        {
+            return oAsignacionD.MtListarFichasCombo();
+        }
+
+        public List<ClFichaInstructorM> MtListarAsignaciones()
+        {
+            return oAsignacionD.MtListarAsignaciones();
+        }
 
         public bool MtAsignarInstructorFicha(int idInstructor, int idFicha)
         {

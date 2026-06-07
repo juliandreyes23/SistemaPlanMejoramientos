@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
-using System.Web.UI.WebControls;
+using sistemaPlanMejoramientos.Modelo;
 
 namespace sistemaPlanMejoramientos.Datos
 {
@@ -17,7 +14,7 @@ namespace sistemaPlanMejoramientos.Datos
             SqlConnection cn = oConex.MtAbrirConexion();
 
             string query = @"INSERT INTO competencias (descripcion, idPrograma)
-            VALUES (@descripcion, @idPrograma)";
+                             VALUES (@descripcion, @idPrograma)";
 
             SqlCommand cmd = new SqlCommand(query, cn);
             cmd.Parameters.AddWithValue("@descripcion", descripcion);
@@ -26,37 +23,61 @@ namespace sistemaPlanMejoramientos.Datos
             int filas = cmd.ExecuteNonQuery();
 
             oConex.MtCerrarConexion();
+
             return filas > 0;
         }
 
-        public DataTable MtListarCompetencias()
+        public List<ClCompetenciasM> MtListarCompetencias()
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
-            string query = @"SELECT c.idCompetencia,c.descripcion AS DescripcionCompetencia,
-            p.idPrograma, p.nombre AS NombrePrograma, p.codigoPrograma
-            FROM competencias c
-            INNER JOIN programas p ON c.idPrograma = p.idPrograma";
+            string query = @"SELECT c.idCompetencia,
+                                    c.descripcion,
+                                    p.idPrograma,
+                                    p.nombre,
+                                    p.codigoPrograma
+                             FROM competencias c
+                             INNER JOIN programas p
+                             ON c.idPrograma = p.idPrograma";
 
             SqlCommand cmd = new SqlCommand(query, cn);
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
 
-            da.Fill(dt);
+            SqlDataReader rd = cmd.ExecuteReader();
 
+            List<ClCompetenciasM> lista = new List<ClCompetenciasM>();
+
+            while (rd.Read())
+            {
+                lista.Add(new ClCompetenciasM
+                {
+                    idCompetencia = Convert.ToInt32(rd["idCompetencia"]),
+                    descripcion = rd["descripcion"].ToString(),
+                    idPrograma = Convert.ToInt32(rd["idPrograma"]),
+                    programa = new ClProgramasM
+                    {
+                        nombre = rd["nombre"].ToString(),
+                        codigoPrograma = rd["codigoPrograma"].ToString()
+                    }
+                });
+            }
+
+            rd.Close();
             oConex.MtCerrarConexion();
 
-            return dt;
+            return lista;
         }
 
         public bool MtActualizarCompetencia(int idCompetencia, string descripcion, int idPrograma)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
-            string query = @"UPDATE competencias SET descripcion = @descripcion , idPrograma = @idPrograma
-            WHERE idCompetencia = @idCompetencia";
+            string query = @"UPDATE competencias
+                             SET descripcion = @descripcion,
+                                 idPrograma = @idPrograma
+                             WHERE idCompetencia = @idCompetencia";
 
             SqlCommand cmd = new SqlCommand(query, cn);
+
             cmd.Parameters.AddWithValue("@idCompetencia", idCompetencia);
             cmd.Parameters.AddWithValue("@descripcion", descripcion);
             cmd.Parameters.AddWithValue("@idPrograma", idPrograma);
@@ -67,6 +88,7 @@ namespace sistemaPlanMejoramientos.Datos
 
             return filas > 0;
         }
+
         public bool MtEliminarCompetencia(int idCompetencia)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
@@ -77,23 +99,25 @@ namespace sistemaPlanMejoramientos.Datos
                 SqlCommand cmd = new SqlCommand("", cn, transaction);
                 cmd.Parameters.AddWithValue("@idCompetencia", idCompetencia);
 
-                cmd.CommandText = @"DELETE FROM planResultados 
-                            WHERE idResultadoAprendizaje IN (
-                                SELECT idResultadoAprendizaje 
-                                FROM resultadoAprendizaje 
-                                WHERE idCompetencia = @idCompetencia
-                            )";
+                cmd.CommandText = @"DELETE FROM planResultados
+                                    WHERE idResultadoAprendizaje IN (
+                                        SELECT idResultadoAprendizaje
+                                        FROM resultadoAprendizaje
+                                        WHERE idCompetencia = @idCompetencia
+                                    )";
                 cmd.ExecuteNonQuery();
 
-                cmd.CommandText = @"DELETE FROM resultadoAprendizaje 
-                            WHERE idCompetencia = @idCompetencia";
+                cmd.CommandText = @"DELETE FROM resultadoAprendizaje
+                                    WHERE idCompetencia = @idCompetencia";
                 cmd.ExecuteNonQuery();
 
-                cmd.CommandText = @"DELETE FROM competencias 
-                            WHERE idCompetencia = @idCompetencia";
+                cmd.CommandText = @"DELETE FROM competencias
+                                    WHERE idCompetencia = @idCompetencia";
+
                 int filas = cmd.ExecuteNonQuery();
 
                 transaction.Commit();
+
                 return filas > 0;
             }
             catch
@@ -107,61 +131,116 @@ namespace sistemaPlanMejoramientos.Datos
             }
         }
 
-        public DataTable MtCargarCompetencias(int idPrograma)
+        public List<ClCompetenciasM> MtCargarCompetencias(int idPrograma)
         {
-
-            ClConexion oConex = new ClConexion();
             SqlConnection cn = oConex.MtAbrirConexion();
-            string query = "SELECT idCompetencia, descripcion FROM competencias WHERE idPrograma = @id ORDER BY descripcion";
+
+            string query = @"SELECT idCompetencia,
+                                    descripcion,
+                                    idPrograma
+                             FROM competencias
+                             WHERE idPrograma = @id
+                             ORDER BY descripcion";
+
             SqlCommand cmd = new SqlCommand(query, cn);
             cmd.Parameters.AddWithValue("@id", idPrograma);
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+
+            SqlDataReader rd = cmd.ExecuteReader();
+
+            List<ClCompetenciasM> lista = new List<ClCompetenciasM>();
+
+            while (rd.Read())
+            {
+                lista.Add(new ClCompetenciasM
+                {
+                    idCompetencia = Convert.ToInt32(rd["idCompetencia"]),
+                    descripcion = rd["descripcion"].ToString(),
+                    idPrograma = Convert.ToInt32(rd["idPrograma"])
+                });
+            }
+
+            rd.Close();
             oConex.MtCerrarConexion();
-            return dt;
+
+            return lista;
         }
-        public DataTable MtListaCompetencia()
+
+        public List<ClCompetenciasM> MtListaCompetencia()
         {
-
-            ClConexion oConex = new ClConexion();
             SqlConnection cn = oConex.MtAbrirConexion();
-            string query = "SELECT idCompetencia, descripcion FROM competencias ORDER BY descripcion";
+
+            string query = @"SELECT idCompetencia,
+                                    descripcion,
+                                    idPrograma
+                             FROM competencias
+                             ORDER BY descripcion";
+
             SqlCommand cmd = new SqlCommand(query, cn);
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+
+            SqlDataReader rd = cmd.ExecuteReader();
+
+            List<ClCompetenciasM> lista = new List<ClCompetenciasM>();
+
+            while (rd.Read())
+            {
+                lista.Add(new ClCompetenciasM
+                {
+                    idCompetencia = Convert.ToInt32(rd["idCompetencia"]),
+                    descripcion = rd["descripcion"].ToString(),
+                    idPrograma = rd["idPrograma"] != DBNull.Value
+                        ? Convert.ToInt32(rd["idPrograma"])
+                        : 0
+                });
+            }
+
+            rd.Close();
             oConex.MtCerrarConexion();
-            return dt;
+
+            return lista;
         }
 
-        public DataTable MtBuscarCompetencias(string filtro)
+        public List<ClCompetenciasM> MtBuscarCompetencias(string filtro)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
             string query = @"SELECT c.idCompetencia,
-                            c.descripcion AS DescripcionCompetencia,
-                            p.idPrograma,
-                            p.nombre AS NombrePrograma,
-                            p.codigoPrograma
-                     FROM competencias c
-                     INNER JOIN programas p
-                        ON c.idPrograma = p.idPrograma
-                     WHERE c.descripcion LIKE @filtro
-                        OR p.nombre LIKE @filtro
-                        OR p.codigoPrograma LIKE @filtro";
+                                    c.descripcion,
+                                    p.idPrograma,
+                                    p.nombre,
+                                    p.codigoPrograma
+                             FROM competencias c
+                             INNER JOIN programas p
+                             ON c.idPrograma = p.idPrograma
+                             WHERE c.descripcion LIKE @filtro
+                             OR p.nombre LIKE @filtro
+                             OR p.codigoPrograma LIKE @filtro";
 
             SqlCommand cmd = new SqlCommand(query, cn);
             cmd.Parameters.AddWithValue("@filtro", "%" + filtro + "%");
 
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
+            SqlDataReader rd = cmd.ExecuteReader();
 
-            da.Fill(dt);
+            List<ClCompetenciasM> lista = new List<ClCompetenciasM>();
 
+            while (rd.Read())
+            {
+                lista.Add(new ClCompetenciasM
+                {
+                    idCompetencia = Convert.ToInt32(rd["idCompetencia"]),
+                    descripcion = rd["descripcion"].ToString(),
+                    idPrograma = Convert.ToInt32(rd["idPrograma"]),
+                    programa = new ClProgramasM
+                    {
+                        nombre = rd["nombre"].ToString(),
+                        codigoPrograma = rd["codigoPrograma"].ToString()
+                    }
+                });
+            }
+
+            rd.Close();
             oConex.MtCerrarConexion();
 
-            return dt;
+            return lista;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using sistemaPlanMejoramientos.Logica;
+using sistemaPlanMejoramientos.Modelo;
 using System;
-using System.Data;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -10,6 +11,8 @@ namespace sistemaPlanMejoramientos.Vista
     public partial class FrmUsuarios : System.Web.UI.Page
     {
         ClUsuarioL oUsuarioL = new ClUsuarioL();
+
+        private const int PageSize = 10;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -29,30 +32,46 @@ namespace sistemaPlanMejoramientos.Vista
             hfMensajeTxt.Value = "";
         }
 
+        private List<ClUsuarioM> ObtenerDatos()
+        {
+            string filtro = txtBuscar.Text.Trim();
+            return oUsuarioL.MtListarUsuarios(filtro) ?? new List<ClUsuarioM>();
+        }
+
         private void CargarUsuarios()
         {
-            DataTable dt = oUsuarioL.MtListarUsuarios(txtBuscar.Text.Trim());
+            List<ClUsuarioM> lista = ObtenerDatos();
 
-            gvUsuarios.PageIndex = (int)ViewState["PaginaActual"];
-            gvUsuarios.DataSource = dt;
+            var data = lista.Select(u => new
+            {
+                u.idUsuario,
+                u.correo,
+                nombreRol = u.rol != null ? u.rol.nombreRol : ""
+            }).ToList();
+
+            int paginaActual = (int)ViewState["PaginaActual"];
+            int totalRegistros = data.Count;
+            int totalPaginas = (int)Math.Ceiling((double)totalRegistros / PageSize);
+
+            if (paginaActual >= totalPaginas) paginaActual = 0;
+
+            var paginaData = data
+                .Skip(paginaActual * PageSize)
+                .Take(PageSize)
+                .ToList();
+
+            gvUsuarios.DataSource = paginaData;
             gvUsuarios.DataBind();
 
-            int totalPaginas = gvUsuarios.PageCount;
             ViewState["TotalPaginas"] = totalPaginas;
 
-            litPaginaActual.Text = ((int)ViewState["PaginaActual"] + 1).ToString();
+            litPaginaActual.Text = (paginaActual + 1).ToString();
             litTotalPaginas.Text = totalPaginas.ToString();
-            litTotalRegistros.Text = dt.Rows.Count.ToString();
+            litTotalRegistros.Text = totalRegistros.ToString();
 
             var paginas = Enumerable.Range(0, totalPaginas).Cast<object>().ToList();
             rptPaginacion.DataSource = paginas;
             rptPaginacion.DataBind();
-        }
-
-        protected void gvUsuarios_PageIndexChanging(object sender, GridViewPageEventArgs e)
-        {
-            ViewState["PaginaActual"] = e.NewPageIndex;
-            CargarUsuarios();
         }
 
         protected void rptPaginacion_ItemCommand(object source, RepeaterCommandEventArgs e)
@@ -64,17 +83,18 @@ namespace sistemaPlanMejoramientos.Vista
 
             if (e.CommandArgument.ToString() == "anterior")
             {
-                if (paginaActual > 0) ViewState["PaginaActual"] = paginaActual - 1;
+                if (paginaActual > 0) paginaActual--;
             }
             else if (e.CommandArgument.ToString() == "siguiente")
             {
-                if (paginaActual < totalPaginas - 1) ViewState["PaginaActual"] = paginaActual + 1;
+                if (paginaActual < totalPaginas - 1) paginaActual++;
             }
             else
             {
-                ViewState["PaginaActual"] = Convert.ToInt32(e.CommandArgument);
+                paginaActual = Convert.ToInt32(e.CommandArgument);
             }
 
+            ViewState["PaginaActual"] = paginaActual;
             CargarUsuarios();
         }
 
@@ -102,11 +122,11 @@ namespace sistemaPlanMejoramientos.Vista
             try
             {
                 string correo = txtCorreo.Text.Trim();
-                string password = txtPassword.Text;
+                string password = txtPassword.Text.Trim();
 
                 if (string.IsNullOrEmpty(ddlRol.SelectedValue))
                 {
-                    SetMensaje("warning", "Por favor, seleccione un rol para el usuario.");
+                    SetMensaje("warning", "Seleccione un rol.");
                     return;
                 }
 
@@ -117,61 +137,50 @@ namespace sistemaPlanMejoramientos.Vista
                 {
                     if (string.IsNullOrEmpty(password))
                     {
-                        SetMensaje("warning", "Por favor, digite una contraseña.");
+                        SetMensaje("warning", "Digite una contraseña.");
                         return;
                     }
 
                     if (oUsuarioL.MtExisteCorreo(correo))
                     {
-                        SetMensaje("warning", "El correo electrónico ya se encuentra registrado.");
+                        SetMensaje("warning", "El correo ya existe.");
                         return;
                     }
 
-                    bool registrado = oUsuarioL.MtCrearUsuario(correo, password, idRol);
+                    bool ok = oUsuarioL.MtCrearUsuario(correo, password, idRol);
 
-                    if (registrado)
+                    if (ok)
                     {
-                        SetMensaje("success", "¡Usuario creado con éxito!");
+                        SetMensaje("success", "Usuario creado correctamente.");
                         LimpiarFormulario();
                         CargarUsuarios();
                     }
                     else
                     {
-                        SetMensaje("error", "Error al registrar el usuario.");
+                        SetMensaje("error", "Error al crear usuario.");
                     }
                 }
                 else
                 {
                     int idUsuario = Convert.ToInt32(hfIdUsuario.Value);
 
-                    bool actualizado = oUsuarioL.MtActualizarUsuario(idUsuario, correo, password, idRol);
+                    bool ok = oUsuarioL.MtActualizarUsuario(idUsuario, correo, password, idRol);
 
-                    if (actualizado)
+                    if (ok)
                     {
-                        SetMensaje("success", "¡Usuario actualizado con éxito!");
+                        SetMensaje("success", "Usuario actualizado correctamente.");
                         LimpiarFormulario();
                         CargarUsuarios();
                     }
                     else
                     {
-                        SetMensaje("error", "Error al actualizar el usuario.");
+                        SetMensaje("error", "Error al actualizar.");
                     }
                 }
             }
-            catch (System.Data.SqlClient.SqlException ex)
+            catch
             {
-                if (ex.Number == 2627 || ex.Number == 2601)
-                {
-                    SetMensaje("warning", "No se puede guardar el usuario porque existen datos duplicados.");
-                }
-                else
-                {
-                    SetMensaje("error", "Ocurrió un error en la base de datos.");
-                }
-            }
-            catch (Exception)
-            {
-                SetMensaje("error", "Ocurrió un error inesperado.");
+                SetMensaje("error", "Error inesperado.");
             }
         }
 
@@ -181,40 +190,34 @@ namespace sistemaPlanMejoramientos.Vista
 
             if (e.CommandName == "Editar")
             {
-                DataTable dt = oUsuarioL.MtBuscarUsuarioPorId(idUsuario);
-                if (dt.Rows.Count > 0)
+                ClUsuarioM usuario = oUsuarioL.MtBuscarUsuarioPorId(idUsuario);
+
+                if (usuario != null)
                 {
-                    DataRow fila = dt.Rows[0];
-                    hfIdUsuario.Value = fila["idUsuario"].ToString();
-                    txtCorreo.Text = fila["correo"].ToString();
-                    ddlRol.SelectedValue = fila["idRol"].ToString();
+                    hfIdUsuario.Value = usuario.idUsuario.ToString();
+                    txtCorreo.Text = usuario.correo;
+                    ddlRol.SelectedValue = usuario.idRol.ToString();
+
                     lblTituloForm.Text = "Modificar Usuario";
-                    btnGuardar.Text = "Actualizar Cambios";
+                    btnGuardar.Text = "Actualizar";
                     btnCancelar.Visible = true;
                     lblInfoPassword.Visible = true;
-                    txtPassword.Attributes.Remove("required");
                 }
             }
-            else if (e.CommandName == "Eliminar")
+
+            if (e.CommandName == "Eliminar")
             {
-                int idAprendizVinculado = oUsuarioL.MtObtenerIdAprendiz(idUsuario);
-                bool eliminado = oUsuarioL.MtEliminarUsuario(idUsuario);
+                bool ok = oUsuarioL.MtEliminarUsuario(idUsuario);
 
-                if (eliminado)
+                if (ok)
                 {
-                    if (idAprendizVinculado > 0)
-                    {
-                        ClAprendizL oAprendizL = new ClAprendizL();
-                        oAprendizL.MtEliminarAprendiz(idAprendizVinculado);
-                    }
-
-                    SetMensaje("success", "¡Usuario y su aprendiz vinculado eliminados correctamente!");
+                    SetMensaje("success", "Usuario eliminado correctamente.");
+                    LimpiarFormulario();
                     CargarUsuarios();
-                    if (hfIdUsuario.Value == idUsuario.ToString()) LimpiarFormulario();
                 }
                 else
                 {
-                    SetMensaje("error", "No se puede eliminar el usuario (puede tener datos asociados).");
+                    SetMensaje("error", "No se pudo eliminar.");
                 }
             }
         }
@@ -249,10 +252,16 @@ namespace sistemaPlanMejoramientos.Vista
             txtCorreo.Text = "";
             txtPassword.Text = "";
             ddlRol.SelectedIndex = 0;
+
             lblTituloForm.Text = "Registrar Usuario";
             btnGuardar.Text = "Guardar Usuario";
             btnCancelar.Visible = false;
             lblInfoPassword.Visible = false;
+        }
+        protected void gvUsuarios_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        {
+            gvUsuarios.PageIndex = e.NewPageIndex;
+            CargarUsuarios();
         }
 
         private void SetMensaje(string tipo, string texto)

@@ -7,9 +7,14 @@ namespace sistemaPlanMejoramientos.Modelo
 {
     public class ClCompetenciasM
     {
-        public int idCompetencia {  get; set; }
+        public int idCompetencia { get; set; }
+
         public string descripcion { get; set; }
+
         public int idPrograma { get; set; }
 
+        public ClProgramasM programa { get; set; }
+
+        public List<ClResultadoAprendizajeM> resultadosAprendizaje { get; set; }
     }
 }

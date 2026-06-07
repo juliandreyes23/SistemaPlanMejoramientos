@@ -1,8 +1,11 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Logica;
+using sistemaPlanMejoramientos.Modelo;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using sistemaPlanMejoramientos.Logica;
 
 namespace sistemaPlanMejoramientos.Vista
 {
@@ -19,44 +22,41 @@ namespace sistemaPlanMejoramientos.Vista
                 ViewState["PaginaActual"] = 0;
                 CargarCompetencias("");
             }
-            if (string.IsNullOrEmpty(Request["__EVENTTARGET"]))
-            {
-                hfMensajeTipo.Value = "";
-                hfMensajeTxt.Value = "";
-            }
+            hfMensajeTipo.Value = "";
+            hfMensajeTxt.Value = "";
 
         }
 
         private void CargarProgramas()
         {
-            DataTable dt = oProgramaL.MtListarProgramas();  
+            var lista = oProgramaL.MtListarProgramas();
+
             ddlPrograma.Items.Clear();
             ddlPrograma.Items.Add(new ListItem("-- Seleccione un programa --", "0"));
-            foreach (DataRow row in dt.Rows)
+
+            foreach (var item in lista)
             {
                 ddlPrograma.Items.Add(new ListItem(
-                    row["codigoPrograma"] + " - " + row["nombre"],
-                    row["idPrograma"].ToString()
+                    item.codigoPrograma + " - " + item.nombre,
+                    item.idPrograma.ToString()
                 ));
             }
         }
 
+
         private void CargarCompetencias(string filtro)
         {
-            DataTable dt;
+            List<ClCompetenciasM> lista;
 
             if (!string.IsNullOrWhiteSpace(filtro))
-            {
-                dt = oCompetenciaL.MtBuscarCompetencias(filtro);
-            }
+                lista = oCompetenciaL.MtBuscarCompetencias(filtro);
             else
-            {
-                dt = oCompetenciaL.MtListarCompetencias();
-            }
+                lista = oCompetenciaL.MtListarCompetencias();
 
             int pageSize = 10;
             int paginaActual = Convert.ToInt32(ViewState["PaginaActual"]);
-            int totalRegistros = dt.Rows.Count;
+
+            int totalRegistros = lista.Count;
             int totalPaginas = (int)Math.Ceiling((double)totalRegistros / pageSize);
 
             if (paginaActual >= totalPaginas && totalPaginas > 0)
@@ -68,30 +68,18 @@ namespace sistemaPlanMejoramientos.Vista
             ViewState["TotalPaginas"] = totalPaginas;
 
             gvCompetencias.PageIndex = paginaActual;
-            gvCompetencias.DataSource = dt;
+            gvCompetencias.DataSource = lista;
             gvCompetencias.DataBind();
 
             litPaginaActual.Text = (paginaActual + 1).ToString();
             litTotalPaginas.Text = totalPaginas == 0 ? "1" : totalPaginas.ToString();
             litTotalRegistros.Text = totalRegistros.ToString();
 
-            if (totalPaginas > 1)
-            {
-                int[] paginas = new int[totalPaginas];
+            rptPaginacion.DataSource = totalPaginas > 1
+                ? Enumerable.Range(0, totalPaginas).ToList()
+                : null;
 
-                for (int i = 0; i < totalPaginas; i++)
-                {
-                    paginas[i] = i;
-                }
-
-                rptPaginacion.DataSource = paginas;
-                rptPaginacion.DataBind();
-            }
-            else
-            {
-                rptPaginacion.DataSource = null;
-                rptPaginacion.DataBind();
-            }
+            rptPaginacion.DataBind();
         }
 
         protected void btnGuardar_Click(object sender, EventArgs e)
@@ -155,18 +143,36 @@ namespace sistemaPlanMejoramientos.Vista
 
             if (e.CommandName == "Editar")
             {
-                DataTable dt = oCompetenciaL.MtListarCompetencias();
-                DataRow[] rows = dt.Select($"idCompetencia = {id}");
-                if (rows.Length > 0)
+                List<ClCompetenciasM> lista = oCompetenciaL.MtListarCompetencias();
+
+                var item = lista.FirstOrDefault(x => x.idCompetencia == id);
+
+                if (item != null)
                 {
-                    hfIdCompetencia.Value = id.ToString();
-                    txtDescripcion.Text = rows[0]["DescripcionCompetencia"].ToString();
-                    ddlPrograma.SelectedValue = rows[0]["idPrograma"].ToString();
+                    hfIdCompetencia.Value = item.idCompetencia.ToString();
+
+                    txtDescripcion.Text = item.descripcion;
+
+                    if (item.programa != null)
+                        ddlPrograma.SelectedValue = item.programa.idPrograma.ToString();
+
                     lblTituloForm.Text = "Actualizar Competencia";
                     btnGuardar.Text = "Actualizar Competencia";
                     btnCancelar.Visible = true;
                 }
             }
+            else if (e.CommandName == "Eliminar")
+            {
+                bool ok = oCompetenciaL.MtEliminarCompetencia(id);
+
+                hfMensajeTipo.Value = ok ? "success" : "error";
+                hfMensajeTxt.Value = ok ? "Competencia eliminada correctamente." : "Error al eliminar.";
+
+                LimpiarFormulario();
+                ViewState["PaginaActual"] = 0;
+                CargarCompetencias(txtBuscar.Text.Trim());
+            }
+
             else if (e.CommandName == "Eliminar")
             {
                 bool ok = oCompetenciaL.MtEliminarCompetencia(id);

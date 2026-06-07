@@ -1,6 +1,7 @@
 ﻿using sistemaPlanMejoramientos.Logica;
+using sistemaPlanMejoramientos.Modelo;
 using System;
-using System.Data;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -27,84 +28,174 @@ namespace sistemaPlanMejoramientos.Vista
 
         private void LlenarProgramas()
         {
-            try
+            List<ClProgramasM> programas = oProgramaL.MtListarProgramas();
+
+            ddlPrograma.Items.Clear();
+            ddlPrograma.Items.Add(new ListItem("-- Seleccione un Programa --", "0"));
+
+            foreach (var p in programas)
             {
-                DataTable dtProg = oProgramaL.MtListarProgramas();
-                ddlPrograma.DataSource = dtProg;
-                ddlPrograma.DataTextField = "nombre";
-                ddlPrograma.DataValueField = "idPrograma";
-                ddlPrograma.DataBind();
-                ddlPrograma.Items.Insert(0, new ListItem("-- Seleccione un Programa --", ""));
-            }
-            catch (Exception ex)
-            {
-                SetMensaje("error", "Error al cargar programas: " + ex.Message);
+                ddlPrograma.Items.Add(new ListItem(
+                    p.codigoPrograma + " - " + p.nombre,
+                    p.idPrograma.ToString()
+                ));
             }
         }
 
         private void ListarFichas()
         {
-            try
-            {
-                DataTable dtFichas = oFichaL.MtListarFichas(txtBuscar.Text.Trim());
+            List<ClFichasM> lista = oFichaL.MtListarFichas(txtBuscar.Text.Trim());
 
-                gvFichas.PageIndex = (int)ViewState["PaginaActual"];
-                gvFichas.DataSource = dtFichas;
-                gvFichas.DataBind();
+            int paginaActual = Convert.ToInt32(ViewState["PaginaActual"]);
+            int pageSize = gvFichas.PageSize;
 
-                int totalPaginas = gvFichas.PageCount;
-                ViewState["TotalPaginas"] = totalPaginas;
+            int totalRegistros = lista.Count;
+            int totalPaginas = (int)Math.Ceiling((double)totalRegistros / pageSize);
 
-                litPaginaActual.Text = ((int)ViewState["PaginaActual"] + 1).ToString();
-                litTotalPaginas.Text = totalPaginas.ToString();
-                litTotalRegistros.Text = dtFichas.Rows.Count.ToString();
+            var datosPaginados = lista
+                .Skip(paginaActual * pageSize)
+                .Take(pageSize)
+                .ToList();
 
-                var paginas = Enumerable.Range(0, totalPaginas).Cast<object>().ToList();
-                rptPaginacion.DataSource = paginas;
-                rptPaginacion.DataBind();
-            }
-            catch (Exception ex)
-            {
-                SetMensaje("error", "Error al listar fichas: " + ex.Message);
-            }
+            gvFichas.DataSource = datosPaginados;
+            gvFichas.DataBind();
+
+            ViewState["TotalPaginas"] = totalPaginas;
+
+            litPaginaActual.Text = (paginaActual + 1).ToString();
+            litTotalPaginas.Text = totalPaginas == 0 ? "1" : totalPaginas.ToString();
+            litTotalRegistros.Text = totalRegistros.ToString();
+
+            rptPaginacion.DataSource = Enumerable.Range(0, totalPaginas).ToList();
+            rptPaginacion.DataBind();
         }
 
-        protected void gvFichas_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        protected void btnGuardar_Click(object sender, EventArgs e)
         {
-            ViewState["PaginaActual"] = e.NewPageIndex;
+            string codigo = txtCodigoFicha.Text.Trim();
+            DateTime fInicio = Convert.ToDateTime(txtFechaInicio.Text);
+            DateTime fFinal = Convert.ToDateTime(txtFechaFinal.Text);
+            if (fFinal <= fInicio)
+            {
+                SetMensaje("warning", "La fecha de finalización debe ser posterior a la fecha de inicio");
+                return;
+            }
+            string jornada = ddlJornada.SelectedValue;
+            string estado = ddlEstado.SelectedValue;
+            int idPrograma = Convert.ToInt32(ddlPrograma.SelectedValue);
+
+            bool esNuevo = string.IsNullOrEmpty(hfIdFicha.Value);
+            bool ok = false;
+
+            if (esNuevo)
+            {
+                if (oFichaL.MtExisteFicha(codigo))
+                {
+                    SetMensaje("warning", "Ya existe una ficha con ese código");
+                    return;
+                }
+
+                ok = oFichaL.MtCrearFicha(codigo, fInicio, fFinal, jornada, estado, idPrograma);
+            }
+            else
+            {
+                int idFicha = Convert.ToInt32(hfIdFicha.Value);
+
+                if (oFichaL.MtExisteFichaEditar(idFicha, codigo))
+                {
+                    SetMensaje("warning", "Ya existe otra ficha con ese código");
+                    return;
+                }
+
+                ok = oFichaL.MtActualizarFicha(idFicha, codigo, fInicio, fFinal, jornada, estado, idPrograma);
+            }
+
+            SetMensaje(ok ? "success" : "error",
+                ok ? (esNuevo ? "Ficha creada" : "Ficha actualizada") : "Error al guardar");
+
+            LimpiarFormulario();
             ListarFichas();
+        }
+
+        protected void gvFichas_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            int idFicha = Convert.ToInt32(e.CommandArgument);
+
+            List<ClFichasM> lista = oFichaL.MtListarFichas("");
+            ClFichasM ficha = lista.FirstOrDefault(x => x.idFicha == idFicha);
+
+            if (ficha == null) return;
+
+            if (e.CommandName == "Editar")
+            {
+                hfIdFicha.Value = ficha.idFicha.ToString();
+                txtCodigoFicha.Text = ficha.codigoFicha;
+
+                txtFechaInicio.Text = ficha.fechaInicio.ToString("yyyy-MM-dd");
+                txtFechaFinal.Text = ficha.fechaFinalizacion.ToString("yyyy-MM-dd");
+
+                ddlJornada.SelectedValue = ficha.jornada;
+                ddlEstado.SelectedValue = ficha.estado;
+
+                ddlPrograma.SelectedValue = ficha.idPrograma.ToString();
+
+                lblTituloForm.Text = "Actualizar Ficha";
+                btnGuardar.Text = "Actualizar Ficha";
+                btnCancelar.Visible = true;
+            }
+            else if (e.CommandName == "Eliminar")
+            {
+                bool ok = oFichaL.MtEliminarFicha(idFicha);
+
+                SetMensaje(ok ? "success" : "error",
+                    ok ? "Ficha eliminada" : "Error al eliminar");
+
+                LimpiarFormulario();
+                ListarFichas();
+            }
         }
 
         protected void rptPaginacion_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
             if (e.CommandName != "Pagina") return;
 
-            int paginaActual = (int)ViewState["PaginaActual"];
-            int totalPaginas = (int)ViewState["TotalPaginas"];
+            int paginaActual = Convert.ToInt32(ViewState["PaginaActual"]);
+            int totalPaginas = Convert.ToInt32(ViewState["TotalPaginas"]);
 
             if (e.CommandArgument.ToString() == "anterior")
-            {
-                if (paginaActual > 0) ViewState["PaginaActual"] = paginaActual - 1;
-            }
-            else if (e.CommandArgument.ToString() == "siguiente")
-            {
-                if (paginaActual < totalPaginas - 1) ViewState["PaginaActual"] = paginaActual + 1;
-            }
-            else
-            {
-                ViewState["PaginaActual"] = Convert.ToInt32(e.CommandArgument);
-            }
+                paginaActual = Math.Max(0, paginaActual - 1);
 
+            else if (e.CommandArgument.ToString() == "siguiente")
+                paginaActual = Math.Min(totalPaginas - 1, paginaActual + 1);
+
+            else
+                paginaActual = Convert.ToInt32(e.CommandArgument);
+
+            ViewState["PaginaActual"] = paginaActual;
             ListarFichas();
         }
 
-        protected void btnBuscar_Click(object sender, EventArgs e)
+
+        private void LimpiarFormulario()
+        {
+            hfIdFicha.Value = "";
+            txtCodigoFicha.Text = "";
+            txtFechaInicio.Text = "";
+            txtFechaFinal.Text = "";
+            ddlJornada.SelectedIndex = 0;
+            ddlPrograma.SelectedIndex = 0;
+            ddlEstado.SelectedIndex = 0;
+
+            lblTituloForm.Text = "Registrar Ficha";
+            btnGuardar.Text = "Guardar Ficha";
+            btnCancelar.Visible = false;
+        }
+        protected void txtBuscar_TextChanged(object sender, EventArgs e)
         {
             ViewState["PaginaActual"] = 0;
             ListarFichas();
         }
-
-        protected void txtBuscar_TextChanged(object sender, EventArgs e)
+        protected void btnBuscar_Click(object sender, EventArgs e)
         {
             ViewState["PaginaActual"] = 0;
             ListarFichas();
@@ -117,128 +208,10 @@ namespace sistemaPlanMejoramientos.Vista
             ListarFichas();
         }
 
-        protected void btnGuardar_Click(object sender, EventArgs e)
+        private void SetMensaje(string tipo, string texto)
         {
-            try
-            {
-                string codigo = txtCodigoFicha.Text.Trim();
-                DateTime fInicio = Convert.ToDateTime(txtFechaInicio.Text);
-                DateTime fFinal = Convert.ToDateTime(txtFechaFinal.Text);
-                string jornada = ddlJornada.SelectedValue;
-                string estado = ddlEstado.SelectedValue;
-                int idPrograma = Convert.ToInt32(ddlPrograma.SelectedValue);
-
-                bool resultado = false;
-                bool esNuevo = string.IsNullOrEmpty(hfIdFicha.Value);
-
-                if (esNuevo)
-                {
-                    if (oFichaL.MtExisteFicha(codigo))
-                    {
-                        SetMensaje("warning", "Ya existe una ficha registrada con ese código.");
-                        return;
-                    }
-
-                    resultado = oFichaL.MtCrearFicha(codigo, fInicio, fFinal, jornada, estado, idPrograma);
-
-                    if (!resultado)
-                        SetMensaje("error", "El programa seleccionado no tiene un centro asignado.");
-                }
-                else
-                {
-                    int idFicha = Convert.ToInt32(hfIdFicha.Value);
-
-                    if (oFichaL.MtExisteFichaEditar(idFicha, codigo))
-                    {
-                        SetMensaje("warning", "Ya existe otra ficha registrada con ese código.");
-                        return;
-                    }
-
-                    resultado = oFichaL.MtActualizarFicha(idFicha, codigo, fInicio, fFinal, jornada, estado, idPrograma);
-                }
-
-                if (resultado)
-                {
-                    LimpiarFormulario();
-                    ListarFichas();
-                    SetMensaje("success", esNuevo ? "¡Ficha registrada con éxito!" : "¡Ficha actualizada con éxito!");
-                }
-                else if (esNuevo == false)
-                {
-                    SetMensaje("error", "No se pudo completar la operación en la base de datos.");
-                }
-            }
-            catch (Exception ex)
-            {
-                SetMensaje("error", "Error en el proceso: " + ex.Message);
-            }
-        }
-
-        protected void gvFichas_RowCommand(object sender, GridViewCommandEventArgs e)
-        {
-            if (e.CommandArgument == null || string.IsNullOrEmpty(e.CommandArgument.ToString())) return;
-
-            int idFicha = Convert.ToInt32(e.CommandArgument);
-
-            if (e.CommandName == "Editar")
-            {
-                GridViewRow fila = (GridViewRow)((LinkButton)e.CommandSource).NamingContainer;
-
-                hfIdFicha.Value = idFicha.ToString();
-                txtCodigoFicha.Text = fila.Cells[1].Text.Trim();
-
-                string jornadaTabla = Server.HtmlDecode(fila.Cells[3].Text).Trim();
-                ListItem itemJornada = ddlJornada.Items.FindByValue(jornadaTabla);
-                if (itemJornada != null) ddlJornada.SelectedValue = itemJornada.Value;
-                else
-                {
-                    ListItem itemJornadaTexto = ddlJornada.Items.FindByText(jornadaTabla);
-                    if (itemJornadaTexto != null) ddlJornada.SelectedValue = itemJornadaTexto.Value;
-                }
-
-                DateTime fInicio = Convert.ToDateTime(fila.Cells[4].Text);
-                DateTime fFin = Convert.ToDateTime(fila.Cells[5].Text);
-                txtFechaInicio.Text = fInicio.ToString("yyyy-MM-dd");
-                txtFechaFinal.Text = fFin.ToString("yyyy-MM-dd");
-
-                string estadoTabla = Server.HtmlDecode(fila.Cells[6].Text).Trim();
-                ListItem itemEstado = ddlEstado.Items.FindByValue(estadoTabla);
-                if (itemEstado != null) ddlEstado.SelectedValue = itemEstado.Value;
-                else
-                {
-                    ListItem itemEstadoTexto = ddlEstado.Items.FindByText(estadoTabla);
-                    if (itemEstadoTexto != null) ddlEstado.SelectedValue = itemEstadoTexto.Value;
-                }
-
-                string nombreProgTabla = Server.HtmlDecode(fila.Cells[2].Text).Trim();
-                ListItem itemProg = ddlPrograma.Items.FindByText(nombreProgTabla);
-                if (itemProg != null) ddlPrograma.SelectedValue = itemProg.Value;
-
-                lblTituloForm.Text = "Modificar Ficha: " + fila.Cells[1].Text;
-                btnCancelar.Visible = true;
-                btnGuardar.Text = "Actualizar Ficha";
-            }
-            else if (e.CommandName == "Eliminar")
-            {
-                try
-                {
-                    bool eliminado = oFichaL.MtEliminarFicha(idFicha);
-                    if (eliminado)
-                    {
-                        LimpiarFormulario();
-                        ListarFichas();
-                        SetMensaje("success", "¡Ficha eliminada correctamente!");
-                    }
-                    else
-                    {
-                        SetMensaje("error", "No se pudo eliminar la ficha seleccionada.");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    SetMensaje("error", "Error al intentar eliminar: " + ex.Message);
-                }
-            }
+            hfMensajeTipo.Value = tipo;
+            hfMensajeTxt.Value = texto;
         }
 
         protected void btnCancelar_Click(object sender, EventArgs e)
@@ -249,26 +222,6 @@ namespace sistemaPlanMejoramientos.Vista
         protected void lnkVolver_Click(object sender, EventArgs e)
         {
             Response.Redirect("Dashboard.aspx");
-        }
-
-        private void LimpiarFormulario()
-        {
-            hfIdFicha.Value = "";
-            txtCodigoFicha.Text = "";
-            txtFechaInicio.Text = "";
-            txtFechaFinal.Text = "";
-            ddlJornada.SelectedIndex = 0;
-            ddlPrograma.SelectedIndex = 0;
-            ddlEstado.SelectedIndex = 0;
-            lblTituloForm.Text = "Registrar Ficha";
-            btnGuardar.Text = "Guardar Ficha";
-            btnCancelar.Visible = false;
-        }
-
-        private void SetMensaje(string tipo, string texto)
-        {
-            hfMensajeTipo.Value = tipo;
-            hfMensajeTxt.Value = texto;
         }
     }
 }

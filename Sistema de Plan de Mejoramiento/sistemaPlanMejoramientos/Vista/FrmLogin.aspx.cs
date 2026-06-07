@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Data;
 using System.Web.UI;
 using sistemaPlanMejoramientos.Logica;
+using sistemaPlanMejoramientos.Modelo;
 
 namespace sistemaPlanMejoramientos
 {
@@ -29,24 +29,22 @@ namespace sistemaPlanMejoramientos
                 return;
             }
 
-            DataTable dtUsuario = oUsuarioL.MtLogin(correo, password);
+            ClUsuarioM usuario = oUsuarioL.MtLogin(correo, password);
 
-            if (dtUsuario != null && dtUsuario.Rows.Count > 0)
+            if (usuario != null)
             {
-                DataRow fila = dtUsuario.Rows[0];
-                int idUsuario = Convert.ToInt32(fila["idUsuario"]);
-                string nombreRol = fila["nombreRol"].ToString().ToUpper();
+                string nombreRol = usuario.rol.nombreRol.ToUpper();
 
-                Session["idUsuario"] = idUsuario.ToString();
-                Session["correo"] = fila["correo"].ToString();
+                Session["idUsuario"] = usuario.idUsuario.ToString();
+                Session["correo"] = usuario.correo;
                 Session["rol"] = nombreRol;
 
                 if (nombreRol == "ADMINISTRADOR")
-                    Session["idCentro"] = oUsuarioL.MtObtenerIdCentroAdmin(idUsuario).ToString();
+                    Session["idCentro"] = oUsuarioL.MtObtenerIdCentroAdmin(usuario.idUsuario).ToString();
                 else if (nombreRol == "INSTRUCTOR")
-                    Session["idInstructor"] = oUsuarioL.MtObtenerIdInstructor(idUsuario).ToString();
+                    Session["idInstructor"] = oUsuarioL.MtObtenerIdInstructor(usuario.idUsuario).ToString();
                 else if (nombreRol == "APRENDIZ")
-                    Session["idAprendiz"] = oUsuarioL.MtObtenerIdAprendiz(idUsuario).ToString();
+                    Session["idAprendiz"] = oUsuarioL.MtObtenerIdAprendiz(usuario.idUsuario).ToString();
 
                 if (nombreRol == "ADMINISTRADOR")
                     Response.Redirect("Dashboard.aspx");

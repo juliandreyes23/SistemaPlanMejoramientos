@@ -1,9 +1,10 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Datos;
+using sistemaPlanMejoramientos.Modelo;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Web;
-using sistemaPlanMejoramientos.Datos;
 
 namespace sistemaPlanMejoramientos.Logica
 {
@@ -20,12 +21,11 @@ namespace sistemaPlanMejoramientos.Logica
             return oEvidenciaD.MtRegistrarEvidencia(idPlanMejoramiento, nombreArchivo, rutaArchivo, fechaSubida, tipoArchivo);
         }
 
-        public DataTable MtListarEvidenciaPorPlan(int idPlanMejoramiento)
+        public List<ClEvidenciaM> MtListarEvidenciaPorPlan(int idPlanMejoramiento)
         {
             if (idPlanMejoramiento <= 0)
-            {
-                return new DataTable();
-            }
+                return new List<ClEvidenciaM>();
+
             return oEvidenciaD.MtListarEvidenciaPorPlan(idPlanMejoramiento);
         }
 
@@ -56,10 +56,10 @@ namespace sistemaPlanMejoramientos.Logica
             }
             return oEvidenciaD.MtRegistrarObservacionesEvidencia(idPlanMejoramiento, observaciones);
         }
-        public DataTable MtObtenerAprendizPorUsuario(int idUsuario)
+        public ClAprendizM MtObtenerAprendizPorUsuario(int idUsuario)
         {
             if (idUsuario <= 0)
-                return new DataTable();
+                return null;
 
             return oEvidenciaD.MtObtenerAprendizPorUsuario(idUsuario);
         }
@@ -72,22 +72,26 @@ namespace sistemaPlanMejoramientos.Logica
             return oEvidenciaD.MtContarPlanesPorEstado(idAprendiz, estado);
         }
 
-        public DataTable MtListarPlanesPorAprendiz(int idAprendiz)
+        public List<ClPlanMejoramientoM> MtListarPlanesPorAprendiz(int idAprendiz)
         {
             if (idAprendiz <= 0)
-                return new DataTable();
+                return new List<ClPlanMejoramientoM>();
 
             return oEvidenciaD.MtListarPlanesPorAprendiz(idAprendiz);
         }
-        public DataTable MtObtenerPlanPorId(int idPlan)
+        public ClPlanMejoramientoM MtObtenerPlanPorId(int idPlan)
         {
-            if (idPlan <= 0) return new DataTable();
+            if (idPlan <= 0)
+                return null;
+
             return oEvidenciaD.MtObtenerPlanPorId(idPlan);
         }
 
-        public DataTable MtListarResultadosPorPlan(int idPlan)
+        public List<ClResultadoAprendizajeM> MtListarResultadosPorPlan(int idPlan)
         {
-            if (idPlan <= 0) return new DataTable();
+            if (idPlan <= 0)
+                return new List<ClResultadoAprendizajeM>();
+
             return oEvidenciaD.MtListarResultadosPorPlan(idPlan);
         }
 

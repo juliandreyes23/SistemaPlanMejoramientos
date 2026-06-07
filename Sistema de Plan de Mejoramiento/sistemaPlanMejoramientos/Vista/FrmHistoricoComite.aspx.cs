@@ -1,6 +1,9 @@
 ﻿using sistemaPlanMejoramientos.Logica;
+using sistemaPlanMejoramientos.Modelo;
 using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -22,21 +25,24 @@ namespace sistemaPlanMejoramientos.Instructor
         private void CargarPlanes(string filtroNombre, string filtroEstado)
         {
             int idInstructor = ObtenerIdInstructor();
-            DataTable dt = oPlanL.MtListarPlanesComitePorInstructor(idInstructor, filtroNombre, filtroEstado);
 
-            if (dt == null || dt.Rows.Count == 0)
+            List<ClPlanMejoramientoM> lista =
+                oPlanL.MtListarPlanesComitePorInstructor(idInstructor, filtroNombre, filtroEstado);
+
+            if (lista == null || lista.Count == 0)
             {
                 rptPlanes.Visible = false;
                 pnlVacio.Visible = true;
+                return;
             }
-            else
-            {
-                rptPlanes.DataSource = dt;
-                rptPlanes.DataBind();
-                rptPlanes.Visible = true;
-                pnlVacio.Visible = false;
-            }
+
+            rptPlanes.DataSource = lista;
+            rptPlanes.DataBind();
+
+            rptPlanes.Visible = true;
+            pnlVacio.Visible = false;
         }
+
 
         protected void btnFiltrar_Click(object sender, EventArgs e)
         {
@@ -55,53 +61,43 @@ namespace sistemaPlanMejoramientos.Instructor
 
         private void CargarDetalle(int idPlan)
         {
-            DataTable dtLista = oPlanL.MtListarPlanesComitePorInstructor(ObtenerIdInstructor(), "", "");
-            DataRow[] filas = dtLista.Select("idPlanMejoramiento = " + idPlan);
+            int idInstructor = ObtenerIdInstructor();
 
-            if (filas.Length == 0) return;
-            DataRow plan = filas[0];
+            List<ClPlanMejoramientoM> lista =
+                oPlanL.MtListarPlanesComitePorInstructor(idInstructor, "", "");
 
-            lblIdPlan.Text = idPlan.ToString();
-            lblFechaAsig.Text = Convert.ToDateTime(plan["fechaAsignacion"]).ToString("dd/MM/yyyy");
-            lblFechaLimite.Text = Convert.ToDateTime(plan["fechaLimite"]).ToString("dd/MM/yyyy");
-            lblActividades.Text = plan["actividades"]?.ToString() ?? "—";
-            lblInstructor.Text = plan["nombreInstructor"]?.ToString() ?? "—";
+            ClPlanMejoramientoM plan =
+                lista.FirstOrDefault(p => p.idPlanMejoramiento == idPlan);
 
-            lblAprendizHeader.Text = plan["nombreAprendiz"].ToString();
-            lblEstadoHeader.Text = plan["estadoPlan"].ToString();
-            lblFichaHeader.Text = plan["codigoFicha"].ToString();
+            if (plan == null) return;
 
-            DataTable dtRaps = oEvidL.MtListarResultadosPorPlan(idPlan);
-            if (dtRaps.Rows.Count == 0)
-            {
-                rptResultados.Visible = false;
-                pnlSinResultados.Visible = true;
-            }
-            else
-            {
-                rptResultados.DataSource = dtRaps;
-                rptResultados.DataBind();
-                rptResultados.Visible = true;
-                pnlSinResultados.Visible = false;
-            }
+            lblIdPlan.Text = plan.idPlanMejoramiento.ToString();
+            lblFechaAsig.Text = plan.fechaAsignacion.ToString("dd/MM/yyyy");
+            lblFechaLimite.Text = plan.fechaLimite.ToString("dd/MM/yyyy");
+            lblActividades.Text = plan.actividades ?? "—";
+            lblInstructor.Text = plan.nombreInstructor ?? "—";
 
-            DataTable dtEv = oEvidL.MtListarEvidenciaPorPlan(idPlan);
-            if (dtEv.Rows.Count == 0)
-            {
-                rptEvidencias.Visible = false;
-                pnlSinEvidencias.Visible = true;
-            }
-            else
-            {
-                rptEvidencias.DataSource = dtEv;
-                rptEvidencias.DataBind();
-                rptEvidencias.Visible = true;
-                pnlSinEvidencias.Visible = false;
-            }
+            lblAprendizHeader.Text = plan.nombreAprendiz;
+            lblEstadoHeader.Text = plan.estadoPlan;
+            lblFichaHeader.Text = plan.codigoFicha;
 
-            DataTable dtCrit = oEvalL.MtConsultarEvaluacionPorPlan(idPlan);
+            var dtRaps = oEvidL.MtListarResultadosPorPlan(idPlan);
+            rptResultados.DataSource = dtRaps;
+            rptResultados.DataBind();
 
-            if (dtCrit.Rows.Count == 0)
+            pnlSinResultados.Visible = dtRaps == null || dtRaps.Count == 0;
+            rptResultados.Visible = !pnlSinResultados.Visible;
+
+            var dtEv = oEvidL.MtListarEvidenciaPorPlan(idPlan);
+            rptEvidencias.DataSource = dtEv;
+            rptEvidencias.DataBind();
+
+            pnlSinEvidencias.Visible = dtEv == null || dtEv.Count == 0;
+            rptEvidencias.Visible = !pnlSinEvidencias.Visible;
+
+            var ev = oEvalL.MtConsultarEvaluacionPorPlan(idPlan);
+
+            if (ev == null)
             {
                 pnlSinEvaluacion.Visible = true;
                 pnlConEvaluacion.Visible = false;
@@ -111,10 +107,9 @@ namespace sistemaPlanMejoramientos.Instructor
                 pnlSinEvaluacion.Visible = false;
                 pnlConEvaluacion.Visible = true;
 
-                DataRow ev = dtCrit.Rows[0];
-                string producto = ev["criterioProducto"]?.ToString() ?? "";
-                string conocimiento = ev["criterioConocimiento"]?.ToString() ?? "";
-                string desempeno = ev["criterioDesempeno"]?.ToString() ?? "";
+                string producto = ev.criterioProducto ?? "";
+                string conocimiento = ev.criterioConocimiento ?? "";
+                string desempeno = ev.criterioDesempeno ?? "";
 
                 lblProducto.Text = producto;
                 lblConocimiento.Text = conocimiento;
@@ -124,8 +119,9 @@ namespace sistemaPlanMejoramientos.Instructor
                 divConocimiento.Attributes["class"] = "eval-crit " + GetClaseCriterio(conocimiento);
                 divDesempeno.Attributes["class"] = "eval-crit " + GetClaseCriterio(desempeno);
 
-                string obsEval = ev["observaciones"]?.ToString() ?? "";
-                lblObsEvaluacion.Text = string.IsNullOrWhiteSpace(obsEval) ? "Sin observaciones registradas." : obsEval;
+                lblObsEvaluacion.Text = string.IsNullOrWhiteSpace(ev.observaciones)
+                    ? "Sin observaciones registradas."
+                    : ev.observaciones;
             }
 
             panelDetalle.Style["display"] = "block";

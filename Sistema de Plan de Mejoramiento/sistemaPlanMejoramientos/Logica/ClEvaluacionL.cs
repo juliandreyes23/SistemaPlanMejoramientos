@@ -1,6 +1,7 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Datos;
+using sistemaPlanMejoramientos.Modelo;
+using System;
 using System.Data;
-using sistemaPlanMejoramientos.Datos;
 
 namespace sistemaPlanMejoramientos.Logica
 {
@@ -10,9 +11,11 @@ namespace sistemaPlanMejoramientos.Logica
         ClEvidenciaD oEvidenciaD = new ClEvidenciaD();
         ClPlanMejoramientoD oPlanD = new ClPlanMejoramientoD();
 
-        public DataTable MtConsultarEvaluacionPorPlan(int idPlanMejoramiento)
+        public ClEvaluacionM MtConsultarEvaluacionPorPlan(int idPlanMejoramiento)
         {
-            if (idPlanMejoramiento <= 0) return new DataTable();
+            if (idPlanMejoramiento <= 0)
+                return null;
+
             return oEvaluacionD.MtConsultarEvaluacionPorPlan(idPlanMejoramiento);
         }
 
@@ -76,11 +79,15 @@ namespace sistemaPlanMejoramientos.Logica
         private void MtCopiarResultadosAlComite(int idPlanInterno, int idPlanComite)
         {
             ClEvidenciaD ev = new ClEvidenciaD();
-            DataTable resultados = ev.MtListarResultadosPorPlan(idPlanInterno);
-            foreach (DataRow row in resultados.Rows)
+
+            var resultados = ev.MtListarResultadosPorPlan(idPlanInterno);
+
+            foreach (var item in resultados)
             {
-                int idResultado = Convert.ToInt32(row["idResultadoAprendizaje"]);
-                oPlanD.MtAsociarResultadoAPlan(idPlanComite, idResultado);
+                oPlanD.MtAsociarResultadoAPlan(
+                    idPlanComite,
+                    item.idResultadoAprendizaje
+                );
             }
         }
     }

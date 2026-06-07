@@ -1,7 +1,9 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Logica;
+using sistemaPlanMejoramientos.Modelo;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Web.UI.WebControls;
-using sistemaPlanMejoramientos.Logica;
 
 namespace sistemaPlanMejoramientos.Instructor
 {
@@ -19,20 +21,22 @@ namespace sistemaPlanMejoramientos.Instructor
         private void CargarPlanesPendientes()
         {
             int idInstructor = ObtenerIdInstructor();
-            DataTable dt = oPlanL.MtListarPlanesPendientesEvaluacion(idInstructor);
 
-            if (dt == null || dt.Rows.Count == 0)
+            List<ClPlanMejoramientoM> lista =
+                oPlanL.MtListarPlanesPendientesEvaluacion(idInstructor);
+
+            if (lista == null || lista.Count == 0)
             {
                 rptPlanes.Visible = false;
                 pnlVacio.Visible = true;
+                return;
             }
-            else
-            {
-                rptPlanes.DataSource = dt;
-                rptPlanes.DataBind();
-                rptPlanes.Visible = true;
-                pnlVacio.Visible = false;
-            }
+
+            rptPlanes.DataSource = lista;
+            rptPlanes.DataBind();
+
+            rptPlanes.Visible = true;
+            pnlVacio.Visible = false;
         }
 
         protected void rptPlanes_ItemCommand(object source, RepeaterCommandEventArgs e)
@@ -61,16 +65,16 @@ namespace sistemaPlanMejoramientos.Instructor
 
         private void CargarDetallePlan(int idPlan, string tipoPlan, DateTime fechaLimite, bool vencido)
         {
-            DataTable dtPlan = oEvidL.MtObtenerPlanPorId(idPlan);
-            if (dtPlan.Rows.Count == 0) return;
+            ClPlanMejoramientoM plan = oEvidL.MtObtenerPlanPorId(idPlan);
 
-            DataRow row = dtPlan.Rows[0];
+            if (plan == null) return;
 
-            lblIdPlanHeader.Text = idPlan.ToString();
+            lblIdPlanHeader.Text = plan.idPlanMejoramiento.ToString();
             lblTipoPlanHeader.Text = tipoPlan;
             lblFechaLimiteHeader.Text = fechaLimite.ToString("dd/MM/yyyy");
-            lblActividadesInfo.Text = row["actividades"]?.ToString() ?? "";
-            lblAprendizInfo.Text = "ID Aprendiz: " + hfIdAprendiz.Value;
+
+            lblActividadesInfo.Text = plan.actividades ?? "";
+            lblAprendizInfo.Text = "ID Aprendiz: " + plan.idAprendiz;
             lblFichaInfo.Text = "—";
 
             pnlAlertaVencido.Visible = vencido;
@@ -100,16 +104,19 @@ namespace sistemaPlanMejoramientos.Instructor
 
             txtObservaciones.Text = "";
 
-            DataTable dtEv = oEvidL.MtListarEvidenciaPorPlan(idPlan);
-            if (dtEv.Rows.Count == 0)
+            List<ClEvidenciaM> evidencias =
+                oEvidL.MtListarEvidenciaPorPlan(idPlan);
+
+            if (evidencias == null || evidencias.Count == 0)
             {
                 rptEvidencias.Visible = false;
                 pnlSinEvidencias.Visible = true;
             }
             else
             {
-                rptEvidencias.DataSource = dtEv;
+                rptEvidencias.DataSource = evidencias;
                 rptEvidencias.DataBind();
+
                 rptEvidencias.Visible = true;
                 pnlSinEvidencias.Visible = false;
             }

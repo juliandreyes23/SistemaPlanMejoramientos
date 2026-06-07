@@ -1,4 +1,5 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Logica;
+using System;
 using System.Web.UI;
 
 namespace sistemaPlanMejoramientos.Aprendiz
@@ -20,16 +21,24 @@ namespace sistemaPlanMejoramientos.Aprendiz
 
         private void CargarPerfil()
         {
-            lblNombre.Text = Session["nombreAprendiz"]?.ToString() ?? "—";
-            lblTipoDoc.Text = Session["tipoDocumento"]?.ToString() ?? "—";
-            lblDocumento.Text = Session["numeroDocumento"]?.ToString() ?? "—";
-            lblCorreo.Text = Session["correoAprendiz"]?.ToString() ?? "—";
-            lblTelefono.Text = Session["telefono"]?.ToString() ?? "—";
-            lblFicha.Text = Session["codigoFicha"]?.ToString() ?? "—";
-            lblPrograma.Text = Session["nombrePrograma"]?.ToString() ?? "—";
-            lblJornada.Text = Session["jornada"]?.ToString() ?? "—";
+            int idUsuario = Convert.ToInt32(Session["idUsuario"]);
 
-            string estado = Session["estadoAcademico"]?.ToString() ?? "—";
+            ClEvidenciaL oEvidenciaL = new ClEvidenciaL();
+            var aprendiz = oEvidenciaL.MtObtenerAprendizPorUsuario(idUsuario);
+
+            if (aprendiz == null) return;
+
+            lblNombre.Text = aprendiz.nombres + " " + aprendiz.apellidos;
+            lblTipoDoc.Text = aprendiz.tipoDocumento;
+            lblDocumento.Text = aprendiz.numeroDocumento;
+            lblCorreo.Text = aprendiz.correo;
+            lblTelefono.Text = aprendiz.telefono;
+
+            lblFicha.Text = aprendiz.ficha?.codigoFicha ?? "—";
+            lblPrograma.Text = aprendiz.ficha?.programa?.nombre ?? "—";
+            lblJornada.Text = aprendiz.ficha?.jornada ?? "—";
+
+            string estado = aprendiz.estadoAcademico ?? "—";
             string css = estado == "Cancelado" ? "cancelado" :
                          (estado == "Aplazado" || estado == "Condicionado") ? "aplazado" : "";
             lblEstado.Text = $"<span class='estado-pill {css}'>" +

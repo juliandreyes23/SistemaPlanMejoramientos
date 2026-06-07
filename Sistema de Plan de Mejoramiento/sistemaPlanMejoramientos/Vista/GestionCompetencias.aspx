@@ -126,9 +126,18 @@
                                 PagerStyle-CssClass="d-none">
                                 <Columns>
                                     <asp:BoundField DataField="idCompetencia" HeaderText="ID" ItemStyle-Width="45px" ItemStyle-HorizontalAlign="Center" />
-                                    <asp:BoundField DataField="DescripcionCompetencia" HeaderText="Competencia" />
-                                    <asp:BoundField DataField="NombrePrograma" HeaderText="Programa" ItemStyle-Width="160px" />
-                                    <asp:BoundField DataField="codigoPrograma" HeaderText="Código" ItemStyle-Width="75px" ItemStyle-HorizontalAlign="Center" />
+                                    <asp:BoundField DataField="descripcion" HeaderText="Competencia" />
+                                    <asp:TemplateField HeaderText="Programa">
+                                        <ItemTemplate>
+                                            <%# Eval("programa.nombre") %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+
+                                    <asp:TemplateField HeaderText="Código">
+                                        <ItemTemplate>
+                                            <%# Eval("programa.codigoPrograma") %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="90px" ItemStyle-HorizontalAlign="Center">
                                         <ItemTemplate>
                                             <asp:LinkButton ID="btnEditar" runat="server" CommandName="Editar"

@@ -1,5 +1,7 @@
 ﻿using sistemaPlanMejoramientos.Datos;
+using sistemaPlanMejoramientos.Modelo;
 using System;
+using System.Collections.Generic;
 using System.Data;
 
 namespace sistemaPlanMejoramientos.Logica
@@ -21,12 +23,12 @@ namespace sistemaPlanMejoramientos.Logica
             return oFichaD.MtCrearFicha(codigoFicha, fechaInicio, fechaFinalizacion, jornada, estado, idPrograma, idCentro);
         }
 
-        public DataTable MtListarFichas()
+        public List<ClFichasM> MtListarFichas()
         {
             return oFichaD.MtListarFichas();
         }
 
-        public DataTable MtListarFichas(string filtro)
+        public List<ClFichasM> MtListarFichas(string filtro)
         {
             return oFichaD.MtListarFichas(filtro ?? "");
         }
@@ -65,15 +67,19 @@ namespace sistemaPlanMejoramientos.Logica
             return oFichaD.MtObtenerIdCentroPorPrograma(idPrograma);
         }
 
-        public DataTable MtListarFichasPorInstructor(int idInstructor)
+        public List<ClFichasM> MtListarFichasPorInstructor(int idInstructor)
         {
-            if (idInstructor <= 0) return new DataTable();
+            if (idInstructor <= 0)
+                return new List<ClFichasM>();
+
             return oFichaD.MtListarFichasPorInstructor(idInstructor);
         }
 
-        public DataTable MtListarAprendicesPorFicha(int idFicha)
+        public List<ClAprendizM> MtListarAprendicesPorFicha(int idFicha)
         {
-            if (idFicha <= 0) return new DataTable();
+            if (idFicha <= 0)
+                return new List<ClAprendizM>();
+
             return oFichaD.MtListarAprendicesPorFicha(idFicha);
         }
 

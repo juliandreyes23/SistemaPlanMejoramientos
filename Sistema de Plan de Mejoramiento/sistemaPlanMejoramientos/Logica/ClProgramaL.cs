@@ -1,4 +1,6 @@
 ﻿using sistemaPlanMejoramientos.Datos;
+using sistemaPlanMejoramientos.Modelo;
+using System.Collections.Generic;
 using System.Data;
 
 namespace sistemaPlanMejoramientos.Logica
@@ -16,18 +18,20 @@ namespace sistemaPlanMejoramientos.Logica
             return oProgramaD.MtCrearPrograma(codigoPrograma, nombre, version, nivel, duracion, estado, idCentro);
         }
 
-        public DataTable MtListarProgramas()
+        public List<ClProgramasM> MtListarProgramas()
         {
             return oProgramaD.MtListarProgramas();
         }
 
-        public DataTable MtListarProgramas(string filtro)
+        public List<ClProgramasM> MtListarProgramas(string filtro)
         {
             return oProgramaD.MtListarProgramas(filtro ?? "");
         }
 
-        public DataTable MtObtenerProgramaPorId(int idPrograma)
+        public ClProgramasM MtObtenerProgramaPorId(int idPrograma)
         {
+            if (idPrograma <= 0) return null;
+
             return oProgramaD.MtObtenerProgramaPorId(idPrograma);
         }
 

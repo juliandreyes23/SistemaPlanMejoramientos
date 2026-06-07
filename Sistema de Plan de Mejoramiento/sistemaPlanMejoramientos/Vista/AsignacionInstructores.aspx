@@ -160,26 +160,42 @@
                                 GridLines="None"
                                 OnRowCommand="gvAsignaciones_RowCommand"
                                 OnPageIndexChanging="gvAsignaciones_PageIndexChanging"
-                                EmptyDataText="No hay asignaciones registradas."
                                 AllowPaging="True"
                                 PageSize="10"
-                                PagerStyle-CssClass="d-none">
+                                EmptyDataText="No hay asignaciones registradas.">
+
                                 <Columns>
-                                    <asp:BoundField DataField="Instructor" HeaderText="Instructor" />
-                                    <asp:BoundField DataField="Ficha" HeaderText="Ficha" />
-                                    <asp:BoundField DataField="Programa" HeaderText="Programa" />
+
+                                    <asp:TemplateField HeaderText="Instructor">
+                                        <ItemTemplate>
+                                            <%# Eval("instructor.nombres") + " " + Eval("instructor.apellidos") %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+
+                                    <asp:TemplateField HeaderText="Ficha">
+                                        <ItemTemplate>
+                                            <%# Eval("ficha.codigoFicha") %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+
+                                    <asp:TemplateField HeaderText="Programa">
+                                        <ItemTemplate>
+                                            <%# Eval("ficha.programa.nombre") %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+
                                     <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="90px" ItemStyle-HorizontalAlign="Center">
                                         <ItemTemplate>
                                             <asp:LinkButton ID="btnEliminar" runat="server"
                                                 CommandName="Eliminar"
                                                 CommandArgument='<%# Eval("idFichaInstructor") %>'
                                                 CssClass="btn btn-danger btn-sm border-0"
-                                                ToolTip="Quitar asignación"
                                                 OnClientClick="return confirmarEliminar(this);">
-                                                <i class="bi bi-trash-fill"></i>
+                    <i class="bi bi-trash-fill"></i>
                                             </asp:LinkButton>
                                         </ItemTemplate>
                                     </asp:TemplateField>
+
                                 </Columns>
                             </asp:GridView>
                         </div>

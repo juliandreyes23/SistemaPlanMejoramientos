@@ -54,7 +54,7 @@
             <div class="card-custom p-4">
                 <div class="d-flex justify-content-between align-items-center container-header mb-4">
                     <span>Listado General de Aprendices</span>
-                    <asp:LinkButton ID="btnNuevo" runat="server" CssClass="btn btn-sena btn-sm px-4" OnClick="btnCancelar_Click">
+                    <asp:LinkButton ID="btnNuevo" runat="server" CssClass="btn btn-sena btn-sm px-4" OnClick="btnNuevo_Click">
                         <i class="bi bi-person-plus-fill me-1"></i> Nuevo Aprendiz
                     </asp:LinkButton>
                 </div>

@@ -1,6 +1,6 @@
 ﻿using sistemaPlanMejoramientos.Logica;
+using sistemaPlanMejoramientos.Modelo;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Web.UI;
@@ -16,7 +16,7 @@ namespace sistemaPlanMejoramientos.Vista
         {
             if (Session["rol"] == null || Session["rol"].ToString().ToUpper() != "ADMINISTRADOR")
             {
-                Response.Redirect("~/Dashboard.aspx");
+                Response.Redirect("~/Vista/FrmLogin.aspx");
                 return;
             }
 
@@ -32,10 +32,10 @@ namespace sistemaPlanMejoramientos.Vista
 
         private void CargarCentros()
         {
-            DataTable dt = oCentroL.MtListarCentros(txtBuscar.Text.Trim());
+            var lista = oCentroL.MtListarCentros(txtBuscar.Text.Trim());
 
             gvCentros.PageIndex = (int)ViewState["PaginaActual"];
-            gvCentros.DataSource = dt;
+            gvCentros.DataSource = lista;
             gvCentros.DataBind();
 
             int totalPaginas = gvCentros.PageCount;
@@ -43,7 +43,7 @@ namespace sistemaPlanMejoramientos.Vista
 
             litPaginaActual.Text = ((int)ViewState["PaginaActual"] + 1).ToString();
             litTotalPaginas.Text = totalPaginas.ToString();
-            litTotalRegistros.Text = dt.Rows.Count.ToString();
+            litTotalRegistros.Text = lista.Count.ToString();
 
             var paginas = Enumerable.Range(0, totalPaginas).Cast<object>().ToList();
             rptPaginacion.DataSource = paginas;
@@ -103,89 +103,109 @@ namespace sistemaPlanMejoramientos.Vista
                 string departamento = txtDepartamento.Text.Trim();
                 string estado = ddlEstado.SelectedValue;
 
-                if (string.IsNullOrEmpty(codigo))
-                {
-                    SetMensaje("warning", "El código del centro es obligatorio.");
-                    return;
-                }
-                if (string.IsNullOrEmpty(nombre))
-                {
-                    SetMensaje("warning", "El nombre del centro es obligatorio.");
-                    return;
-                }
-
                 bool esNuevo = string.IsNullOrEmpty(hfIdCentro.Value);
 
                 if (esNuevo)
                 {
-                    bool insertado = oCentroL.MtCrearCentro(codigo, nombre, regional, municipio, departamento, estado);
-                    SetMensaje(insertado ? "success" : "error",
-                               insertado ? "¡Centro registrado exitosamente!" : "Error al registrar el centro.");
-                    if (insertado) { LimpiarFormulario(); CargarCentros(); }
+                    bool insertado = oCentroL.MtCrearCentro(
+                        codigo, nombre, regional, municipio, departamento, estado
+                    );
+
+                    if (insertado)
+                    {
+                        SetMensaje("success", "¡Centro registrado correctamente!");
+                        LimpiarFormulario();
+                        CargarCentros();
+                    }
+                    else
+                    {
+                        SetMensaje("error", "No se pudo registrar el centro.");
+                    }
                 }
                 else
                 {
                     int idCentro = Convert.ToInt32(hfIdCentro.Value);
-                    bool actualizado = oCentroL.MtActualizarCentro(idCentro, codigo, nombre, regional, municipio, departamento, estado);
-                    SetMensaje(actualizado ? "success" : "error",
-                               actualizado ? "¡Centro modificado correctamente!" : "Error al modificar el centro.");
-                    if (actualizado) { LimpiarFormulario(); CargarCentros(); }
+
+                    bool actualizado = oCentroL.MtActualizarCentro(
+                        idCentro, codigo, nombre, regional, municipio, departamento, estado
+                    );
+
+                    if (actualizado)
+                    {
+                        SetMensaje("success", "¡Centro actualizado correctamente!");
+                        LimpiarFormulario();
+                        CargarCentros();
+                    }
+                    else
+                    {
+                        SetMensaje("error", "No se pudo actualizar el centro.");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                SetMensaje("warning", "Ocurrió un error: " + ex.Message);
+                SetMensaje("error", ex.Message);
             }
         }
 
         protected void gvCentros_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            if (e.CommandArgument == null || string.IsNullOrEmpty(e.CommandArgument.ToString())) return;
+            if (e.CommandArgument == null || string.IsNullOrEmpty(e.CommandArgument.ToString()))
+                return;
 
             if (e.CommandName == "Editar")
             {
-                int index = Convert.ToInt32(e.CommandArgument);
-                hfIdCentro.Value = gvCentros.DataKeys[index].Value.ToString();
-
-                DataTable dt = oCentroL.MtObtenerCentroPorId(Convert.ToInt32(hfIdCentro.Value));
-                if (dt.Rows.Count > 0)
+                try
                 {
-                    DataRow r = dt.Rows[0];
-                    txtCodigo.Text = r["codigoCentro"].ToString();
-                    txtNombre.Text = r["nombre"].ToString();
-                    txtRegional.Text = r["regional"].ToString();
-                    txtMunicipio.Text = r["municipio"].ToString();
-                    txtDepartamento.Text = r["departamento"].ToString();
+                    int index = Convert.ToInt32(e.CommandArgument);
+                    hfIdCentro.Value = gvCentros.DataKeys[index].Value.ToString();
 
-                    if (ddlEstado.Items.FindByValue(r["estado"].ToString()) != null)
-                        ddlEstado.SelectedValue = r["estado"].ToString();
+                    ClCentroM centro = oCentroL.MtObtenerCentroPorId(Convert.ToInt32(hfIdCentro.Value));
+
+                    if (centro != null)
+                    {
+                        txtCodigo.Text = centro.codigoCentro;
+                        txtNombre.Text = centro.nombre;
+                        txtRegional.Text = centro.regional;
+                        txtMunicipio.Text = centro.municipio;
+                        txtDepartamento.Text = centro.departamento;
+                        ddlEstado.SelectedValue = centro.estado;
+                    }
+
+                    lblTituloForm.Text = "Modificar Centro";
+                    btnGuardar.Text = "Actualizar Centro";
+                    btnCancelar.Visible = true;
                 }
-
-                lblTituloForm.Text = "Modificar Centro";
-                btnGuardar.Text = "Actualizar Centro";
-                btnCancelar.Visible = true;
+                catch (Exception ex)
+                {
+                    SetMensaje("error", "Error al cargar centro: " + ex.Message);
+                }
             }
+
             else if (e.CommandName == "Eliminar")
             {
                 try
                 {
                     int idCentro = Convert.ToInt32(e.CommandArgument);
+
                     bool eliminado = oCentroL.MtEliminarCentro(idCentro);
 
                     if (eliminado)
                     {
-                        SetMensaje("success", "¡Centro eliminado correctamente!");
+                        SetMensaje("success", "Centro eliminado correctamente.");
                         CargarCentros();
-                        if (hfIdCentro.Value == idCentro.ToString()) LimpiarFormulario();
+
+                        if (hfIdCentro.Value == idCentro.ToString())
+                            LimpiarFormulario();
                     }
                     else
                     {
-                        SetMensaje("error", "No se pudo eliminar. Puede tener programas o fichas asociadas.");
+                        SetMensaje("error", "No se pudo eliminar el centro.");
                     }
                 }
                 catch (Exception ex)
                 {
-                    SetMensaje("error", "Error al intentar eliminar: " + ex.Message);
+                    SetMensaje("error", ex.Message);
                 }
             }
         }
@@ -211,6 +231,7 @@ namespace sistemaPlanMejoramientos.Vista
             txtMunicipio.Text = "";
             txtDepartamento.Text = "";
             ddlEstado.SelectedIndex = 0;
+
             lblTituloForm.Text = "Registrar Centro";
             btnGuardar.Text = "Guardar Centro";
             btnCancelar.Visible = false;

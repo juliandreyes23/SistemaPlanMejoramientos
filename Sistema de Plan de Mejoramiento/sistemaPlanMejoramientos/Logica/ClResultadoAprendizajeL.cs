@@ -1,9 +1,10 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Datos;
+using sistemaPlanMejoramientos.Modelo;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Web;
-using sistemaPlanMejoramientos.Datos;
 
 namespace sistemaPlanMejoramientos.Logica
 {
@@ -20,16 +21,16 @@ namespace sistemaPlanMejoramientos.Logica
             return oResultadoD.MtCrearResultado(descripcion, idCompetencia);
         }
 
-        public DataTable MtListarResultadoAprendizaje()
+        public List<ClResultadoAprendizajeM> MtListarResultadoAprendizaje()
         {
             return oResultadoD.MtListarResultadoAprendizaje();
         }
 
-        public DataTable MtCargarPrograma()
+        public List<ClProgramasM> MtCargarPrograma()
         {
             return oResultadoD.MtCargarPrograma();
         }
-        
+
 
         public bool MtActualizarResultado(int idResultadoAprendizaje, string descripcion, int idCompetencia)
         {

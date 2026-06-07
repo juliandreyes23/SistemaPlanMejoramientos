@@ -1,8 +1,10 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Logica;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Web.UI;
-using sistemaPlanMejoramientos.Logica;
+using System.Linq;
 
 namespace sistemaPlanMejoramientos.Instructor
 {
@@ -31,19 +33,22 @@ namespace sistemaPlanMejoramientos.Instructor
         private void RenderFichas(string filtro)
         {
             int idInstructor = Convert.ToInt32(Session["idInstructor"]);
-            DataTable dtFichas = oFichaL.MtListarFichasPorInstructor(idInstructor);
 
-            if (!string.IsNullOrEmpty(filtro))
+            List<ClFichasM> fichas = oFichaL.MtListarFichasPorInstructor(idInstructor);
+
+            if (!string.IsNullOrWhiteSpace(filtro))
             {
                 string f = filtro.ToLower();
-                DataRow[] filas = dtFichas.Select(
-                    "codigoFicha LIKE '%" + f + "%' OR nombrePrograma LIKE '%" + f + "%'");
-                DataTable dtFiltrado = dtFichas.Clone();
-                foreach (DataRow r in filas) dtFiltrado.ImportRow(r);
-                dtFichas = dtFiltrado;
+
+                fichas = fichas
+                    .Where(x =>
+                        (x.codigoFicha != null && x.codigoFicha.ToLower().Contains(f)) ||
+                        (x.programa?.nombre != null && x.programa.nombre.ToLower().Contains(f))
+                    )
+                    .ToList();
             }
 
-            if (dtFichas.Rows.Count == 0)
+            if (fichas.Count == 0)
             {
                 pnlFichas.Visible = false;
                 pnlVacio.Visible = true;
@@ -56,63 +61,77 @@ namespace sistemaPlanMejoramientos.Instructor
 
             StringBuilder sb = new StringBuilder();
 
-            foreach (DataRow ficha in dtFichas.Rows)
+            foreach (var ficha in fichas)
             {
-                int idFicha = Convert.ToInt32(ficha["idFicha"]);
-                string codigo = ficha["codigoFicha"].ToString();
-                string programa = ficha["nombrePrograma"].ToString();
-                string jornada = ficha["jornada"].ToString();
-                string estado = ficha["estado"].ToString();
-                string inicio = Convert.ToDateTime(ficha["fechaInicio"]).ToString("dd/MM/yyyy");
-                string fin = Convert.ToDateTime(ficha["fechaFinalizacion"]).ToString("dd/MM/yyyy");
+                int idFicha = ficha.idFicha;
 
-                DataTable dtAprendices = oFichaL.MtListarAprendicesPorFicha(idFicha);
-                int totalAprendices = dtAprendices.Rows.Count;
+                string codigo = ficha.codigoFicha;
+                string programa = ficha.programa?.nombre ?? "";
+                string jornada = ficha.jornada;
+                string estado = ficha.estado;
+                string inicio = ficha.fechaInicio.ToString("dd/MM/yyyy");
+                string fin = ficha.fechaFinalizacion.ToString("dd/MM/yyyy");
+
+                var aprendices = oFichaL.MtListarAprendicesPorFicha(idFicha);
+                int total = aprendices.Count;
 
                 string pillEstado = estado == "En formacion" ? "pill-activa" : "pill-finalizada";
 
                 sb.Append("<div class='ficha-card'>");
+
                 sb.Append("<div class='ficha-header' onclick='toggleFicha(" + idFicha + ")'>");
+
                 sb.Append("<div class='ficha-left'>");
                 sb.Append("<div class='ficha-icon'><i class='bi bi-folder2-open'></i></div>");
                 sb.Append("<div>");
                 sb.Append("<div class='ficha-codigo'>Ficha " + codigo + "</div>");
-                sb.Append("<div class='ficha-programa'>" + programa + " &nbsp;|&nbsp; " + inicio + " – " + fin + "</div>");
-                sb.Append("</div></div>");
+                sb.Append("<div class='ficha-programa'>" + programa +
+                          " &nbsp;|&nbsp; " + inicio + " – " + fin + "</div>");
+                sb.Append("</div>");
+                sb.Append("</div>");
+
                 sb.Append("<div class='ficha-right'>");
                 sb.Append("<span class='pill pill-jornada'>" + jornada + "</span>");
                 sb.Append("<span class='pill " + pillEstado + "'>" + estado + "</span>");
-                sb.Append("<span class='pill pill-count'><i class='bi bi-people-fill'></i> " + totalAprendices + "</span>");
+                sb.Append("<span class='pill pill-count'><i class='bi bi-people-fill'></i> " + total + "</span>");
                 sb.Append("<i class='bi bi-chevron-down chevron' id='chev_" + idFicha + "'></i>");
                 sb.Append("</div>");
+
                 sb.Append("</div>");
 
                 sb.Append("<div class='aprendices-wrap' id='aprendices_" + idFicha + "'>");
 
-                if (totalAprendices == 0)
+                if (total == 0)
                 {
-                    sb.Append("<p style='color:#adb5bd;font-size:13px;padding:16px 0;'>No hay aprendices asignados a esta ficha.</p>");
+                    sb.Append("<p style='color:#adb5bd;font-size:13px;padding:16px 0;'>No hay aprendices asignados.</p>");
                 }
                 else
                 {
-                    foreach (DataRow ap in dtAprendices.Rows)
+                    foreach (var ap in aprendices)
                     {
-                        string nombres = ap["nombres"].ToString();
-                        string apellidos = ap["apellidos"].ToString();
-                        string doc = ap["tipoDocumento"] + " " + ap["numeroDocumento"];
-                        string estadoAp = ap["estadoAcademico"].ToString();
-                        string iniciales = (nombres.Length > 0 ? nombres[0].ToString() : "") +
-                                           (apellidos.Length > 0 ? apellidos[0].ToString() : "");
-                        string claseEstado = ObtenerClaseEstado(estadoAp);
+                        string nombres = ap.nombres;
+                        string apellidos = ap.apellidos;
+                        string doc = ap.tipoDocumento + " " + ap.numeroDocumento;
+
+                        string estadoAp = ap.estadoAcademico;
+                        string iniciales =
+                            (nombres?.Length > 0 ? nombres[0].ToString() : "") +
+                            (apellidos?.Length > 0 ? apellidos[0].ToString() : "");
+
+                        string clase = ObtenerClaseEstado(estadoAp);
 
                         sb.Append("<div class='aprendiz-row'>");
+
                         sb.Append("<div class='aprendiz-left'>");
                         sb.Append("<div class='aprendiz-avatar'>" + iniciales + "</div>");
                         sb.Append("<div>");
                         sb.Append("<div class='aprendiz-name'>" + apellidos + ", " + nombres + "</div>");
                         sb.Append("<div class='aprendiz-doc'>" + doc + "</div>");
-                        sb.Append("</div></div>");
-                        sb.Append("<span class='estado " + claseEstado + "'>" + estadoAp + "</span>");
+                        sb.Append("</div>");
+                        sb.Append("</div>");
+
+                        sb.Append("<span class='estado " + clase + "'>" + estadoAp + "</span>");
+
                         sb.Append("</div>");
                     }
                 }

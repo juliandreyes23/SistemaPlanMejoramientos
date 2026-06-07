@@ -4,6 +4,8 @@ using System.Data;
 using System.Linq;
 using System.Web;
 using sistemaPlanMejoramientos.Datos;
+using sistemaPlanMejoramientos.Modelo;
+
 
 namespace sistemaPlanMejoramientos.Logica
 {
@@ -22,12 +24,12 @@ namespace sistemaPlanMejoramientos.Logica
             return oAprendizD.MtCrearAprendiz(tipoDocumento, numeroDocumento, nombres, apellidos, correo, telefono, estadoAcademico, idUsuario, idFicha, idCentro);
         }
 
-        public DataTable MtListarAprendices()
+        public List<ClAprendizM> MtListarAprendices()
         {
             return oAprendizD.MtListarAprendices();
         }
 
-        public DataTable MtListarAprendices(string filtro)
+        public List<ClAprendizM> MtListarAprendices(string filtro)
         {
             return oAprendizD.MtListarAprendices(filtro);
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Modelo;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -16,7 +17,7 @@ namespace sistemaPlanMejoramientos.Datos
             SqlConnection cn = oConex.MtAbrirConexion();
 
             string query = @"INSERT INTO aprendices (tipoDocumento, numeroDocumento, nombres, apellidos, correo, telefono, estadoAcademico, idUsuario, idFicha, idCentro)
-                    VALUES (@tipoDocumento, @numeroDocumento, @nombres, @apellidos, @correo, @telefono, @estadoAcademico, @idUsuario, @idFicha, @idCentro)";
+                VALUES (@tipoDocumento, @numeroDocumento, @nombres, @apellidos, @correo, @telefono, @estadoAcademico, @idUsuario, @idFicha, @idCentro)";
 
             SqlCommand cmd = new SqlCommand(query, cn);
             cmd.Parameters.AddWithValue("@tipoDocumento", tipoDocumento);
@@ -35,61 +36,102 @@ namespace sistemaPlanMejoramientos.Datos
             return filas > 0;
         }
 
-        public DataTable MtListarAprendices()
+        public List<ClAprendizM> MtListarAprendices()
         {
             return MtListarAprendices("");
         }
 
-        public DataTable MtListarAprendices(string filtro)
+        public List<ClAprendizM> MtListarAprendices(string filtro)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
-            string query = @"SELECT a.idAprendiz, a.tipoDocumento, a.numeroDocumento, a.nombres, a.apellidos, 
-                                    a.correo, a.telefono, a.estadoAcademico,
-                                    ISNULL(CAST(f.codigoFicha AS NVARCHAR), 'Sin ficha') AS codigoFicha,
-                                    ISNULL(u.correo, 'Sin usuario') AS CorreoUsuario,
-                                    a.idFicha, a.idUsuario
-                             FROM aprendices a
-                             LEFT JOIN fichas f ON a.idFicha = f.idFicha
-                             LEFT JOIN usuarios u ON a.idUsuario = u.idUsuario
-                             WHERE (@filtro = '' OR
-                                    CAST(a.idAprendiz AS NVARCHAR) LIKE '%' + @filtro + '%' OR
-                                    a.tipoDocumento       LIKE '%' + @filtro + '%' OR
-                                    a.numeroDocumento     LIKE '%' + @filtro + '%' OR
-                                    a.nombres             LIKE '%' + @filtro + '%' OR
-                                    a.apellidos           LIKE '%' + @filtro + '%' OR
-                                    a.correo              LIKE '%' + @filtro + '%' OR
-                                    a.telefono            LIKE '%' + @filtro + '%' OR
-                                    a.estadoAcademico     LIKE '%' + @filtro + '%' OR
-                                    CAST(f.codigoFicha AS NVARCHAR) LIKE '%' + @filtro + '%')";
+            string query = @"SELECT a.idAprendiz,
+                                a.tipoDocumento,
+                                a.numeroDocumento,
+                                a.nombres,
+                                a.apellidos,
+                                a.correo,
+                                a.telefono,
+                                a.estadoAcademico,
+                                a.idFicha,
+                                a.idUsuario,
+                                f.codigoFicha,
+                                u.correo AS correoUsuario
+                         FROM aprendices a
+                         LEFT JOIN fichas f ON a.idFicha = f.idFicha
+                         LEFT JOIN usuarios u ON a.idUsuario = u.idUsuario
+                         WHERE (@filtro = '' OR
+                                CAST(a.idAprendiz AS NVARCHAR) LIKE '%' + @filtro + '%' OR
+                                a.tipoDocumento LIKE '%' + @filtro + '%' OR
+                                a.numeroDocumento LIKE '%' + @filtro + '%' OR
+                                a.nombres LIKE '%' + @filtro + '%' OR
+                                a.apellidos LIKE '%' + @filtro + '%' OR
+                                a.correo LIKE '%' + @filtro + '%' OR
+                                a.telefono LIKE '%' + @filtro + '%' OR
+                                a.estadoAcademico LIKE '%' + @filtro + '%' OR
+                                CAST(f.codigoFicha AS NVARCHAR) LIKE '%' + @filtro + '%')";
 
             SqlCommand cmd = new SqlCommand(query, cn);
             cmd.Parameters.AddWithValue("@filtro", filtro.Trim());
 
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+            SqlDataReader rd = cmd.ExecuteReader();
 
+            List<ClAprendizM> lista = new List<ClAprendizM>();
+
+            while (rd.Read())
+            {
+                ClAprendizM aprendiz = new ClAprendizM();
+
+                aprendiz.idAprendiz = Convert.ToInt32(rd["idAprendiz"]);
+                aprendiz.tipoDocumento = rd["tipoDocumento"].ToString();
+                aprendiz.numeroDocumento = rd["numeroDocumento"].ToString();
+                aprendiz.nombres = rd["nombres"].ToString();
+                aprendiz.apellidos = rd["apellidos"].ToString();
+                aprendiz.correo = rd["correo"].ToString();
+                aprendiz.telefono = rd["telefono"].ToString();
+                aprendiz.estadoAcademico = rd["estadoAcademico"].ToString();
+
+                if (rd["idFicha"] != DBNull.Value)
+                    aprendiz.idFicha = Convert.ToInt32(rd["idFicha"]);
+
+                if (rd["idUsuario"] != DBNull.Value)
+                    aprendiz.idUsuario = Convert.ToInt32(rd["idUsuario"]);
+
+                aprendiz.codigoFicha = rd["codigoFicha"].ToString();
+                aprendiz.CorreoUsuario = rd["correoUsuario"].ToString();
+
+                aprendiz.ficha = new ClFichasM { codigoFicha = aprendiz.codigoFicha };
+                aprendiz.usuario = new ClUsuarioM { correo = aprendiz.CorreoUsuario };
+
+                lista.Add(aprendiz);
+            }
+
+            rd.Close();
             oConex.MtCerrarConexion();
-            return dt;
+
+            return lista;
         }
 
-        public bool MtActualizarAprendiz(int idAprendiz, string tipoDocumento, string numeroDocumento, string nombres, string apellidos, string correo, string telefono, string estadoAcademico, int idFicha)
+        public bool MtActualizarAprendiz(int idAprendiz, string tipoDocumento,
+    string numeroDocumento, string nombres, string apellidos,
+    string correo, string telefono, string estadoAcademico, int idFicha)
         {
+
             SqlConnection cn = oConex.MtAbrirConexion();
 
-            string query = @"UPDATE aprendices 
-                     SET tipoDocumento = @tipoDocumento,
-                         numeroDocumento = @numeroDocumento,
-                         nombres = @nombres, 
-                         apellidos = @apellidos, 
-                         correo = @correo,
-                         telefono = @telefono, 
-                         estadoAcademico = @estadoAcademico, 
-                         idFicha = @idFicha
-                     WHERE idAprendiz = @idAprendiz";
+            string query = @"UPDATE aprendices
+                         SET tipoDocumento = @tipoDocumento,
+                             numeroDocumento = @numeroDocumento,
+                             nombres = @nombres,
+                             apellidos = @apellidos,
+                             correo = @correo,
+                             telefono = @telefono,
+                             estadoAcademico = @estadoAcademico,
+                             idFicha = @idFicha
+                         WHERE idAprendiz = @idAprendiz";
 
             SqlCommand cmd = new SqlCommand(query, cn);
+
             cmd.Parameters.AddWithValue("@idAprendiz", idAprendiz);
             cmd.Parameters.AddWithValue("@tipoDocumento", tipoDocumento);
             cmd.Parameters.AddWithValue("@numeroDocumento", numeroDocumento);
@@ -105,24 +147,68 @@ namespace sistemaPlanMejoramientos.Datos
             oConex.MtCerrarConexion();
 
             return filas > 0;
+
         }
 
         public bool MtEliminarAprendiz(int idAprendiz)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
+            SqlTransaction transaction = cn.BeginTransaction();
 
-            string queryIntermedia = "DELETE FROM fichaAprendiz WHERE idAprendiz = @idAprendiz";
-            SqlCommand cmdIntermedia = new SqlCommand(queryIntermedia, cn);
-            cmdIntermedia.Parameters.AddWithValue("@idAprendiz", idAprendiz);
-            cmdIntermedia.ExecuteNonQuery();
+            try
+            {
+                SqlCommand cmd = new SqlCommand("", cn, transaction);
+                cmd.Parameters.AddWithValue("@idAprendiz", idAprendiz);
 
-            string query = "DELETE FROM aprendices WHERE idAprendiz = @idAprendiz";
-            SqlCommand cmd = new SqlCommand(query, cn);
-            cmd.Parameters.AddWithValue("@idAprendiz", idAprendiz);
-            int filas = cmd.ExecuteNonQuery();
+                cmd.CommandText = @"DELETE FROM planResultados
+                            WHERE idPlanMejoramiento IN (
+                                SELECT idPlanMejoramiento FROM planesMejoramiento
+                                WHERE idAprendiz = @idAprendiz
+                            )";
+                cmd.ExecuteNonQuery();
 
-            oConex.MtCerrarConexion();
-            return filas > 0;
+                cmd.CommandText = @"DELETE FROM evaluaciones
+                            WHERE idPlanMejoramiento IN (
+                                SELECT idPlanMejoramiento FROM planesMejoramiento
+                                WHERE idAprendiz = @idAprendiz
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM evidencias
+                            WHERE idPlanMejoramiento IN (
+                                SELECT idPlanMejoramiento FROM planesMejoramiento
+                                WHERE idAprendiz = @idAprendiz
+                            )";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM planesMejoramiento
+                            WHERE idAprendiz = @idAprendiz";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM fichaAprendiz
+                            WHERE idAprendiz = @idAprendiz";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"UPDATE aprendices SET idUsuario = NULL
+                            WHERE idAprendiz = @idAprendiz";
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"DELETE FROM aprendices
+                            WHERE idAprendiz = @idAprendiz";
+                int filas = cmd.ExecuteNonQuery();
+
+                transaction.Commit();
+                return filas > 0;
+            }
+            catch
+            {
+                transaction.Rollback();
+                return false;
+            }
+            finally
+            {
+                oConex.MtCerrarConexion();
+            }
         }
 
         public bool MtRegistrarFichaIntermedia(int idFicha, int idAprendiz)
@@ -160,13 +246,12 @@ namespace sistemaPlanMejoramientos.Datos
             bulkCopy.ColumnMappings.Add("idFicha", "idFicha");
             bulkCopy.ColumnMappings.Add("idCentro", "idCentro");
 
-
             try
             {
                 bulkCopy.WriteToServer(dtAprendicesExcel);
                 resultado = true;
             }
-            catch (Exception)
+            catch
             {
                 resultado = false;
             }
@@ -190,7 +275,6 @@ namespace sistemaPlanMejoramientos.Datos
             return resultado != null ? Convert.ToInt32(resultado) : 0;
         }
 
-
         public bool MtExisteUsuarioPorCorreo(string correo)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
@@ -207,9 +291,9 @@ namespace sistemaPlanMejoramientos.Datos
             SqlConnection cn = oConex.MtAbrirConexion();
 
             string query = @"INSERT INTO usuarios (correo, contrasena, idRol)
-                             VALUES (@correo, @contrasena,
-                                 (SELECT TOP 1 idRol FROM roles WHERE nombreRol = 'Aprendiz'))
-                             SELECT SCOPE_IDENTITY()";
+                         VALUES (@correo, @contrasena,
+                             (SELECT TOP 1 idRol FROM roles WHERE nombreRol = 'Aprendiz'))
+                         SELECT SCOPE_IDENTITY()";
 
             SqlCommand cmd = new SqlCommand(query, cn);
             cmd.Parameters.AddWithValue("@correo", correo);
@@ -219,6 +303,7 @@ namespace sistemaPlanMejoramientos.Datos
             oConex.MtCerrarConexion();
             return resultado != null ? Convert.ToInt32(resultado) : 0;
         }
+
         public int MtObtenerIdUsuarioPorAprendiz(int idAprendiz)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
@@ -229,13 +314,14 @@ namespace sistemaPlanMejoramientos.Datos
             oConex.MtCerrarConexion();
             return resultado != null && resultado != DBNull.Value ? Convert.ToInt32(resultado) : 0;
         }
+
         public int MtCrearAprendizConRetorno(string tipoDocumento, string numeroDocumento, string nombres, string apellidos, string correo, string telefono, string estadoAcademico, int idUsuario, int idFicha, int idCentro)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
 
             string query = @"INSERT INTO aprendices (tipoDocumento, numeroDocumento, nombres, apellidos, correo, telefono, estadoAcademico, idUsuario, idFicha, idCentro)
-                    VALUES (@tipoDocumento, @numeroDocumento, @nombres, @apellidos, @correo, @telefono, @estadoAcademico, @idUsuario, @idFicha, @idCentro)
-                    SELECT SCOPE_IDENTITY()";
+                VALUES (@tipoDocumento, @numeroDocumento, @nombres, @apellidos, @correo, @telefono, @estadoAcademico, @idUsuario, @idFicha, @idCentro)
+                SELECT SCOPE_IDENTITY()";
 
             SqlCommand cmd = new SqlCommand(query, cn);
             cmd.Parameters.AddWithValue("@tipoDocumento", tipoDocumento);
@@ -253,6 +339,7 @@ namespace sistemaPlanMejoramientos.Datos
             oConex.MtCerrarConexion();
             return res != null ? Convert.ToInt32(res) : 0;
         }
+
         public bool MtExisteAprendiz(string numeroDocumento)
         {
             SqlConnection cn = oConex.MtAbrirConexion();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using sistemaPlanMejoramientos.Modelo;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -25,7 +26,7 @@ namespace sistemaPlanMejoramientos.Datos
             return filas > 0;
         }
 
-        public int CrearUsuarioInstructor(string correo, string documento)
+        public int MtCrearUsuarioInstructor(string correo, string documento)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
             string query = @"INSERT INTO usuarios (correo, password, idRol) 
@@ -39,28 +40,49 @@ namespace sistemaPlanMejoramientos.Datos
             return resultado != null ? Convert.ToInt32(resultado) : 0;
         }
 
-        public DataTable MtListarUsuarios()
+        public List<ClUsuarioM> MtListarUsuarios()
         {
             return MtListarUsuarios("");
         }
 
-        public DataTable MtListarUsuarios(string filtro)
+        public List<ClUsuarioM> MtListarUsuarios(string filtro)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
-            string query = @"SELECT u.idUsuario, u.correo, r.nombreRol
-                             FROM usuarios u 
-                             INNER JOIN roles r ON u.idRol = r.idRol
-                             WHERE (@filtro = '' OR
-                                    CAST(u.idUsuario AS NVARCHAR) LIKE '%' + @filtro + '%' OR
-                                    u.correo                      LIKE '%' + @filtro + '%' OR
-                                    r.nombreRol                   LIKE '%' + @filtro + '%')";
+
+            string query = @"SELECT u.idUsuario, u.correo, u.idRol, r.nombreRol
+                     FROM usuarios u
+                     INNER JOIN roles r ON u.idRol = r.idRol
+                     WHERE (@filtro = '' OR
+                            CAST(u.idUsuario AS NVARCHAR) LIKE '%' + @filtro + '%' OR
+                            u.correo LIKE '%' + @filtro + '%' OR
+                            r.nombreRol LIKE '%' + @filtro + '%')";
+
             SqlCommand cmd = new SqlCommand(query, cn);
             cmd.Parameters.AddWithValue("@filtro", filtro.Trim());
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            List<ClUsuarioM> lista = new List<ClUsuarioM>();
+
+            while (dr.Read())
+            {
+                lista.Add(new ClUsuarioM
+                {
+                    idUsuario = Convert.ToInt32(dr["idUsuario"]),
+                    correo = dr["correo"].ToString(),
+                    idRol = Convert.ToInt32(dr["idRol"]),
+                    rol = new ClRolM
+                    {
+                        idRol = Convert.ToInt32(dr["idRol"]),
+                        nombreRol = dr["nombreRol"].ToString()
+                    }
+                });
+            }
+
+            dr.Close();
             oConex.MtCerrarConexion();
-            return dt;
+
+            return lista;
         }
 
         public bool MtActualizarUsuario(int idUsuario, string correo, string password, int idRol)
@@ -141,37 +163,81 @@ namespace sistemaPlanMejoramientos.Datos
             }
         }
 
-        public DataTable MtLogin(string correo, string password)
+        public ClUsuarioM MtLogin(string correo, string password)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
-            string query = @"SELECT u.idUsuario, u.correo, r.nombreRol 
-                             FROM usuarios u 
-                             INNER JOIN roles r ON u.idRol = r.idRol
-                             WHERE u.correo = @correo AND u.password = @password";
+
+            string query = @"SELECT u.idUsuario, u.correo, u.idRol, r.nombreRol
+                     FROM usuarios u
+                     INNER JOIN roles r ON u.idRol = r.idRol
+                     WHERE u.correo = @correo
+                     AND u.password = @password";
+
             SqlCommand cmd = new SqlCommand(query, cn);
+
             cmd.Parameters.AddWithValue("@correo", correo);
             cmd.Parameters.AddWithValue("@password", MtEncriptarCadena(password.Trim()));
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            ClUsuarioM usuario = null;
+
+            if (dr.Read())
+            {
+                usuario = new ClUsuarioM
+                {
+                    idUsuario = Convert.ToInt32(dr["idUsuario"]),
+                    correo = dr["correo"].ToString(),
+                    idRol = Convert.ToInt32(dr["idRol"]),
+                    rol = new ClRolM
+                    {
+                        idRol = Convert.ToInt32(dr["idRol"]),
+                        nombreRol = dr["nombreRol"].ToString()
+                    }
+                };
+            }
+
+            dr.Close();
             oConex.MtCerrarConexion();
-            return dt;
+
+            return usuario;
         }
 
-        public DataTable MtBuscarUsuarioPorId(int idUsuario)
+        public ClUsuarioM MtBuscarUsuarioPorId(int idUsuario)
         {
             SqlConnection cn = oConex.MtAbrirConexion();
-            string query = @"SELECT u.idUsuario, u.correo, u.idRol, r.nombreRol 
-                             FROM usuarios u 
-                             INNER JOIN roles r ON u.idRol = r.idRol 
-                             WHERE u.idUsuario = @idUsuario";
+
+            string query = @"SELECT u.idUsuario, u.correo, u.idRol, r.nombreRol
+                     FROM usuarios u
+                     INNER JOIN roles r ON u.idRol = r.idRol
+                     WHERE u.idUsuario = @idUsuario";
+
             SqlCommand cmd = new SqlCommand(query, cn);
             cmd.Parameters.AddWithValue("@idUsuario", idUsuario);
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            ClUsuarioM usuario = null;
+
+            if (dr.Read())
+            {
+                usuario = new ClUsuarioM
+                {
+                    idUsuario = Convert.ToInt32(dr["idUsuario"]),
+                    correo = dr["correo"].ToString(),
+                    idRol = Convert.ToInt32(dr["idRol"]),
+                    rol = new ClRolM
+                    {
+                        idRol = Convert.ToInt32(dr["idRol"]),
+                        nombreRol = dr["nombreRol"].ToString()
+                    }
+                };
+            }
+
+            dr.Close();
             oConex.MtCerrarConexion();
-            return dt;
+
+            return usuario;
         }
 
         public string MtEncriptarCadena(string textoClave)

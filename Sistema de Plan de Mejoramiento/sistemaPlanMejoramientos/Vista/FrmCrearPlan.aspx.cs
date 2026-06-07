@@ -33,13 +33,22 @@ namespace sistemaPlanMejoramientos.Instructor
         private void CargarAprendices()
         {
             int idInstructor = Convert.ToInt32(Session["idInstructor"]);
-            DataTable dt = oPlanL.MtListarAprendicesPorInstructor(idInstructor);
+
+            var lista = oPlanL.MtListarAprendicesPorInstructor(idInstructor);
+
             ddlAprendiz.Items.Clear();
             ddlAprendiz.Items.Add(new ListItem("-- Seleccione un aprendiz --", ""));
-            foreach (DataRow r in dt.Rows)
+
+            foreach (var r in lista)
             {
-                string texto = r["nombreCompleto"] + " | Ficha: " + r["codigoFicha"] + " | Doc: " + r["numeroDocumento"];
-                string valor = r["idAprendiz"] + "|" + r["idFicha"];
+                string nombreCompleto = r.nombres + " " + r.apellidos;
+
+                string texto = nombreCompleto +
+                               " | Ficha: " + r.codigoFicha +
+                               " | Doc: " + r.numeroDocumento;
+
+                string valor = r.idAprendiz + "|" + r.idFicha;
+
                 ddlAprendiz.Items.Add(new ListItem(texto, valor));
             }
         }
@@ -71,10 +80,11 @@ namespace sistemaPlanMejoramientos.Instructor
 
         private void CargarResultados(int idFicha)
         {
-            DataTable dt = oPlanL.MtListarResultadosPorFicha(idFicha);
+            var lista = oPlanL.MtListarResultadosPorFicha(idFicha);
+
             StringBuilder sb = new StringBuilder();
 
-            if (dt.Rows.Count == 0)
+            if (lista.Count == 0)
             {
                 sb.Append("<div class='empty-resultados'>No hay resultados de aprendizaje registrados para esta ficha.</div>");
                 pnlResultados.Controls.Add(new LiteralControl(sb.ToString()));
@@ -82,20 +92,25 @@ namespace sistemaPlanMejoramientos.Instructor
             }
 
             sb.Append("<div class='resultados-wrap'>");
+
             string competenciaActual = "";
-            foreach (DataRow r in dt.Rows)
+
+            foreach (var r in lista)
             {
-                string comp = r["nombreCompetencia"].ToString();
+                string comp = r.nombreCompetencia;
+
                 if (comp != competenciaActual)
                 {
                     competenciaActual = comp;
                     sb.Append("<div class='resultado-comp' style='padding:6px 10px 2px;'>" + comp + "</div>");
                 }
+
                 sb.Append("<div class='resultado-item'>");
-                sb.Append("<input type='checkbox' name='chkResultados' value='" + r["idResultadoAprendizaje"] + "' id='chk_" + r["idResultadoAprendizaje"] + "' />");
-                sb.Append("<label class='resultado-label' for='chk_" + r["idResultadoAprendizaje"] + "'>" + r["descripcion"] + "</label>");
+                sb.Append("<input type='checkbox' name='chkResultados' value='" + r.idResultadoAprendizaje + "' id='chk_" + r.idResultadoAprendizaje + "' />");
+                sb.Append("<label class='resultado-label' for='chk_" + r.idResultadoAprendizaje + "'>" + r.descripcion + "</label>");
                 sb.Append("</div>");
             }
+
             sb.Append("</div>");
             pnlResultados.Controls.Add(new LiteralControl(sb.ToString()));
         }

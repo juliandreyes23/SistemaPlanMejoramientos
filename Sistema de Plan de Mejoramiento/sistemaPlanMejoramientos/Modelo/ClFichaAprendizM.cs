@@ -7,9 +7,12 @@ namespace sistemaPlanMejoramientos.Modelo
 {
     public class ClFichaAprendizM
     {
-        public int idFichaAprendiz {  get; set; }
         public int idFicha { get; set; }
+
         public int idAprendiz { get; set; }
 
+        public ClFichasM ficha { get; set; }
+
+        public ClAprendizM aprendiz { get; set; }
     }
 }
