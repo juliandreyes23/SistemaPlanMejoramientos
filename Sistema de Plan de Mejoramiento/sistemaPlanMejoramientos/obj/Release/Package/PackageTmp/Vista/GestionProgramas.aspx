@@ -16,19 +16,16 @@
             border-color: rgba(255, 255, 255, 0.15);
             color: #ffffff;
         }
-
         .pagination .page-item.active .page-link {
             background-color: #39b54a;
             border-color: #39b54a;
             color: #ffffff;
         }
-
         .pagination .page-link:hover {
             background-color: rgba(57, 181, 74, 0.2);
             border-color: #39b54a;
             color: #39b54a;
         }
-
         .pagination .page-item.disabled .page-link {
             background-color: rgba(31, 41, 55, 0.4);
             border-color: rgba(255, 255, 255, 0.08);
@@ -112,26 +109,28 @@
                     <div class="card card-custom p-4">
                         <h4 class="mb-3 text-light">Programas Registrados</h4>
 
-                        <div class="row mb-4">
-                            <div class="col-md-9 col-lg-8">
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text bg-dark border-secondary text-secondary">
-                                        <i class="bi bi-search"></i>
-                                    </span>
-                                    <asp:TextBox ID="txtBuscar" runat="server"
-                                        CssClass="form-control bg-dark border-secondary text-white"
-                                        placeholder="Buscar por código, nombre, nivel, estado...">
-                                    </asp:TextBox>
-                                    <asp:LinkButton ID="btnBuscar" runat="server" CssClass="btn btn-sena" OnClick="btnBuscar_Click">
-                                        Buscar
-                                    </asp:LinkButton>
-                                    <asp:LinkButton ID="btnLimpiarBuscar" runat="server" CssClass="btn btn-outline-secondary"
-                                        OnClick="btnLimpiarBuscar_Click" ToolTip="Limpiar Filtro">
-                                        <i class="bi bi-arrow-clockwise"></i>
-                                    </asp:LinkButton>
+                        <asp:Panel ID="pnlBusqueda" runat="server" DefaultButton="btnBuscar">
+                            <div class="row mb-4">
+                                <div class="col-md-9 col-lg-8">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-dark border-secondary text-secondary">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+                                        <asp:TextBox ID="txtBuscar" runat="server"
+                                            CssClass="form-control bg-dark border-secondary text-white"
+                                            placeholder="Buscar por código, nombre, nivel, estado...">
+                                        </asp:TextBox>
+                                        <asp:LinkButton ID="btnBuscar" runat="server" CssClass="btn btn-sena" OnClick="btnBuscar_Click">
+                                            Buscar
+                                        </asp:LinkButton>
+                                        <asp:LinkButton ID="btnLimpiarBuscar" runat="server" CssClass="btn btn-outline-secondary"
+                                            OnClick="btnLimpiarBuscar_Click" ToolTip="Limpiar Filtro">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </asp:LinkButton>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </asp:Panel>
 
                         <div class="table-responsive">
                             <asp:GridView ID="gvProgramas" runat="server" AutoGenerateColumns="False"
@@ -149,7 +148,11 @@
                                     <asp:BoundField DataField="nombre" HeaderText="Programa" />
                                     <asp:BoundField DataField="version" HeaderText="Ver." ItemStyle-Width="45px" ItemStyle-HorizontalAlign="Center" />
                                     <asp:BoundField DataField="nivel" HeaderText="Nivel" ItemStyle-Width="110px" />
-                                    <asp:BoundField DataField="nombreCentro" HeaderText="Centro" ItemStyle-Width="140px" />
+                                    <asp:TemplateField HeaderText="Centro" ItemStyle-Width="140px">
+                                        <ItemTemplate>
+                                            <%# Eval("centro.nombre") %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
                                     <asp:BoundField DataField="duracion" HeaderText="Duracion" ItemStyle-Width="140px" />
                                     <asp:BoundField DataField="estado" HeaderText="Estado" ItemStyle-Width="75px" ItemStyle-HorizontalAlign="Center" />
                                     <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="90px" ItemStyle-HorizontalAlign="Center">
@@ -198,7 +201,7 @@
                                 <FooterTemplate>
                                     <li class='page-item <%# Convert.ToInt32(ViewState["PaginaActual"]) >= Convert.ToInt32(ViewState["TotalPaginas"]) - 1 ? "disabled" : "" %>'>
                                         <asp:LinkButton runat="server" CssClass="page-link" CommandName="Pagina" CommandArgument="siguiente">
-                                                <i class="bi bi-chevron-right"></i>
+                                            <i class="bi bi-chevron-right"></i>
                                         </asp:LinkButton>
                                     </li>
                                     </ul>

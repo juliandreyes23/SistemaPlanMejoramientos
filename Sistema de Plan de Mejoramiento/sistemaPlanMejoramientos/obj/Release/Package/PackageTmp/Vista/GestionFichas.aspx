@@ -142,7 +142,6 @@
                             <asp:GridView ID="gvFichas" runat="server" AutoGenerateColumns="False"
                                 CssClass="table table-custom align-middle"
                                 OnRowCommand="gvFichas_RowCommand"
-                                OnPageIndexChanging="gvFichas_PageIndexChanging"
                                 DataKeyNames="idFicha"
                                 AllowPaging="True"
                                 PageSize="10"
@@ -150,7 +149,11 @@
                                 <Columns>
                                     <asp:BoundField DataField="idFicha" HeaderText="ID" ItemStyle-Width="50px" ItemStyle-HorizontalAlign="Center" />
                                     <asp:BoundField DataField="codigoFicha" HeaderText="Ficha" ItemStyle-Width="100px" ItemStyle-Font-Bold="true" />
-                                    <asp:BoundField DataField="nombrePrograma" HeaderText="Programa Asociado" />
+                                    <asp:TemplateField HeaderText="Programa Asociado">
+                                        <ItemTemplate>
+                                            <%# Eval("programa.nombre") %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
                                     <asp:BoundField DataField="jornada" HeaderText="Jornada" ItemStyle-Width="100px" />
                                     <asp:BoundField DataField="fechaInicio" HeaderText="F. Inicio" DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="100px" />
                                     <asp:BoundField DataField="fechaFinalizacion" HeaderText="F. Fin" DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="100px" />
